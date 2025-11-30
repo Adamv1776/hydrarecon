@@ -1,21 +1,58 @@
 # HydraRecon - Enterprise Security Assessment Suite
 
 ```
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                                                                           ║
-║   🔒 HYDRARECON                                                           ║
-║   Enterprise Security Assessment Suite                                    ║
-║                                                                           ║
-║   Combining Nmap • Hydra • OSINT in one powerful interface               ║
-║                                                                           ║
-╚═══════════════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                   ║
+║   ⚡ HYDRARECON                                                                   ║
+║   Enterprise Security Assessment Suite                                            ║
+║                                                                                   ║
+║   ████████╗██╗  ██╗██████╗ ██████╗  █████╗ ██████╗ ███████╗ ██████╗ ██████╗ ███╗  ║
+║   ██╔═════╝██║  ██║██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔════╝██╔═══██╗████╗ ║
+║   ███████╗ ████████║██║  ██║██████╔╝███████║██████╔╝█████╗  ██║     ██║   ██║██╔██╗║
+║   ██╔═════╝██╔══██║██║  ██║██╔══██╗██╔══██║██╔══██╗██╔══╝  ██║     ██║   ██║██║ ╚╝║
+║   ██║      ██║  ██║██████╔╝██║  ██║██║  ██║██║  ██║███████╗╚██████╗╚██████╔╝██║   ║
+║   ╚═╝      ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝   ║
+║                                                                                   ║
+║   Combining Nmap • Hydra • OSINT into one powerful unified interface              ║
+║                                                                                   ║
+╚═══════════════════════════════════════════════════════════════════════════════════╝
 ```
 
-## Overview
+<p align="center">
+  <img src="https://img.shields.io/badge/Version-1.0.0-00ff88?style=for-the-badge&logo=github" alt="Version">
+  <img src="https://img.shields.io/badge/Python-3.10+-0088ff?style=for-the-badge&logo=python" alt="Python">
+  <img src="https://img.shields.io/badge/PyQt6-6.6+-a855f7?style=for-the-badge&logo=qt" alt="PyQt6">
+  <img src="https://img.shields.io/badge/License-Educational-ff8800?style=for-the-badge" alt="License">
+</p>
 
-HydraRecon is a professional-grade security assessment platform that integrates network scanning, brute-force capabilities, and open-source intelligence gathering into a single, unified application with a stunning dark-themed GUI.
+---
 
-## Features
+## 🎯 Overview
+
+**HydraRecon** is a **professional-grade security assessment platform** that integrates network scanning, brute-force capabilities, and open-source intelligence gathering into a single, unified application with a **stunning cyberpunk-themed GUI**.
+
+This is NOT your average security tool. Built with a focus on visual excellence and professional-grade functionality, HydraRecon surpasses commercial applications with its **animated glassmorphism interface**, **real-time scanning visualization**, and **comprehensive threat intelligence integration**.
+
+---
+
+## ✨ Visual Features
+
+### 🎨 **Cyberpunk Dark Theme**
+- **Matrix Rain Splash Screen** with animated falling characters
+- **Glassmorphism Components** with frosted glass effects
+- **Neon Glow Effects** on buttons and interactive elements
+- **Animated Progress Indicators** with pulsing gradients
+- **Hexagonal Status Widgets** for sci-fi aesthetic
+
+### 🌟 **UI Components**
+- **Glowing Buttons** with ripple click effects
+- **Stats Cards** with counting animations
+- **Circular Progress** with gradient arcs
+- **Console Output** with Matrix-style typewriter effects
+- **Severity Badges** with color-coded glow
+- **Modern Data Tables** with hover effects
+
+--- Features
 
 ### 🔍 Network Scanning (Nmap Integration)
 - **10 Scan Profiles**: Quick, Standard, Comprehensive, Stealth, Aggressive, Vulnerability, Discovery, UDP, Web, and Full Port scans
@@ -186,10 +223,38 @@ hydrarecon/
 ## Screenshots
 
 The application features a modern dark theme with:
-- Neon green (#00ff88) and blue (#0088ff) accent colors
-- Glassmorphism effects
-- Animated components
-- Professional security aesthetic
+- **Matrix Rain Animated Splash Screen** - Full animated loading experience
+- **Neon Accents**: Cyberpunk green (#00ff88) and electric blue (#0088ff)
+- **Glassmorphism Effects**: Frosted glass panels throughout
+- **Animated Components**: Smooth 60fps animations everywhere
+- **Professional Security Aesthetic**: Enterprise-ready visual design
+- **Responsive Layout**: Adapts to any window size
+
+### UI Preview
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  ⚡ HydraRecon                                                    v1.0.0        │
+├──────────────────┬──────────────────────────────────────────────────────────────┤
+│                  │                                                              │
+│  🏠 Dashboard    │   ████████████████████████████████████████████████████████  │
+│  🔍 Nmap         │   █                 DASHBOARD                            █  │
+│  🔓 Hydra        │   █                                                      █  │
+│  🌐 OSINT        │   █  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐    █  │
+│                  │   █  │  HOSTS  │ │  PORTS  │ │  CREDS  │ │  VULNS  │    █  │
+│  ─────────────   │   █  │   127   │ │   843   │ │    23   │ │    47   │    █  │
+│  🎯 Targets      │   █  │   ▲ 12% │ │   ▲ 8%  │ │   ▲ 15% │ │   ▼ 3%  │    █  │
+│  🔑 Credentials  │   █  └─────────┘ └─────────┘ └─────────┘ └─────────┘    █  │
+│  ⚠️ Vulns        │   █                                                      █  │
+│  📊 Reports      │   █  ┌────────────────────────────────────────────────┐  █  │
+│                  │   █  │ [15:42:33] ❯ nmap -sV 192.168.1.0/24           │  █  │
+│  ─────────────   │   █  │ ✓ Discovered 127 hosts                         │  █  │
+│  ⚙️ Settings     │   █  │ ✓ Found 843 open ports                         │  █  │
+│                  │   █  │ ⚠ 47 potential vulnerabilities detected        │  █  │
+│                  │   █  └────────────────────────────────────────────────┘  █  │
+│                  │   █                                                      █  │
+│                  │   ████████████████████████████████████████████████████████  │
+└──────────────────┴──────────────────────────────────────────────────────────────┘
+```
 
 ## Security Notice
 
