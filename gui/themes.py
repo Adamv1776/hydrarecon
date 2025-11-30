@@ -613,9 +613,9 @@ QPushButton#navItem:checked, QPushButton#navItem[selected="true"] {
     border-left: 3px solid #00ff88;
 }
 
-/* Glow Effects */
+/* Glow Effects - use border instead of box-shadow (not supported by Qt) */
 QLineEdit:focus {
-    box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+    border: 2px solid #00ff88;
 }
 
 /* Animation placeholder - handled in code */

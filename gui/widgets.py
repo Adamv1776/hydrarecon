@@ -463,7 +463,8 @@ class CircularProgress(QWidget):
         painter.drawArc(rect, 0, 360 * 16)
         
         # Draw progress arc with gradient
-        gradient = QConicalGradient(rect.center(), 90)
+        center = rect.center()
+        gradient = QConicalGradient(float(center.x()), float(center.y()), 90)
         gradient.setColorAt(0, self._color)
         gradient.setColorAt(0.5, QColor(self._color).lighter(130))
         gradient.setColorAt(1, self._color)

@@ -513,8 +513,14 @@ class HydraPage(QWidget):
         try:
             from scanners import HydraScanner
             self.scanner = HydraScanner(self.config, self.db)
+            if self.scanner.hydra_available:
+                self.output_console.append_success(f"Hydra scanner initialized (v{self.scanner.hydra_version})")
+            else:
+                self.output_console.append_warning("Hydra not found! Install with: sudo apt install hydra")
+                self.output_console.append_info("Scanner will show error if attack is attempted without Hydra")
         except Exception as e:
-            self.output_console.append_error(f"Failed to initialize Hydra: {e}")
+            self.scanner = None
+            self.output_console.append_error(f"Failed to initialize Hydra scanner: {e}")
     
     def _on_protocol_changed(self, index: int):
         """Update port when protocol changes"""
@@ -533,6 +539,14 @@ class HydraPage(QWidget):
     
     def _start_attack(self):
         """Start the brute-force attack"""
+        if not self.scanner:
+            QMessageBox.critical(self, "Error", "Hydra scanner not initialized. Check the output console for details.")
+            return
+            
+        if not self.scanner.hydra_available:
+            QMessageBox.critical(self, "Error", "Hydra is not installed!\n\nInstall with:\nsudo apt install hydra")
+            return
+        
         target = self.target_input.text().strip()
         
         if not target:

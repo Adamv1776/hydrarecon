@@ -165,6 +165,47 @@ class NmapPage(QWidget):
         """)
         layout.addWidget(self.profile_combo)
         
+        # Quick Port Buttons
+        quick_ports_label = QLabel("Quick Port Selection")
+        quick_ports_label.setStyleSheet("color: #e6e6e6; font-weight: 600;")
+        layout.addWidget(quick_ports_label)
+        
+        quick_btn_layout1 = QHBoxLayout()
+        quick_btn_layout2 = QHBoxLayout()
+        
+        quick_port_options = [
+            ("Top 20", "21,22,23,25,53,80,110,111,135,139,143,443,445,993,995,1723,3306,3389,5900,8080"),
+            ("Top 100", "1-100,443,445,3306,3389,5900,8080,8443"),
+            ("Web", "80,443,8080,8443,8000,8888,9000"),
+            ("SSH/RDP", "22,3389,5900,5901"),
+            ("Database", "1433,1521,3306,5432,27017,6379"),
+            ("Mail", "25,110,143,465,587,993,995"),
+            ("All Ports", "1-65535"),
+            ("Common", "21,22,23,25,53,80,110,139,143,443,445,3389"),
+        ]
+        
+        for i, (name, ports) in enumerate(quick_port_options):
+            btn = QPushButton(name)
+            btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #21262d;
+                    border: 1px solid #30363d;
+                    border-radius: 6px;
+                    padding: 8px 12px;
+                    color: #00ff88;
+                    font-size: 11px;
+                }
+                QPushButton:hover { background-color: #30363d; border-color: #00ff88; }
+            """)
+            btn.clicked.connect(lambda checked, p=ports: self.ports_input.setText(p))
+            if i < 4:
+                quick_btn_layout1.addWidget(btn)
+            else:
+                quick_btn_layout2.addWidget(btn)
+        
+        layout.addLayout(quick_btn_layout1)
+        layout.addLayout(quick_btn_layout2)
+        
         # Port specification
         ports_label = QLabel("Ports (optional)")
         ports_label.setStyleSheet("color: #e6e6e6; font-weight: 600;")
@@ -409,7 +450,13 @@ class NmapPage(QWidget):
         try:
             from scanners import NmapScanner
             self.scanner = NmapScanner(self.config, self.db)
+            if self.scanner.nmap_available:
+                self.raw_output.append_success(f"Nmap scanner initialized (v{self.scanner.nmap_version})")
+            else:
+                self.raw_output.append_warning("Nmap not found! Install with: sudo apt install nmap")
+                self.raw_output.append_info("Scanner will show error if scan is attempted without Nmap")
         except Exception as e:
+            self.scanner = None
             self.raw_output.append_error(f"Failed to initialize Nmap scanner: {e}")
     
     def _start_scan(self):
@@ -422,6 +469,10 @@ class NmapPage(QWidget):
         
         if self.scanner is None:
             QMessageBox.critical(self, "Error", "Nmap scanner not initialized.")
+            return
+        
+        if not self.scanner.nmap_available:
+            QMessageBox.critical(self, "Error", "Nmap is not installed!\n\nInstall with:\nsudo apt install nmap")
             return
         
         # Get profile

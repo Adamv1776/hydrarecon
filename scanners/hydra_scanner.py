@@ -154,6 +154,8 @@ class HydraScanner(BaseScanner):
     def __init__(self, config, db):
         super().__init__(config, db)
         self.hydra_path = config.hydra.path
+        self.hydra_available = False
+        self.hydra_version = "unknown"
         self._verify_hydra()
         self._builtin_wordlists = self._init_builtin_wordlists()
     
@@ -173,20 +175,23 @@ class HydraScanner(BaseScanner):
                 capture_output=True, text=True, timeout=10
             )
             # Hydra returns non-zero even for help, check if output contains expected text
-            if 'hydra' not in result.stdout.lower() and 'hydra' not in result.stderr.lower():
-                raise RuntimeError("Hydra not found or not accessible")
-            
-            # Try to get version
-            version_match = re.search(r'v(\d+\.\d+)', result.stdout + result.stderr)
-            if version_match:
-                self.hydra_version = version_match.group(1)
+            if 'hydra' in result.stdout.lower() or 'hydra' in result.stderr.lower():
+                self.hydra_available = True
+                # Try to get version
+                version_match = re.search(r'v(\d+\.\d+)', result.stdout + result.stderr)
+                if version_match:
+                    self.hydra_version = version_match.group(1)
+                else:
+                    self.hydra_version = "unknown"
             else:
-                self.hydra_version = "unknown"
+                self.hydra_available = False
                 
         except FileNotFoundError:
-            raise RuntimeError(f"Hydra not found at {self.hydra_path}")
+            self.hydra_available = False
         except subprocess.TimeoutExpired:
-            raise RuntimeError("Hydra check timed out")
+            self.hydra_available = False
+        except Exception:
+            self.hydra_available = False
     
     def _init_builtin_wordlists(self) -> Dict[str, Dict[str, str]]:
         """Initialize paths to common built-in wordlists"""
@@ -333,6 +338,16 @@ class HydraScanner(BaseScanner):
     async def scan(self, target: str, protocol: str = "ssh",
                    port: int = None, **options) -> ScanResult:
         """Execute Hydra brute-force attack"""
+        
+        if not self.hydra_available:
+            return ScanResult(
+                scan_id=self.scan_id,
+                scan_type=self.scanner_type,
+                target=target,
+                status=ScanStatus.FAILED,
+                started_at=datetime.now(),
+                errors=["Hydra is not installed or not found. Install with: sudo apt install hydra"]
+            )
         
         if not await self.validate_target(target):
             return ScanResult(

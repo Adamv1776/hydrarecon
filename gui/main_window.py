@@ -418,21 +418,19 @@ class HydraReconMainWindow(QMainWindow):
     
     def _new_project(self):
         """Create a new project"""
-        from .dialogs.project_dialog import NewProjectDialog
+        from .dialogs import NewProjectDialog
         dialog = NewProjectDialog(self)
         if dialog.exec():
-            project_data = dialog.get_data()
-            project_id = self.db.create_project(**project_data)
-            self.current_project = self.db.get_project(project_id)
-            self._update_project_display()
+            # Project data is emitted via signal
+            pass
     
     def _open_project(self):
         """Open an existing project"""
-        from .dialogs.project_dialog import OpenProjectDialog
-        dialog = OpenProjectDialog(self.db, self)
+        from .dialogs import OpenProjectDialog
+        dialog = OpenProjectDialog([], self)
         if dialog.exec():
-            self.current_project = dialog.get_selected_project()
-            self._update_project_display()
+            # Project data is emitted via signal
+            pass
     
     def _update_project_display(self):
         """Update project display in sidebar"""

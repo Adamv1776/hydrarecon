@@ -141,6 +141,8 @@ class NmapScanner(BaseScanner):
     def __init__(self, config, db):
         super().__init__(config, db)
         self.nmap_path = config.nmap.path
+        self.nmap_available = False
+        self.nmap_version = "unknown"
         self._verify_nmap()
     
     @property
@@ -158,20 +160,23 @@ class NmapScanner(BaseScanner):
                 [self.nmap_path, '--version'],
                 capture_output=True, text=True, timeout=10
             )
-            if result.returncode != 0:
-                raise RuntimeError("Nmap not found or not accessible")
-            
-            # Parse version
-            version_match = re.search(r'Nmap version (\d+\.\d+)', result.stdout)
-            if version_match:
-                self.nmap_version = version_match.group(1)
+            if result.returncode == 0:
+                self.nmap_available = True
+                # Parse version
+                version_match = re.search(r'Nmap version (\d+\.\d+)', result.stdout)
+                if version_match:
+                    self.nmap_version = version_match.group(1)
+                else:
+                    self.nmap_version = "unknown"
             else:
-                self.nmap_version = "unknown"
+                self.nmap_available = False
                 
         except FileNotFoundError:
-            raise RuntimeError(f"Nmap not found at {self.nmap_path}")
+            self.nmap_available = False
         except subprocess.TimeoutExpired:
-            raise RuntimeError("Nmap version check timed out")
+            self.nmap_available = False
+        except Exception:
+            self.nmap_available = False
     
     async def validate_target(self, target: str) -> bool:
         """Validate target (IP, hostname, or CIDR range)"""
