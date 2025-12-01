@@ -116,11 +116,23 @@ else
     print_status "All system dependencies satisfied"
 fi
 
-echo -e "\n${BOLD}Step 3: Installing Python packages...${NC}\n"
+echo -e "\n${BOLD}Step 3: Setting up Python virtual environment...${NC}\n"
 
-# Install Python dependencies
-pip3 install --user --upgrade pip
-pip3 install --user PyQt6 PyQt6-WebEngine cryptography pyyaml aiohttp dnspython python-whois requests beautifulsoup4 python-nmap shodan
+# Create virtual environment
+VENV_DIR="$INSTALL_DIR/venv"
+print_info "Creating virtual environment..."
+
+# Create install dir first
+mkdir -p "$INSTALL_DIR"
+
+# Create venv
+python3 -m venv "$VENV_DIR"
+source "$VENV_DIR/bin/activate"
+
+# Install Python dependencies in venv
+print_info "Installing Python packages in virtual environment..."
+pip install --upgrade pip
+pip install PyQt6 cryptography pyyaml aiohttp dnspython python-whois requests beautifulsoup4 python-nmap
 
 print_status "Python packages installed"
 
@@ -140,8 +152,9 @@ print_status "Application files copied to $INSTALL_DIR"
 # Create launcher script
 cat > "$BIN_DIR/hydrarecon" << 'LAUNCHER'
 #!/bin/bash
+source "$HOME/.local/share/hydrarecon/venv/bin/activate"
 cd "$HOME/.local/share/hydrarecon"
-python3 main.py "$@"
+python main.py "$@"
 LAUNCHER
 
 chmod +x "$BIN_DIR/hydrarecon"
