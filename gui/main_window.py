@@ -24,6 +24,8 @@ from .pages.credentials_page import CredentialsPage
 from .pages.vulnerabilities_page import VulnerabilitiesPage
 from .pages.reports_page import ReportsPage
 from .pages.settings_page import SettingsPage
+from .pages.automation_page import AutomationPage
+from .pages.attack_surface_page import AttackSurfacePage
 
 
 class HydraReconMainWindow(QMainWindow):
@@ -149,6 +151,8 @@ class HydraReconMainWindow(QMainWindow):
             ("nmap", "Nmap Scanner", "🔍"),
             ("hydra", "Hydra Attack", "🔓"),
             ("osint", "OSINT", "🌐"),
+            ("automation", "Automation", "⚡"),
+            ("attack_surface", "Attack Surface", "🗺️"),
         ]
         
         for key, text, icon in nav_items:
@@ -254,6 +258,8 @@ class HydraReconMainWindow(QMainWindow):
             "vulnerabilities": VulnerabilitiesPage(self.config, self.db, self),
             "reports": ReportsPage(self.config, self.db, self),
             "settings": SettingsPage(self.config, self.db, self),
+            "automation": AutomationPage(self),
+            "attack_surface": AttackSurfacePage(self),
         }
         
         for page in self.pages.values():
