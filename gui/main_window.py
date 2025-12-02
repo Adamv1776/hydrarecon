@@ -27,6 +27,52 @@ from .pages.settings_page import SettingsPage
 from .pages.automation_page import AutomationPage
 from .pages.attack_surface_page import AttackSurfacePage
 
+# Import new advanced pages (will be created)
+try:
+    from .pages.api_discovery_page import APIDiscoveryPage
+except ImportError:
+    APIDiscoveryPage = None
+
+try:
+    from .pages.c2_page import C2Page
+except ImportError:
+    C2Page = None
+
+try:
+    from .pages.exploit_browser_page import ExploitBrowserPage
+except ImportError:
+    ExploitBrowserPage = None
+
+try:
+    from .pages.forensics_page import ForensicsPage
+except ImportError:
+    ForensicsPage = None
+
+try:
+    from .pages.network_mapper_page import NetworkMapperPage
+except ImportError:
+    NetworkMapperPage = None
+
+try:
+    from .pages.credential_spray_page import CredentialSprayPage
+except ImportError:
+    CredentialSprayPage = None
+
+try:
+    from .pages.hash_cracker_page import HashCrackerPage
+except ImportError:
+    HashCrackerPage = None
+
+try:
+    from .pages.threat_intel_page import ThreatIntelPage
+except ImportError:
+    ThreatIntelPage = None
+
+try:
+    from .pages.plugin_manager_page import PluginManagerPage
+except ImportError:
+    PluginManagerPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -153,6 +199,15 @@ class HydraReconMainWindow(QMainWindow):
             ("osint", "OSINT", "🌐"),
             ("automation", "Automation", "⚡"),
             ("attack_surface", "Attack Surface", "🗺️"),
+            ("api_discovery", "API Discovery", "🔌"),
+            ("exploit_browser", "Exploit Browser", "💀"),
+            ("c2", "C2 Framework", "📡"),
+            ("forensics", "Forensics", "🔬"),
+            ("network_mapper", "Network Mapper", "🕸️"),
+            ("credential_spray", "Credential Spray", "🔐"),
+            ("hash_cracker", "Hash Cracker", "🔨"),
+            ("threat_intel", "Threat Intel", "🛡️"),
+            ("plugins", "Plugins", "🔌"),
         ]
         
         for key, text, icon in nav_items:
@@ -261,6 +316,26 @@ class HydraReconMainWindow(QMainWindow):
             "automation": AutomationPage(self),
             "attack_surface": AttackSurfacePage(self),
         }
+        
+        # Add advanced pages if available
+        if APIDiscoveryPage:
+            self.pages["api_discovery"] = APIDiscoveryPage(self)
+        if ExploitBrowserPage:
+            self.pages["exploit_browser"] = ExploitBrowserPage(self)
+        if C2Page:
+            self.pages["c2"] = C2Page(self)
+        if ForensicsPage:
+            self.pages["forensics"] = ForensicsPage(self)
+        if NetworkMapperPage:
+            self.pages["network_mapper"] = NetworkMapperPage(self)
+        if CredentialSprayPage:
+            self.pages["credential_spray"] = CredentialSprayPage(self)
+        if HashCrackerPage:
+            self.pages["hash_cracker"] = HashCrackerPage(self)
+        if ThreatIntelPage:
+            self.pages["threat_intel"] = ThreatIntelPage(self)
+        if PluginManagerPage:
+            self.pages["plugins"] = PluginManagerPage(self)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)
