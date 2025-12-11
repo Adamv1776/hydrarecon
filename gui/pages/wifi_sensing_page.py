@@ -11517,13 +11517,109 @@ class WifiSensingPage(QWidget):
         header.setStyleSheet("color:#d7e7ff; font-size:16px; font-weight:600;")
         v.addWidget(header)
 
+        # Create tab widget for different 3D views
+        self.view_tabs = QTabWidget()
+        self.view_tabs.setStyleSheet("""
+            QTabWidget::pane {
+                border: 1px solid #1f3a5f;
+                background: #0a0f1a;
+                border-radius: 8px;
+            }
+            QTabBar::tab {
+                background: #0d1520;
+                color: #8fb3ff;
+                padding: 10px 20px;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+                margin-right: 3px;
+                font-weight: bold;
+            }
+            QTabBar::tab:selected {
+                background: #1a3050;
+                color: #00d4ff;
+            }
+            QTabBar::tab:hover {
+                background: #1a2a40;
+            }
+        """)
+
+        # Tab 1: Original 3D WiFi Sensing View
         self.viewer = WifiSensing3D(self) if WIFI_AVAILABLE else QLabel("WiFi engine not available")
         if WIFI_AVAILABLE:
-            self.viewer.setMinimumHeight(560)
+            self.viewer.setMinimumHeight(500)
         else:
             self.viewer.setStyleSheet("color:#ff7b7b; padding:20px;")
-        v.addWidget(self.viewer, 1)
+        self.view_tabs.addTab(self.viewer, "🌐 3D Scene")
+
+        # Tab 2: First-Person Immersive View (NEW!)
+        self.immersive_tab = CSIImmersiveExperienceTab()
+        self.view_tabs.addTab(self.immersive_tab, "👁️ First-Person POV")
+
+        # Tab 3: Full Experience Widget with Emergency Alerts
+        self.full_experience = CSIFullExperienceWidget()
+        self.full_experience.emergency_alert.connect(self._on_emergency_alert)
+        self.view_tabs.addTab(self.full_experience, "🚨 Full Experience")
+
+        v.addWidget(self.view_tabs, 1)
+
+        # View controls below tabs
+        controls = QHBoxLayout()
+        
+        self.view_mode_label = QLabel("View Mode:")
+        self.view_mode_label.setStyleSheet("color: #8fb3ff;")
+        controls.addWidget(self.view_mode_label)
+        
+        self.reset_view_btn = QPushButton("🔄 Reset Camera")
+        self.reset_view_btn.setStyleSheet("background:#1a3050; color:#00d4ff; padding:8px 16px; border-radius:6px;")
+        self.reset_view_btn.clicked.connect(self._reset_camera_view)
+        controls.addWidget(self.reset_view_btn)
+        
+        self.toggle_grid_btn = QPushButton("📐 Toggle Grid")
+        self.toggle_grid_btn.setStyleSheet("background:#1a3050; color:#00d4ff; padding:8px 16px; border-radius:6px;")
+        self.toggle_grid_btn.clicked.connect(self._toggle_grid)
+        controls.addWidget(self.toggle_grid_btn)
+        
+        self.toggle_trails_btn = QPushButton("🔗 Toggle Trails")
+        self.toggle_trails_btn.setStyleSheet("background:#1a3050; color:#00d4ff; padding:8px 16px; border-radius:6px;")
+        self.toggle_trails_btn.clicked.connect(self._toggle_trails)
+        controls.addWidget(self.toggle_trails_btn)
+        
+        controls.addStretch()
+        v.addLayout(controls)
+        
         return frame
+    
+    def _on_emergency_alert(self, emergency: dict):
+        """Handle emergency alerts from full experience widget."""
+        etype = emergency.get('emergency_type', 'unknown')
+        entity = emergency.get('entity_id', 'unknown')
+        QMessageBox.critical(self, "🚨 EMERGENCY ALERT", 
+                            f"Type: {etype}\nEntity: {entity}\n\nImmediate attention required!")
+    
+    def _reset_camera_view(self):
+        """Reset camera to default position."""
+        current_tab = self.view_tabs.currentIndex()
+        if current_tab == 1 and hasattr(self, 'immersive_tab'):
+            self.immersive_tab._reset_view()
+        elif current_tab == 2 and hasattr(self, 'full_experience'):
+            self.full_experience.view_3d.camera_pos = np.array([5.0, 5.0, 1.6])
+            self.full_experience.view_3d.camera_yaw = 0.0
+            self.full_experience.view_3d.camera_pitch = 0.0
+    
+    def _toggle_grid(self):
+        """Toggle grid visibility."""
+        current_tab = self.view_tabs.currentIndex()
+        if current_tab == 1 and hasattr(self, 'immersive_tab'):
+            self.immersive_tab.immersive_view.grid_visible = not self.immersive_tab.immersive_view.grid_visible
+        elif current_tab == 2 and hasattr(self, 'full_experience'):
+            self.full_experience.view_3d.grid_visible = not self.full_experience.view_3d.grid_visible
+    
+    def _toggle_trails(self):
+        """Toggle entity trails visibility."""
+        current_tab = self.view_tabs.currentIndex()
+        if current_tab == 1 and hasattr(self, 'immersive_tab'):
+            view = self.immersive_tab.immersive_view
+            view.trail_fade = 0.0 if view.trail_fade > 0 else 0.85
 
     def _card_connection(self) -> QWidget:
         card = QFrame()
