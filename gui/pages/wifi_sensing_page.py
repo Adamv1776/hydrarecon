@@ -89684,3 +89684,599 @@ class CSIGUIExperienceController:
             'environment': self.structure_builder.export_structure(),
             'frame': self.latest_frame
         }
+
+
+class CSIImmersive3DWidget(QFrame):
+    """PyQt6 widget for immersive first-person 3D visualization of tracked entities."""
+    
+    entity_clicked = pyqtSignal(str)
+    view_updated = pyqtSignal(dict)
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setMinimumSize(800, 600)
+        self.setStyleSheet("""
+            QFrame {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #0a0f1a, stop:0.5 #0d1520, stop:1 #0a0f1a);
+                border: 2px solid #1f3a5f;
+                border-radius: 12px;
+            }
+        """)
+        
+        # Controller and state
+        self.controller = CSIGUIExperienceController()
+        self.camera_yaw = 0.0
+        self.camera_pitch = 0.0
+        self.camera_pos = np.array([5.0, 5.0, 1.6])
+        self.mouse_sensitivity = 0.003
+        self.move_speed = 0.15
+        self.keys_pressed = set()
+        
+        # Rendering state
+        self.entity_colors: Dict[str, QColor] = {}
+        self.trail_fade = 0.85
+        self.grid_visible = True
+        self.hud_visible = True
+        self.skeleton_visible = True
+        
+        # Animation
+        self.animation_timer = QTimer(self)
+        self.animation_timer.timeout.connect(self._on_frame)
+        self.animation_timer.start(33)  # ~30 FPS
+        
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setMouseTracking(True)
+        
+    def _get_entity_color(self, entity_id: str) -> QColor:
+        if entity_id not in self.entity_colors:
+            hue = hash(entity_id) % 360
+            self.entity_colors[entity_id] = QColor.fromHsv(hue, 200, 255)
+        return self.entity_colors[entity_id]
+    
+    def _world_to_screen(self, world_pos: np.ndarray) -> Optional[QPointF]:
+        """Project 3D world position to 2D screen coordinates."""
+        rel = world_pos - self.camera_pos
+        
+        # Camera basis vectors
+        forward = np.array([
+            np.cos(self.camera_pitch) * np.cos(self.camera_yaw),
+            np.cos(self.camera_pitch) * np.sin(self.camera_yaw),
+            np.sin(self.camera_pitch)
+        ])
+        right = np.array([-np.sin(self.camera_yaw), np.cos(self.camera_yaw), 0])
+        up = np.cross(right, forward)
+        
+        # Project
+        depth = np.dot(rel, forward)
+        if depth < 0.1:
+            return None
+        
+        x_cam = np.dot(rel, right)
+        y_cam = np.dot(rel, up)
+        
+        fov = 1.2  # ~70 degrees
+        aspect = self.width() / max(1, self.height())
+        
+        x_ndc = x_cam / (depth * np.tan(fov / 2) * aspect)
+        y_ndc = y_cam / (depth * np.tan(fov / 2))
+        
+        screen_x = (x_ndc + 1) * self.width() / 2
+        screen_y = (1 - y_ndc) * self.height() / 2
+        
+        return QPointF(screen_x, screen_y)
+    
+    def ingest_csi_data(self, entity_id: str, csi_vector: np.ndarray, 
+                        position: Tuple[float, float, float]):
+        """Feed CSI data into the visualization system."""
+        self.controller.ingest_csi(entity_id, csi_vector, position)
+        
+    def _on_frame(self):
+        """Animation frame update."""
+        self._process_movement()
+        self.controller.set_viewer_pose(
+            tuple(self.camera_pos),
+            (np.cos(self.camera_yaw), np.sin(self.camera_yaw), np.sin(self.camera_pitch))
+        )
+        self.controller.step()
+        self.update()
+        
+    def _process_movement(self):
+        """Process WASD movement."""
+        forward = np.array([np.cos(self.camera_yaw), np.sin(self.camera_yaw), 0])
+        right = np.array([-np.sin(self.camera_yaw), np.cos(self.camera_yaw), 0])
+        
+        if Qt.Key.Key_W in self.keys_pressed:
+            self.camera_pos += forward * self.move_speed
+        if Qt.Key.Key_S in self.keys_pressed:
+            self.camera_pos -= forward * self.move_speed
+        if Qt.Key.Key_A in self.keys_pressed:
+            self.camera_pos -= right * self.move_speed
+        if Qt.Key.Key_D in self.keys_pressed:
+            self.camera_pos += right * self.move_speed
+        if Qt.Key.Key_Space in self.keys_pressed:
+            self.camera_pos[2] += self.move_speed
+        if Qt.Key.Key_Shift in self.keys_pressed:
+            self.camera_pos[2] -= self.move_speed
+            
+    def keyPressEvent(self, event):
+        self.keys_pressed.add(event.key())
+        super().keyPressEvent(event)
+        
+    def keyReleaseEvent(self, event):
+        self.keys_pressed.discard(event.key())
+        super().keyReleaseEvent(event)
+        
+    def mouseMoveEvent(self, event):
+        if event.buttons() & Qt.MouseButton.RightButton:
+            delta_x = event.position().x() - self.width() / 2
+            delta_y = event.position().y() - self.height() / 2
+            self.camera_yaw += delta_x * self.mouse_sensitivity
+            self.camera_pitch = np.clip(
+                self.camera_pitch - delta_y * self.mouse_sensitivity,
+                -np.pi / 2 + 0.1, np.pi / 2 - 0.1
+            )
+        super().mouseMoveEvent(event)
+        
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        w, h = self.width(), self.height()
+        
+        # Draw grid floor
+        if self.grid_visible:
+            self._draw_grid(painter)
+        
+        # Draw environment hotspots
+        self._draw_environment(painter)
+        
+        # Draw entities
+        self._draw_entities(painter)
+        
+        # Draw HUD
+        if self.hud_visible:
+            self._draw_hud(painter)
+            
+        painter.end()
+        
+    def _draw_grid(self, painter: QPainter):
+        """Draw perspective floor grid."""
+        grid_pen = QPen(QColor("#1a3050"), 1)
+        painter.setPen(grid_pen)
+        
+        for i in range(-10, 11):
+            # Lines along X
+            p1 = self._world_to_screen(np.array([float(i), -10.0, 0.0]))
+            p2 = self._world_to_screen(np.array([float(i), 10.0, 0.0]))
+            if p1 and p2:
+                painter.drawLine(p1, p2)
+            
+            # Lines along Y
+            p1 = self._world_to_screen(np.array([-10.0, float(i), 0.0]))
+            p2 = self._world_to_screen(np.array([10.0, float(i), 0.0]))
+            if p1 and p2:
+                painter.drawLine(p1, p2)
+                
+    def _draw_environment(self, painter: QPainter):
+        """Draw structure hotspots and anchors."""
+        env = self.controller.structure_builder.export_structure()
+        
+        # Draw hotspots as glowing points
+        for x, y, z, strength in env.get('hotspots', []):
+            pos = self._world_to_screen(np.array([float(x), float(y), float(z)]))
+            if pos:
+                alpha = int(min(255, strength * 100))
+                color = QColor(0, 180, 255, alpha)
+                painter.setBrush(QBrush(color))
+                painter.setPen(Qt.PenStyle.NoPen)
+                radius = max(3, min(15, strength * 5))
+                painter.drawEllipse(pos, radius, radius)
+                
+        # Draw anchors
+        for ax, ay, az in env.get('anchors', []):
+            pos = self._world_to_screen(np.array([float(ax), float(ay), float(az)]))
+            if pos:
+                painter.setBrush(QBrush(QColor("#ff6b00")))
+                painter.drawRect(int(pos.x()) - 6, int(pos.y()) - 6, 12, 12)
+                
+    def _draw_entities(self, painter: QPainter):
+        """Draw tracked entities with trails and skeletons."""
+        tracks = self.controller.tracker.get_tracks()
+        
+        for entity_id, track in tracks.items():
+            color = self._get_entity_color(entity_id)
+            pos = track.get('position')
+            if pos is None:
+                continue
+                
+            screen_pos = self._world_to_screen(pos)
+            if screen_pos is None:
+                continue
+            
+            confidence = track.get('confidence', 0.5)
+            
+            # Draw trail
+            trail = track.get('trail', [])
+            if len(trail) > 1:
+                trail_pen = QPen(color, 2)
+                trail_pen.setStyle(Qt.PenStyle.DashLine)
+                painter.setPen(trail_pen)
+                
+                for i in range(1, len(trail)):
+                    p1 = self._world_to_screen(trail[i-1])
+                    p2 = self._world_to_screen(trail[i])
+                    if p1 and p2:
+                        alpha = int(255 * (i / len(trail)) * self.trail_fade)
+                        fade_color = QColor(color.red(), color.green(), color.blue(), alpha)
+                        painter.setPen(QPen(fade_color, 2))
+                        painter.drawLine(p1, p2)
+            
+            # Draw skeleton if available
+            if self.skeleton_visible and entity_id in self.controller.skeleton_cache:
+                skel_frames = self.controller.skeleton_cache[entity_id]
+                if skel_frames:
+                    skel = skel_frames[-1]
+                    self._draw_skeleton(painter, skel, color)
+            
+            # Draw entity marker
+            size = int(12 + confidence * 8)
+            painter.setBrush(QBrush(color))
+            painter.setPen(QPen(QColor("#ffffff"), 2))
+            painter.drawEllipse(screen_pos, size, size)
+            
+            # Draw label
+            char_info = self.controller.characterizer.characterize(entity_id)
+            label = f"{entity_id[:8]} ({char_info.get('identity', '?')})"
+            painter.setPen(QPen(QColor("#ffffff")))
+            painter.setFont(QFont("Consolas", 9))
+            painter.drawText(int(screen_pos.x()) - 40, int(screen_pos.y()) - size - 5, label)
+            
+    def _draw_skeleton(self, painter: QPainter, skeleton: dict, color: QColor):
+        """Draw body skeleton keypoints and connections."""
+        keypoint_positions = {}
+        
+        for name, world_pos in skeleton.items():
+            if isinstance(world_pos, np.ndarray):
+                screen = self._world_to_screen(world_pos)
+                if screen:
+                    keypoint_positions[name] = screen
+        
+        # Draw bones
+        bones = [
+            ('pelvis', 'spine'), ('spine', 'head'),
+            ('pelvis', 'left_foot'), ('pelvis', 'right_foot')
+        ]
+        
+        bone_pen = QPen(color, 3)
+        painter.setPen(bone_pen)
+        
+        for start, end in bones:
+            if start in keypoint_positions and end in keypoint_positions:
+                painter.drawLine(keypoint_positions[start], keypoint_positions[end])
+        
+        # Draw keypoints
+        painter.setBrush(QBrush(QColor("#ffffff")))
+        for name, pos in keypoint_positions.items():
+            painter.drawEllipse(pos, 4, 4)
+            
+    def _draw_hud(self, painter: QPainter):
+        """Draw heads-up display overlay."""
+        w, h = self.width(), self.height()
+        
+        # HUD background
+        hud_rect = QFrame()
+        painter.fillRect(10, 10, 280, 120, QColor(10, 15, 26, 200))
+        painter.setPen(QPen(QColor("#1f3a5f"), 1))
+        painter.drawRect(10, 10, 280, 120)
+        
+        # HUD text
+        painter.setPen(QPen(QColor("#00d4ff")))
+        painter.setFont(QFont("Consolas", 10, QFont.Weight.Bold))
+        painter.drawText(20, 30, "CSI IMMERSIVE VIEW")
+        
+        painter.setFont(QFont("Consolas", 9))
+        painter.setPen(QPen(QColor("#aaccff")))
+        
+        tracks = self.controller.tracker.get_tracks()
+        painter.drawText(20, 50, f"Tracked Entities: {len(tracks)}")
+        painter.drawText(20, 65, f"Camera: ({self.camera_pos[0]:.1f}, {self.camera_pos[1]:.1f}, {self.camera_pos[2]:.1f})")
+        painter.drawText(20, 80, f"Yaw: {np.degrees(self.camera_yaw):.0f}° Pitch: {np.degrees(self.camera_pitch):.0f}°")
+        
+        # Recent HUD events
+        events = self.controller.renderer.hud_events[-3:]
+        y = 95
+        for evt in events:
+            sev_color = {"info": "#aaccff", "success": "#00ff88", "warning": "#ffaa00"}.get(evt.get('severity', 'info'), "#aaccff")
+            painter.setPen(QPen(QColor(sev_color)))
+            painter.drawText(20, y, evt.get('message', '')[:35])
+            y += 12
+            
+        # Crosshair
+        cx, cy = w // 2, h // 2
+        painter.setPen(QPen(QColor("#00ff88"), 1))
+        painter.drawLine(cx - 10, cy, cx + 10, cy)
+        painter.drawLine(cx, cy - 10, cx, cy + 10)
+        
+        # Controls hint
+        painter.setPen(QPen(QColor("#667788")))
+        painter.setFont(QFont("Consolas", 8))
+        painter.drawText(w - 200, h - 20, "WASD: Move | RMB: Look | Space/Shift: Up/Down")
+
+
+class CSIEntityProfilePanel(QFrame):
+    """Panel showing detailed entity characterization profiles."""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setStyleSheet("""
+            QFrame {
+                background: #0d1520;
+                border: 1px solid #1f3a5f;
+                border-radius: 8px;
+            }
+            QLabel { color: #aaccff; font-family: Consolas; }
+        """)
+        
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(10, 10, 10, 10)
+        
+        self.title = QLabel("Entity Profiles")
+        self.title.setStyleSheet("font-size: 14px; font-weight: bold; color: #00d4ff;")
+        layout.addWidget(self.title)
+        
+        self.scroll = QScrollArea()
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setStyleSheet("QScrollArea { border: none; }")
+        
+        self.content = QWidget()
+        self.content_layout = QVBoxLayout(self.content)
+        self.content_layout.setContentsMargins(0, 0, 0, 0)
+        self.content_layout.setSpacing(8)
+        self.scroll.setWidget(self.content)
+        
+        layout.addWidget(self.scroll)
+        
+        self.entity_widgets: Dict[str, QFrame] = {}
+        
+    def update_profiles(self, characterizer: CSIEntityCharacterizer):
+        """Update displayed entity profiles."""
+        for entity_id, profile in characterizer.entity_profiles.items():
+            if entity_id not in self.entity_widgets:
+                widget = self._create_entity_widget(entity_id)
+                self.entity_widgets[entity_id] = widget
+                self.content_layout.addWidget(widget)
+            
+            self._update_entity_widget(entity_id, profile, characterizer.characterize(entity_id))
+            
+    def _create_entity_widget(self, entity_id: str) -> QFrame:
+        widget = QFrame()
+        widget.setStyleSheet("""
+            QFrame { 
+                background: #0a0f1a; 
+                border: 1px solid #2a4a6f; 
+                border-radius: 6px;
+                padding: 5px;
+            }
+        """)
+        layout = QVBoxLayout(widget)
+        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setSpacing(4)
+        
+        widget.id_label = QLabel(f"Entity: {entity_id[:12]}")
+        widget.id_label.setStyleSheet("font-weight: bold; color: #00d4ff;")
+        layout.addWidget(widget.id_label)
+        
+        widget.identity_label = QLabel("Identity: Unknown")
+        layout.addWidget(widget.identity_label)
+        
+        widget.confidence_bar = QProgressBar()
+        widget.confidence_bar.setMaximum(100)
+        widget.confidence_bar.setStyleSheet("""
+            QProgressBar { 
+                background: #1a2a3a; 
+                border-radius: 3px; 
+                height: 8px;
+            }
+            QProgressBar::chunk { 
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #00d4ff, stop:1 #00ff88);
+                border-radius: 3px;
+            }
+        """)
+        layout.addWidget(widget.confidence_bar)
+        
+        widget.gait_label = QLabel("Gait: --")
+        layout.addWidget(widget.gait_label)
+        
+        widget.energy_label = QLabel("Energy: --")
+        layout.addWidget(widget.energy_label)
+        
+        return widget
+        
+    def _update_entity_widget(self, entity_id: str, profile: dict, char_info: dict):
+        widget = self.entity_widgets.get(entity_id)
+        if not widget:
+            return
+            
+        identity = char_info.get('identity', 'unknown')
+        confidence = char_info.get('confidence', 0.0)
+        gait = char_info.get('gait', {})
+        energy = profile.get('last_energy', 0.0)
+        
+        widget.identity_label.setText(f"Identity: {identity.capitalize()}")
+        widget.confidence_bar.setValue(int(confidence * 100))
+        widget.gait_label.setText(f"Gait: rhythm={gait.get('rhythm', 0):.2f} stability={gait.get('stability', 0):.2f}")
+        widget.energy_label.setText(f"Energy: {energy:.2f}")
+
+
+class CSITrackingControlPanel(QFrame):
+    """Control panel for tracking and visualization settings."""
+    
+    settings_changed = pyqtSignal(dict)
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setStyleSheet("""
+            QFrame {
+                background: #0d1520;
+                border: 1px solid #1f3a5f;
+                border-radius: 8px;
+            }
+            QLabel { color: #aaccff; }
+            QCheckBox { color: #aaccff; }
+            QSpinBox, QComboBox {
+                background: #1a2a3a;
+                color: #ffffff;
+                border: 1px solid #2a4a6f;
+                border-radius: 4px;
+                padding: 4px;
+            }
+        """)
+        
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(10, 10, 10, 10)
+        
+        title = QLabel("Tracking Controls")
+        title.setStyleSheet("font-size: 14px; font-weight: bold; color: #00d4ff;")
+        layout.addWidget(title)
+        
+        # View toggles
+        self.grid_check = QCheckBox("Show Grid")
+        self.grid_check.setChecked(True)
+        self.grid_check.stateChanged.connect(self._emit_settings)
+        layout.addWidget(self.grid_check)
+        
+        self.hud_check = QCheckBox("Show HUD")
+        self.hud_check.setChecked(True)
+        self.hud_check.stateChanged.connect(self._emit_settings)
+        layout.addWidget(self.hud_check)
+        
+        self.skeleton_check = QCheckBox("Show Skeletons")
+        self.skeleton_check.setChecked(True)
+        self.skeleton_check.stateChanged.connect(self._emit_settings)
+        layout.addWidget(self.skeleton_check)
+        
+        self.trails_check = QCheckBox("Show Trails")
+        self.trails_check.setChecked(True)
+        self.trails_check.stateChanged.connect(self._emit_settings)
+        layout.addWidget(self.trails_check)
+        
+        # Camera speed
+        speed_layout = QHBoxLayout()
+        speed_layout.addWidget(QLabel("Move Speed:"))
+        self.speed_spin = QSpinBox()
+        self.speed_spin.setRange(1, 50)
+        self.speed_spin.setValue(15)
+        self.speed_spin.valueChanged.connect(self._emit_settings)
+        speed_layout.addWidget(self.speed_spin)
+        layout.addLayout(speed_layout)
+        
+        # Track pruning TTL
+        ttl_layout = QHBoxLayout()
+        ttl_layout.addWidget(QLabel("Track TTL (s):"))
+        self.ttl_spin = QSpinBox()
+        self.ttl_spin.setRange(1, 60)
+        self.ttl_spin.setValue(5)
+        self.ttl_spin.valueChanged.connect(self._emit_settings)
+        ttl_layout.addWidget(self.ttl_spin)
+        layout.addLayout(ttl_layout)
+        
+        # Reset button
+        self.reset_btn = QPushButton("Reset View")
+        self.reset_btn.setStyleSheet("""
+            QPushButton {
+                background: #1a3a5a;
+                color: #ffffff;
+                border: 1px solid #2a5a8a;
+                border-radius: 4px;
+                padding: 8px;
+            }
+            QPushButton:hover { background: #2a4a6a; }
+        """)
+        layout.addWidget(self.reset_btn)
+        
+        layout.addStretch()
+        
+    def _emit_settings(self):
+        settings = {
+            'grid_visible': self.grid_check.isChecked(),
+            'hud_visible': self.hud_check.isChecked(),
+            'skeleton_visible': self.skeleton_check.isChecked(),
+            'trails_visible': self.trails_check.isChecked(),
+            'move_speed': self.speed_spin.value() / 100.0,
+            'track_ttl': self.ttl_spin.value()
+        }
+        self.settings_changed.emit(settings)
+        
+    def get_settings(self) -> dict:
+        return {
+            'grid_visible': self.grid_check.isChecked(),
+            'hud_visible': self.hud_check.isChecked(),
+            'skeleton_visible': self.skeleton_check.isChecked(),
+            'trails_visible': self.trails_check.isChecked(),
+            'move_speed': self.speed_spin.value() / 100.0,
+            'track_ttl': self.ttl_spin.value()
+        }
+
+
+class CSIImmersiveExperienceTab(QWidget):
+    """Complete immersive experience tab combining 3D view and control panels."""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(10)
+        
+        # Main 3D view
+        self.immersive_view = CSIImmersive3DWidget()
+        layout.addWidget(self.immersive_view, stretch=3)
+        
+        # Right sidebar
+        sidebar = QVBoxLayout()
+        sidebar.setSpacing(10)
+        
+        # Control panel
+        self.control_panel = CSITrackingControlPanel()
+        self.control_panel.settings_changed.connect(self._apply_settings)
+        self.control_panel.reset_btn.clicked.connect(self._reset_view)
+        sidebar.addWidget(self.control_panel)
+        
+        # Entity profiles
+        self.profile_panel = CSIEntityProfilePanel()
+        sidebar.addWidget(self.profile_panel, stretch=1)
+        
+        layout.addLayout(sidebar, stretch=1)
+        
+        # Update timer for profiles
+        self.profile_timer = QTimer(self)
+        self.profile_timer.timeout.connect(self._update_profiles)
+        self.profile_timer.start(500)
+        
+    def _apply_settings(self, settings: dict):
+        self.immersive_view.grid_visible = settings.get('grid_visible', True)
+        self.immersive_view.hud_visible = settings.get('hud_visible', True)
+        self.immersive_view.skeleton_visible = settings.get('skeleton_visible', True)
+        self.immersive_view.move_speed = settings.get('move_speed', 0.15)
+        
+    def _reset_view(self):
+        self.immersive_view.camera_pos = np.array([5.0, 5.0, 1.6])
+        self.immersive_view.camera_yaw = 0.0
+        self.immersive_view.camera_pitch = 0.0
+        
+    def _update_profiles(self):
+        self.profile_panel.update_profiles(self.immersive_view.controller.characterizer)
+        
+    def ingest_csi(self, entity_id: str, csi_vector: np.ndarray, 
+                   position: Tuple[float, float, float]):
+        """Public API to feed CSI data."""
+        self.immersive_view.ingest_csi_data(entity_id, csi_vector, position)
+        
+    def add_anchor(self, x: float, y: float, z: float, label: str = "router"):
+        """Add a static anchor point."""
+        self.immersive_view.controller.structure_builder.add_anchor(
+            int(x), int(y), int(z), label
+        )
