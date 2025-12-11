@@ -90352,6 +90352,64 @@ class CSIImmersiveExperienceTab(QWidget):
         self.profile_timer.timeout.connect(self._update_profiles)
         self.profile_timer.start(500)
         
+        # Demo mode - inject simulated walking entities
+        self.demo_timer = QTimer(self)
+        self.demo_timer.timeout.connect(self._inject_demo_entities)
+        self.demo_timer.start(100)  # 10 Hz simulation
+        self.demo_time = 0.0
+        self.demo_entities = self._init_demo_entities()
+        
+        # Add anchors (WiFi routers)
+        self._setup_demo_environment()
+        
+    def _init_demo_entities(self) -> List[dict]:
+        """Initialize demo walking entities."""
+        return [
+            {'id': 'person_alpha', 'start': (2.0, 2.0, 0.0), 'speed': 0.8, 'angle': 0.3},
+            {'id': 'person_beta', 'start': (8.0, 6.0, 0.0), 'speed': 0.6, 'angle': 2.1},
+            {'id': 'person_gamma', 'start': (5.0, 8.0, 0.0), 'speed': 0.5, 'angle': 4.0},
+            {'id': 'person_delta', 'start': (-2.0, 4.0, 0.0), 'speed': 0.7, 'angle': 1.0},
+        ]
+        
+    def _setup_demo_environment(self):
+        """Add demo WiFi anchors and room structure."""
+        # Add WiFi router anchors
+        anchors = [(0, 0, 2.5), (10, 0, 2.5), (10, 10, 2.5), (0, 10, 2.5)]
+        for x, y, z in anchors:
+            self.immersive_view.controller.structure_builder.add_anchor(x, y, z, "router")
+        
+        # Add wall hotspots
+        for i in range(11):
+            self.immersive_view.controller.structure_builder.integrate_detection((float(i), 0.0, 1.0), strength=0.8)
+            self.immersive_view.controller.structure_builder.integrate_detection((float(i), 10.0, 1.0), strength=0.8)
+            self.immersive_view.controller.structure_builder.integrate_detection((0.0, float(i), 1.0), strength=0.8)
+            self.immersive_view.controller.structure_builder.integrate_detection((10.0, float(i), 1.0), strength=0.8)
+            
+    def _inject_demo_entities(self):
+        """Inject simulated walking entities for demo visualization."""
+        self.demo_time += 0.1
+        
+        for entity in self.demo_entities:
+            # Calculate walking position
+            t = self.demo_time * entity['speed']
+            start = entity['start']
+            angle = entity['angle'] + np.sin(t * 0.3) * 0.5  # Wandering
+            
+            # Walking in a pattern
+            x = start[0] + np.sin(t) * 3.0 + np.cos(t * 0.7) * 2.0
+            y = start[1] + np.cos(t) * 3.0 + np.sin(t * 0.5) * 2.0
+            z = 0.0
+            
+            # Clamp to room
+            x = np.clip(x, -2.0, 12.0)
+            y = np.clip(y, -2.0, 12.0)
+            
+            # Generate fake CSI data
+            csi = np.random.randn(256) * 0.5 + np.sin(np.linspace(0, 10, 256) + t)
+            
+            # Inject into view
+            self.immersive_view.ingest_csi_data(entity['id'], csi, (float(x), float(y), float(z)))
+        
     def _apply_settings(self, settings: dict):
         self.immersive_view.grid_visible = settings.get('grid_visible', True)
         self.immersive_view.hud_visible = settings.get('hud_visible', True)
@@ -92230,6 +92288,42 @@ class CSIFullExperienceWidget(QWidget):
         self.stats_timer = QTimer(self)
         self.stats_timer.timeout.connect(self._update_stats)
         self.stats_timer.start(1000)
+        
+        # Demo mode - inject simulated entities
+        self.demo_timer = QTimer(self)
+        self.demo_timer.timeout.connect(self._inject_demo_data)
+        self.demo_timer.start(100)
+        self.demo_time = 0.0
+        self._setup_demo_anchors()
+        
+    def _setup_demo_anchors(self):
+        """Add demo WiFi anchors."""
+        anchors = [(0, 0, 2.5), (10, 0, 2.5), (10, 10, 2.5), (0, 10, 2.5)]
+        for x, y, z in anchors:
+            self.view_3d.controller.structure_builder.add_anchor(x, y, z, "router")
+            
+    def _inject_demo_data(self):
+        """Inject demo walking entities for visualization."""
+        self.demo_time += 0.1
+        t = self.demo_time
+        
+        # Entity 1: Walking in circle
+        x1 = 5.0 + np.cos(t * 0.5) * 3.0
+        y1 = 5.0 + np.sin(t * 0.5) * 3.0
+        csi1 = np.random.randn(256) * 0.3 + np.sin(np.linspace(0, 8, 256) + t)
+        self.process_csi("walker_01", csi1, (x1, y1, 0.0))
+        
+        # Entity 2: Walking back and forth
+        x2 = 2.0 + np.sin(t * 0.7) * 4.0
+        y2 = 7.0 + np.cos(t * 0.3) * 2.0
+        csi2 = np.random.randn(256) * 0.4 + np.cos(np.linspace(0, 6, 256) + t)
+        self.process_csi("walker_02", csi2, (x2, y2, 0.0))
+        
+        # Entity 3: Stationary (sitting)
+        x3 = 8.0 + np.sin(t * 0.1) * 0.2
+        y3 = 2.0 + np.cos(t * 0.1) * 0.2
+        csi3 = np.random.randn(256) * 0.1 + 0.5
+        self.process_csi("seated_03", csi3, (x3, y3, 0.0))
         
     def _setup_ui(self):
         """Setup the user interface."""
