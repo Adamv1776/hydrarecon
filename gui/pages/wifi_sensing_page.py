@@ -91517,3 +91517,399 @@ class CSIEmergencyResponseSystem:
         if emergency_id < len(self.active_emergencies):
             self.active_emergencies[emergency_id]['resolved'] = True
             self.active_emergencies = [e for e in self.active_emergencies if not e['resolved']]
+
+
+class CSIHumanAvatarRenderer:
+    """Render realistic 3D human avatars from CSI-derived pose data."""
+    
+    def __init__(self, avatar_style: str = "realistic"):
+        self.avatar_style = avatar_style
+        
+        # Avatar models
+        self.avatar_meshes: Dict[str, dict] = {}
+        self.avatar_textures: Dict[str, dict] = {}
+        self.avatar_animations: Dict[str, List[dict]] = {}
+        
+        # Body proportions (normalized)
+        self.body_proportions = {
+            'head_radius': 0.1,
+            'neck_length': 0.05,
+            'torso_length': 0.35,
+            'torso_width': 0.25,
+            'arm_length': 0.35,
+            'leg_length': 0.45,
+            'hand_size': 0.05,
+            'foot_size': 0.08
+        }
+        
+        # Animation state
+        self.current_poses: Dict[str, dict] = {}
+        self.animation_blending: Dict[str, float] = {}
+        
+    def create_avatar(self, entity_id: str, height: float = 1.75, 
+                      body_type: str = "average") -> dict:
+        """Create avatar mesh for entity."""
+        scale = height / 1.75
+        
+        # Generate mesh vertices (simplified)
+        mesh = {
+            'vertices': [],
+            'faces': [],
+            'joints': {},
+            'height': height,
+            'body_type': body_type
+        }
+        
+        # Head sphere
+        head_center = np.array([0, 0, height - self.body_proportions['head_radius']])
+        mesh['joints']['head'] = head_center.tolist()
+        
+        # Neck
+        neck_base = head_center - np.array([0, 0, self.body_proportions['head_radius'] + self.body_proportions['neck_length']])
+        mesh['joints']['neck'] = neck_base.tolist()
+        
+        # Shoulders
+        shoulder_y = self.body_proportions['torso_width'] / 2 * scale
+        mesh['joints']['left_shoulder'] = [0, -shoulder_y, neck_base[2] - 0.05]
+        mesh['joints']['right_shoulder'] = [0, shoulder_y, neck_base[2] - 0.05]
+        
+        # Torso
+        hip_height = height * 0.5
+        mesh['joints']['spine'] = [0, 0, (neck_base[2] + hip_height) / 2]
+        mesh['joints']['pelvis'] = [0, 0, hip_height]
+        
+        # Hips
+        hip_width = self.body_proportions['torso_width'] / 2 * 0.9 * scale
+        mesh['joints']['left_hip'] = [0, -hip_width, hip_height]
+        mesh['joints']['right_hip'] = [0, hip_width, hip_height]
+        
+        # Arms
+        arm_length = self.body_proportions['arm_length'] * scale
+        mesh['joints']['left_elbow'] = [0, -shoulder_y - arm_length * 0.5, neck_base[2] - 0.15]
+        mesh['joints']['right_elbow'] = [0, shoulder_y + arm_length * 0.5, neck_base[2] - 0.15]
+        mesh['joints']['left_wrist'] = [0, -shoulder_y - arm_length, neck_base[2] - 0.25]
+        mesh['joints']['right_wrist'] = [0, shoulder_y + arm_length, neck_base[2] - 0.25]
+        
+        # Legs
+        leg_length = self.body_proportions['leg_length'] * scale
+        knee_height = hip_height - leg_length * 0.5
+        mesh['joints']['left_knee'] = [0, -hip_width, knee_height]
+        mesh['joints']['right_knee'] = [0, hip_width, knee_height]
+        mesh['joints']['left_ankle'] = [0, -hip_width, 0.05]
+        mesh['joints']['right_ankle'] = [0, hip_width, 0.05]
+        
+        self.avatar_meshes[entity_id] = mesh
+        return mesh
+        
+    def update_pose(self, entity_id: str, joint_positions: dict, 
+                    blend_factor: float = 0.3):
+        """Update avatar pose with smooth blending."""
+        if entity_id not in self.avatar_meshes:
+            self.create_avatar(entity_id)
+            
+        mesh = self.avatar_meshes[entity_id]
+        
+        # Blend new pose with current
+        if entity_id in self.current_poses:
+            current = self.current_poses[entity_id]
+            blended = {}
+            for joint_name, new_pos in joint_positions.items():
+                if joint_name in current:
+                    old_pos = np.array(current[joint_name])
+                    new_pos = np.array(new_pos)
+                    blended[joint_name] = (
+                        blend_factor * new_pos + (1 - blend_factor) * old_pos
+                    ).tolist()
+                else:
+                    blended[joint_name] = new_pos if isinstance(new_pos, list) else new_pos.tolist()
+            joint_positions = blended
+            
+        self.current_poses[entity_id] = joint_positions
+        
+        # Update mesh joints
+        for joint_name, position in joint_positions.items():
+            if joint_name in mesh['joints']:
+                mesh['joints'][joint_name] = position if isinstance(position, list) else position.tolist()
+                
+        return mesh
+        
+    def get_render_data(self, entity_id: str) -> dict:
+        """Get data for rendering avatar."""
+        if entity_id not in self.avatar_meshes:
+            return {}
+            
+        mesh = self.avatar_meshes[entity_id]
+        pose = self.current_poses.get(entity_id, {})
+        
+        return {
+            'mesh': mesh,
+            'pose': pose,
+            'style': self.avatar_style,
+            'animation_blend': self.animation_blending.get(entity_id, 0.0)
+        }
+
+
+class CSISceneComposer:
+    """Compose complete 3D scenes with entities, environment, and effects."""
+    
+    def __init__(self):
+        self.entities: Dict[str, dict] = {}
+        self.environment: dict = {}
+        self.lighting: dict = {}
+        self.effects: List[dict] = []
+        self.cameras: Dict[str, dict] = {}
+        
+        # Renderers
+        self.avatar_renderer = CSIHumanAvatarRenderer()
+        self.body_model = CSIAdvancedBodyModelEngine()
+        
+        # Scene settings
+        self.ambient_light = 0.3
+        self.floor_grid = True
+        self.show_trails = True
+        self.trail_length = 50
+        
+    def add_entity(self, entity_id: str, position: Tuple[float, float, float],
+                   entity_type: str = "human"):
+        """Add entity to scene."""
+        self.entities[entity_id] = {
+            'position': list(position),
+            'type': entity_type,
+            'visible': True,
+            'trail': [list(position)],
+            'color': self._generate_color(entity_id),
+            'created_at': time.time()
+        }
+        
+        if entity_type == "human":
+            self.avatar_renderer.create_avatar(entity_id)
+            
+    def _generate_color(self, entity_id: str) -> Tuple[int, int, int]:
+        """Generate consistent color for entity."""
+        h = hash(entity_id) % 360
+        # HSV to RGB (simplified)
+        c = 0.8
+        x = c * (1 - abs((h / 60) % 2 - 1))
+        m = 0.2
+        
+        if h < 60:
+            r, g, b = c, x, 0
+        elif h < 120:
+            r, g, b = x, c, 0
+        elif h < 180:
+            r, g, b = 0, c, x
+        elif h < 240:
+            r, g, b = 0, x, c
+        elif h < 300:
+            r, g, b = x, 0, c
+        else:
+            r, g, b = c, 0, x
+            
+        return (int((r + m) * 255), int((g + m) * 255), int((b + m) * 255))
+        
+    def update_entity(self, entity_id: str, position: Tuple[float, float, float],
+                      pose: Optional[dict] = None, csi_features: Optional[np.ndarray] = None):
+        """Update entity position and pose."""
+        if entity_id not in self.entities:
+            self.add_entity(entity_id, position)
+            
+        entity = self.entities[entity_id]
+        entity['position'] = list(position)
+        
+        # Update trail
+        entity['trail'].append(list(position))
+        if len(entity['trail']) > self.trail_length:
+            entity['trail'] = entity['trail'][-self.trail_length:]
+            
+        # Update pose if human
+        if entity['type'] == "human" and csi_features is not None:
+            pose_result = self.body_model.estimate_pose(
+                entity_id, csi_features, np.array(position)
+            )
+            self.avatar_renderer.update_pose(entity_id, 
+                {name: pos.tolist() for name, pos in zip(pose_result['joint_names'], pose_result['joints_3d'])})
+                
+    def set_environment(self, walls: List[dict], furniture: List[dict],
+                        floor_bounds: Tuple[float, float, float, float]):
+        """Set environment geometry."""
+        self.environment = {
+            'walls': walls,
+            'furniture': furniture,
+            'floor_bounds': floor_bounds
+        }
+        
+    def add_camera(self, camera_id: str, position: Tuple[float, float, float],
+                   target: Tuple[float, float, float], fov: float = 60.0):
+        """Add camera to scene."""
+        self.cameras[camera_id] = {
+            'position': list(position),
+            'target': list(target),
+            'fov': fov,
+            'up': [0, 0, 1]
+        }
+        
+    def add_effect(self, effect_type: str, position: Tuple[float, float, float],
+                   duration: float = 2.0, **kwargs):
+        """Add visual effect to scene."""
+        self.effects.append({
+            'type': effect_type,
+            'position': list(position),
+            'start_time': time.time(),
+            'duration': duration,
+            **kwargs
+        })
+        
+    def render_frame(self, camera_id: str = "main") -> dict:
+        """Render scene frame from camera perspective."""
+        # Clean up expired effects
+        current_time = time.time()
+        self.effects = [e for e in self.effects 
+                       if current_time - e['start_time'] < e['duration']]
+        
+        camera = self.cameras.get(camera_id, {
+            'position': [5, 5, 3],
+            'target': [0, 0, 0],
+            'fov': 60,
+            'up': [0, 0, 1]
+        })
+        
+        # Collect renderable entities
+        rendered_entities = []
+        for entity_id, entity in self.entities.items():
+            if not entity['visible']:
+                continue
+                
+            render_data = {
+                'id': entity_id,
+                'position': entity['position'],
+                'color': entity['color'],
+                'trail': entity['trail'] if self.show_trails else [],
+                'type': entity['type']
+            }
+            
+            if entity['type'] == "human":
+                render_data['avatar'] = self.avatar_renderer.get_render_data(entity_id)
+                
+            rendered_entities.append(render_data)
+            
+        return {
+            'camera': camera,
+            'entities': rendered_entities,
+            'environment': self.environment,
+            'lighting': {
+                'ambient': self.ambient_light,
+                'directional': {'direction': [1, 1, -1], 'intensity': 0.7}
+            },
+            'effects': self.effects,
+            'floor_grid': self.floor_grid,
+            'timestamp': current_time
+        }
+
+
+class CSIRealtimeVisualizationEngine:
+    """Real-time visualization engine coordinating all rendering components."""
+    
+    def __init__(self, target_fps: float = 30.0):
+        self.target_fps = target_fps
+        self.frame_interval = 1.0 / target_fps
+        
+        # Components
+        self.scene = CSISceneComposer()
+        self.tracker = CSIMultiPersonTracker()
+        self.activity_recognizer = CSIActivityRecognitionEngine()
+        self.gesture_recognizer = CSIGestureRecognizer()
+        self.vital_monitor = CSIVitalSignsMonitor()
+        self.emergency_system = CSIEmergencyResponseSystem()
+        
+        # State
+        self.is_running = False
+        self.frame_count = 0
+        self.last_frame_time = 0.0
+        self.fps_history: List[float] = []
+        
+        # Callbacks
+        self.on_frame_callbacks: List[callable] = []
+        self.on_emergency_callbacks: List[callable] = []
+        
+    def register_frame_callback(self, callback: callable):
+        """Register callback for frame updates."""
+        self.on_frame_callbacks.append(callback)
+        
+    def register_emergency_callback(self, callback: callable):
+        """Register callback for emergency events."""
+        self.on_emergency_callbacks.append(callback)
+        
+    def process_csi_batch(self, detections: List[dict]):
+        """Process batch of CSI detections."""
+        # Update tracker
+        self.tracker.update(detections)
+        
+        # Process each detection
+        for det in detections:
+            entity_id = det.get('entity_id', f"entity_{len(self.scene.entities)}")
+            position = det.get('position', (0, 0, 0))
+            csi_features = det.get('csi_features', np.zeros(64))
+            
+            # Update scene
+            self.scene.update_entity(entity_id, tuple(position), csi_features=csi_features)
+            
+            # Activity recognition
+            activity = self.activity_recognizer.classify_activity(entity_id, csi_features)
+            
+            # Gesture recognition
+            gesture = self.gesture_recognizer.process_csi(entity_id, csi_features)
+            
+            # Vital signs
+            vitals = self.vital_monitor.process_sample(entity_id, csi_features)
+            
+            # Emergency check
+            emergency = self.emergency_system.process_all(entity_id, csi_features, position)
+            
+            if emergency['emergency']:
+                for callback in self.on_emergency_callbacks:
+                    callback(emergency)
+                    
+            # Add activity effect
+            if activity['confidence'] > 0.7 and activity['activity'] not in ['standing', 'unknown']:
+                self.scene.add_effect('activity_label', position, duration=1.0,
+                                     label=activity['activity'])
+                                     
+            # Add gesture effect
+            if gesture['confidence'] > 0.5 and gesture['gesture'] != 'none':
+                self.scene.add_effect('gesture_indicator', position, duration=0.5,
+                                     gesture=gesture['gesture'])
+                                     
+    def render_frame(self, camera_id: str = "main") -> dict:
+        """Render current frame."""
+        current_time = time.time()
+        
+        # Calculate FPS
+        if self.last_frame_time > 0:
+            fps = 1.0 / (current_time - self.last_frame_time + 1e-8)
+            self.fps_history.append(fps)
+            if len(self.fps_history) > 60:
+                self.fps_history = self.fps_history[-60:]
+                
+        self.last_frame_time = current_time
+        self.frame_count += 1
+        
+        # Render scene
+        frame = self.scene.render_frame(camera_id)
+        frame['frame_number'] = self.frame_count
+        frame['fps'] = np.mean(self.fps_history) if self.fps_history else 0
+        
+        # Notify callbacks
+        for callback in self.on_frame_callbacks:
+            callback(frame)
+            
+        return frame
+        
+    def get_stats(self) -> dict:
+        """Get visualization engine statistics."""
+        return {
+            'frame_count': self.frame_count,
+            'avg_fps': np.mean(self.fps_history) if self.fps_history else 0,
+            'num_entities': len(self.scene.entities),
+            'num_tracks': len(self.tracker.tracks),
+            'active_emergencies': len(self.emergency_system.active_emergencies)
+        }
