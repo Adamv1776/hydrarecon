@@ -90280,3 +90280,739 @@ class CSIImmersiveExperienceTab(QWidget):
         self.immersive_view.controller.structure_builder.add_anchor(
             int(x), int(y), int(z), label
         )
+
+
+class CSIAdvancedBodyModelEngine:
+    """Full-body pose estimation and articulated skeleton reconstruction from CSI."""
+    
+    def __init__(self, num_joints: int = 17, temporal_window: int = 32):
+        self.num_joints = num_joints
+        self.temporal_window = temporal_window
+        
+        # Joint definitions (COCO format)
+        self.joint_names = [
+            'nose', 'left_eye', 'right_eye', 'left_ear', 'right_ear',
+            'left_shoulder', 'right_shoulder', 'left_elbow', 'right_elbow',
+            'left_wrist', 'right_wrist', 'left_hip', 'right_hip',
+            'left_knee', 'right_knee', 'left_ankle', 'right_ankle'
+        ]
+        
+        # Bone connections
+        self.bones = [
+            (0, 1), (0, 2), (1, 3), (2, 4),  # Face
+            (5, 6), (5, 7), (7, 9), (6, 8), (8, 10),  # Arms
+            (5, 11), (6, 12), (11, 12),  # Torso
+            (11, 13), (13, 15), (12, 14), (14, 16)  # Legs
+        ]
+        
+        # State
+        self.pose_history: Dict[str, List[np.ndarray]] = {}
+        self.joint_velocities: Dict[str, np.ndarray] = {}
+        self.pose_confidence: Dict[str, np.ndarray] = {}
+        
+        # Learned priors
+        self.joint_offsets = self._init_joint_offsets()
+        self.motion_model = self._init_motion_model()
+        
+    def _init_joint_offsets(self) -> np.ndarray:
+        """Initialize anatomical joint offset priors."""
+        offsets = np.zeros((self.num_joints, 3))
+        # Head
+        offsets[0] = [0, 0, 1.7]  # nose
+        offsets[1] = [-0.03, 0.02, 1.72]  # left eye
+        offsets[2] = [0.03, 0.02, 1.72]  # right eye
+        offsets[3] = [-0.08, 0, 1.7]  # left ear
+        offsets[4] = [0.08, 0, 1.7]  # right ear
+        # Shoulders
+        offsets[5] = [-0.2, 0, 1.45]
+        offsets[6] = [0.2, 0, 1.45]
+        # Elbows
+        offsets[7] = [-0.45, 0, 1.2]
+        offsets[8] = [0.45, 0, 1.2]
+        # Wrists
+        offsets[9] = [-0.6, 0, 1.0]
+        offsets[10] = [0.6, 0, 1.0]
+        # Hips
+        offsets[11] = [-0.1, 0, 0.95]
+        offsets[12] = [0.1, 0, 0.95]
+        # Knees
+        offsets[13] = [-0.1, 0, 0.5]
+        offsets[14] = [0.1, 0, 0.5]
+        # Ankles
+        offsets[15] = [-0.1, 0, 0.05]
+        offsets[16] = [0.1, 0, 0.05]
+        return offsets
+        
+    def _init_motion_model(self) -> dict:
+        """Initialize motion dynamics model."""
+        return {
+            'joint_damping': 0.85,
+            'velocity_smoothing': 0.7,
+            'acceleration_limit': 2.0,
+            'bone_length_tolerance': 0.15
+        }
+        
+    def estimate_pose(self, entity_id: str, csi_features: np.ndarray, 
+                      root_position: np.ndarray) -> dict:
+        """Estimate full body pose from CSI features."""
+        csi_features = np.asarray(csi_features).flatten()
+        
+        # Feature-to-joint mapping via learned correlation
+        if csi_features.size < self.num_joints * 3:
+            csi_features = np.pad(csi_features, (0, self.num_joints * 3 - csi_features.size))
+        
+        # Extract joint perturbations from CSI
+        joint_deltas = csi_features[:self.num_joints * 3].reshape(self.num_joints, 3)
+        joint_deltas = joint_deltas * 0.1  # Scale factor
+        
+        # Apply to base skeleton
+        joints_3d = self.joint_offsets.copy() + joint_deltas
+        joints_3d += root_position
+        
+        # Apply temporal smoothing
+        if entity_id in self.pose_history and len(self.pose_history[entity_id]) > 0:
+            prev_pose = self.pose_history[entity_id][-1]
+            alpha = self.motion_model['velocity_smoothing']
+            joints_3d = alpha * joints_3d + (1 - alpha) * prev_pose
+            
+        # Update velocity estimates
+        if entity_id in self.pose_history and len(self.pose_history[entity_id]) > 0:
+            velocity = joints_3d - self.pose_history[entity_id][-1]
+            if entity_id not in self.joint_velocities:
+                self.joint_velocities[entity_id] = velocity
+            else:
+                self.joint_velocities[entity_id] = (
+                    0.8 * self.joint_velocities[entity_id] + 0.2 * velocity
+                )
+        
+        # Store history
+        if entity_id not in self.pose_history:
+            self.pose_history[entity_id] = []
+        self.pose_history[entity_id].append(joints_3d.copy())
+        if len(self.pose_history[entity_id]) > self.temporal_window:
+            self.pose_history[entity_id] = self.pose_history[entity_id][-self.temporal_window:]
+            
+        # Compute confidence per joint
+        confidence = np.ones(self.num_joints) * 0.8
+        if len(self.pose_history[entity_id]) > 2:
+            stability = 1.0 / (np.std(np.array(self.pose_history[entity_id][-5:]), axis=0).mean(axis=1) + 0.1)
+            confidence = np.clip(stability * 0.3, 0.3, 1.0)
+        self.pose_confidence[entity_id] = confidence
+        
+        return {
+            'joints_3d': joints_3d,
+            'joint_names': self.joint_names,
+            'bones': self.bones,
+            'confidence': confidence,
+            'velocity': self.joint_velocities.get(entity_id, np.zeros_like(joints_3d))
+        }
+        
+    def get_bone_lengths(self, pose: dict) -> np.ndarray:
+        """Calculate bone lengths from pose."""
+        joints = pose['joints_3d']
+        lengths = []
+        for start, end in self.bones:
+            length = np.linalg.norm(joints[end] - joints[start])
+            lengths.append(length)
+        return np.array(lengths)
+
+
+class CSIActivityRecognitionEngine:
+    """Recognize human activities from CSI temporal patterns."""
+    
+    ACTIVITIES = [
+        'standing', 'walking', 'sitting', 'lying', 'running',
+        'jumping', 'falling', 'waving', 'reaching', 'bending',
+        'turning', 'climbing_stairs', 'using_phone', 'eating', 'unknown'
+    ]
+    
+    def __init__(self, window_size: int = 64, num_features: int = 128):
+        self.window_size = window_size
+        self.num_features = num_features
+        
+        # Feature buffers
+        self.feature_buffers: Dict[str, List[np.ndarray]] = {}
+        self.activity_history: Dict[str, List[str]] = {}
+        self.confidence_history: Dict[str, List[float]] = {}
+        
+        # Activity signatures (learned patterns)
+        self.activity_signatures = self._init_signatures()
+        
+    def _init_signatures(self) -> Dict[str, dict]:
+        """Initialize activity recognition signatures."""
+        signatures = {}
+        for activity in self.ACTIVITIES:
+            signatures[activity] = {
+                'frequency_range': (0.5, 3.0),
+                'amplitude_range': (0.1, 1.0),
+                'periodicity': 0.5,
+                'complexity': 0.5
+            }
+        
+        # Customize key activities
+        signatures['walking']['frequency_range'] = (1.5, 2.5)
+        signatures['walking']['periodicity'] = 0.8
+        signatures['running']['frequency_range'] = (2.5, 4.0)
+        signatures['running']['amplitude_range'] = (0.5, 1.0)
+        signatures['standing']['amplitude_range'] = (0.0, 0.2)
+        signatures['standing']['periodicity'] = 0.1
+        signatures['sitting']['amplitude_range'] = (0.0, 0.15)
+        signatures['falling']['amplitude_range'] = (0.8, 1.0)
+        signatures['falling']['frequency_range'] = (0.1, 1.0)
+        
+        return signatures
+        
+    def extract_temporal_features(self, signal: np.ndarray) -> dict:
+        """Extract temporal features from CSI signal."""
+        signal = np.asarray(signal).flatten()
+        if signal.size == 0:
+            return {'dominant_freq': 0, 'amplitude': 0, 'periodicity': 0, 'complexity': 0}
+            
+        # FFT analysis
+        spectrum = np.abs(np.fft.rfft(signal))
+        freqs = np.fft.rfftfreq(signal.size, d=1.0/30.0)  # Assume 30 Hz sampling
+        
+        # Dominant frequency
+        if spectrum.size > 0:
+            dominant_idx = int(np.argmax(spectrum))
+            dominant_freq = freqs[dominant_idx] if dominant_idx < len(freqs) else 0
+        else:
+            dominant_freq = 0
+            
+        # Amplitude (normalized)
+        amplitude = float(np.std(signal))
+        
+        # Periodicity (autocorrelation peak)
+        if signal.size > 10:
+            autocorr = np.correlate(signal, signal, mode='full')
+            autocorr = autocorr[autocorr.size // 2:]
+            if autocorr.size > 1:
+                autocorr = autocorr / (autocorr[0] + 1e-8)
+                # Find first significant peak after lag 0
+                peaks = np.where((autocorr[1:-1] > autocorr[:-2]) & (autocorr[1:-1] > autocorr[2:]))[0]
+                if len(peaks) > 0:
+                    periodicity = float(autocorr[peaks[0] + 1])
+                else:
+                    periodicity = 0.0
+            else:
+                periodicity = 0.0
+        else:
+            periodicity = 0.0
+            
+        # Complexity (spectral entropy)
+        if spectrum.size > 0 and np.sum(spectrum) > 0:
+            spectrum_norm = spectrum / (np.sum(spectrum) + 1e-8)
+            complexity = float(-np.sum(spectrum_norm * np.log(spectrum_norm + 1e-8)))
+        else:
+            complexity = 0.0
+            
+        return {
+            'dominant_freq': dominant_freq,
+            'amplitude': amplitude,
+            'periodicity': periodicity,
+            'complexity': complexity
+        }
+        
+    def classify_activity(self, entity_id: str, csi_vector: np.ndarray) -> dict:
+        """Classify current activity from CSI data."""
+        csi_vector = np.asarray(csi_vector).flatten()
+        
+        # Buffer features
+        if entity_id not in self.feature_buffers:
+            self.feature_buffers[entity_id] = []
+        self.feature_buffers[entity_id].append(csi_vector)
+        if len(self.feature_buffers[entity_id]) > self.window_size:
+            self.feature_buffers[entity_id] = self.feature_buffers[entity_id][-self.window_size:]
+            
+        # Need minimum samples
+        if len(self.feature_buffers[entity_id]) < 16:
+            return {'activity': 'unknown', 'confidence': 0.0, 'features': {}}
+            
+        # Extract features from window
+        window = np.concatenate(self.feature_buffers[entity_id])
+        features = self.extract_temporal_features(window)
+        
+        # Match against signatures
+        scores = {}
+        for activity, sig in self.activity_signatures.items():
+            score = 0.0
+            
+            # Frequency match
+            freq_mid = (sig['frequency_range'][0] + sig['frequency_range'][1]) / 2
+            freq_range = sig['frequency_range'][1] - sig['frequency_range'][0]
+            freq_score = 1.0 - min(1.0, abs(features['dominant_freq'] - freq_mid) / (freq_range + 0.1))
+            score += freq_score * 0.3
+            
+            # Amplitude match
+            amp_mid = (sig['amplitude_range'][0] + sig['amplitude_range'][1]) / 2
+            amp_range = sig['amplitude_range'][1] - sig['amplitude_range'][0]
+            amp_score = 1.0 - min(1.0, abs(features['amplitude'] - amp_mid) / (amp_range + 0.1))
+            score += amp_score * 0.3
+            
+            # Periodicity match
+            period_score = 1.0 - abs(features['periodicity'] - sig['periodicity'])
+            score += max(0, period_score) * 0.4
+            
+            scores[activity] = score
+            
+        # Best match
+        best_activity = max(scores, key=scores.get)
+        confidence = scores[best_activity]
+        
+        # Update history
+        if entity_id not in self.activity_history:
+            self.activity_history[entity_id] = []
+        self.activity_history[entity_id].append(best_activity)
+        if len(self.activity_history[entity_id]) > 30:
+            self.activity_history[entity_id] = self.activity_history[entity_id][-30:]
+            
+        return {
+            'activity': best_activity,
+            'confidence': float(confidence),
+            'features': features,
+            'scores': scores
+        }
+
+
+class CSIEnvironmentMapBuilder:
+    """Build detailed environment maps from CSI reflections and multipath."""
+    
+    def __init__(self, grid_resolution: float = 0.25, map_size: Tuple[int, int] = (40, 40)):
+        self.grid_resolution = grid_resolution
+        self.map_size = map_size
+        
+        # Maps
+        self.occupancy_map = np.zeros(map_size, dtype=float)
+        self.reflection_map = np.zeros(map_size, dtype=float)
+        self.material_map = np.zeros(map_size, dtype=int)  # 0=unknown, 1=wall, 2=furniture, 3=door
+        
+        # Object detection
+        self.detected_objects: List[dict] = []
+        self.wall_segments: List[Tuple[np.ndarray, np.ndarray]] = []
+        
+        # CSI processing state
+        self.multipath_history: List[np.ndarray] = []
+        self.aoa_estimates: List[float] = []
+        self.tof_estimates: List[float] = []
+        
+    def process_csi_multipath(self, csi_matrix: np.ndarray, 
+                               rx_position: Tuple[float, float]) -> dict:
+        """Process CSI to extract multipath and environment info."""
+        csi_matrix = np.asarray(csi_matrix)
+        if csi_matrix.ndim == 1:
+            csi_matrix = csi_matrix.reshape(1, -1)
+            
+        # Extract multipath components via MUSIC or similar
+        # Simplified: use FFT peaks
+        spectrum = np.abs(np.fft.fft2(csi_matrix))
+        
+        # Find peaks (simplified multipath detection)
+        threshold = np.mean(spectrum) + 2 * np.std(spectrum)
+        peaks = np.argwhere(spectrum > threshold)
+        
+        multipath_components = []
+        for peak in peaks[:10]:  # Limit to top 10
+            # Convert to AoA/ToF estimates (simplified)
+            aoa = (peak[0] / csi_matrix.shape[0]) * np.pi - np.pi/2
+            tof = peak[1] / csi_matrix.shape[1] * 30e-9  # Assume 30ns max ToF
+            power = float(spectrum[peak[0], peak[1]])
+            
+            multipath_components.append({
+                'aoa': float(aoa),
+                'tof': float(tof),
+                'power': power
+            })
+            
+        self.multipath_history.append(csi_matrix.flatten())
+        if len(self.multipath_history) > 100:
+            self.multipath_history = self.multipath_history[-100:]
+            
+        return {
+            'multipath_components': multipath_components,
+            'num_paths': len(multipath_components),
+            'total_power': float(np.sum(spectrum))
+        }
+        
+    def update_occupancy(self, position: Tuple[float, float], strength: float = 1.0):
+        """Update occupancy map with detection."""
+        gx = int(np.clip(position[0] / self.grid_resolution, 0, self.map_size[0] - 1))
+        gy = int(np.clip(position[1] / self.grid_resolution, 0, self.map_size[1] - 1))
+        
+        self.occupancy_map *= 0.98  # Decay
+        self.occupancy_map[gx, gy] = min(1.0, self.occupancy_map[gx, gy] + strength * 0.2)
+        
+    def detect_walls(self, threshold: float = 0.6) -> List[dict]:
+        """Detect wall segments from accumulated occupancy."""
+        # Find high-occupancy regions
+        wall_mask = self.occupancy_map > threshold
+        
+        # Simple connected component analysis
+        walls = []
+        visited = np.zeros_like(wall_mask, dtype=bool)
+        
+        for i in range(self.map_size[0]):
+            for j in range(self.map_size[1]):
+                if wall_mask[i, j] and not visited[i, j]:
+                    # Flood fill to find connected region
+                    region = []
+                    stack = [(i, j)]
+                    while stack:
+                        x, y = stack.pop()
+                        if 0 <= x < self.map_size[0] and 0 <= y < self.map_size[1]:
+                            if wall_mask[x, y] and not visited[x, y]:
+                                visited[x, y] = True
+                                region.append((x, y))
+                                stack.extend([(x+1, y), (x-1, y), (x, y+1), (x, y-1)])
+                    
+                    if len(region) >= 3:
+                        # Fit line to region (PCA)
+                        points = np.array(region) * self.grid_resolution
+                        center = points.mean(axis=0)
+                        centered = points - center
+                        if len(centered) > 1:
+                            cov = np.cov(centered.T)
+                            if cov.shape == (2, 2):
+                                eigenvalues, eigenvectors = np.linalg.eig(cov)
+                                direction = eigenvectors[:, np.argmax(eigenvalues)]
+                                length = np.max(np.abs(centered @ direction)) * 2
+                                
+                                walls.append({
+                                    'center': center.tolist(),
+                                    'direction': direction.tolist(),
+                                    'length': float(length),
+                                    'points': len(region)
+                                })
+        
+        return walls
+        
+    def export_map(self) -> dict:
+        """Export environment map data."""
+        walls = self.detect_walls()
+        return {
+            'occupancy': self.occupancy_map.tolist(),
+            'resolution': self.grid_resolution,
+            'size': self.map_size,
+            'walls': walls,
+            'objects': self.detected_objects
+        }
+
+
+class CSIMultiPersonTracker:
+    """Track multiple people simultaneously with identity persistence."""
+    
+    def __init__(self, max_persons: int = 16, association_threshold: float = 2.0):
+        self.max_persons = max_persons
+        self.association_threshold = association_threshold
+        
+        # Tracks
+        self.tracks: Dict[str, dict] = {}
+        self.next_id = 0
+        
+        # Re-identification
+        self.appearance_features: Dict[str, np.ndarray] = {}
+        self.gait_features: Dict[str, np.ndarray] = {}
+        
+        # Track management
+        self.track_age: Dict[str, int] = {}
+        self.track_hits: Dict[str, int] = {}
+        self.track_misses: Dict[str, int] = {}
+        
+    def _generate_id(self) -> str:
+        id_str = f"person_{self.next_id:04d}"
+        self.next_id += 1
+        return id_str
+        
+    def _compute_distance(self, track: dict, detection: dict) -> float:
+        """Compute association distance between track and detection."""
+        pos_dist = np.linalg.norm(
+            np.array(track['position']) - np.array(detection['position'])
+        )
+        
+        # Feature distance if available
+        feat_dist = 0.0
+        if 'features' in detection and track['id'] in self.appearance_features:
+            feat_dist = np.linalg.norm(
+                self.appearance_features[track['id']] - detection['features']
+            )
+            
+        return pos_dist + 0.3 * feat_dist
+        
+    def update(self, detections: List[dict]) -> Dict[str, dict]:
+        """Update tracks with new detections using Hungarian assignment."""
+        if not self.tracks and not detections:
+            return {}
+            
+        # Create cost matrix
+        track_ids = list(self.tracks.keys())
+        if track_ids and detections:
+            cost_matrix = np.zeros((len(track_ids), len(detections)))
+            
+            for i, tid in enumerate(track_ids):
+                for j, det in enumerate(detections):
+                    cost_matrix[i, j] = self._compute_distance(self.tracks[tid], det)
+            
+            # Simple greedy assignment (could use Hungarian)
+            assignments = {}
+            used_dets = set()
+            
+            for i, tid in enumerate(track_ids):
+                min_cost = float('inf')
+                min_j = -1
+                for j in range(len(detections)):
+                    if j not in used_dets and cost_matrix[i, j] < min_cost:
+                        min_cost = cost_matrix[i, j]
+                        min_j = j
+                        
+                if min_j >= 0 and min_cost < self.association_threshold:
+                    assignments[tid] = min_j
+                    used_dets.add(min_j)
+                    
+            # Update matched tracks
+            for tid, det_idx in assignments.items():
+                det = detections[det_idx]
+                self.tracks[tid]['position'] = det['position']
+                self.tracks[tid]['velocity'] = det.get('velocity', self.tracks[tid].get('velocity', [0, 0, 0]))
+                self.tracks[tid]['last_seen'] = time.time()
+                self.track_hits[tid] = self.track_hits.get(tid, 0) + 1
+                self.track_misses[tid] = 0
+                
+                if 'features' in det:
+                    self.appearance_features[tid] = det['features']
+                    
+            # Increment misses for unmatched tracks
+            for tid in track_ids:
+                if tid not in assignments:
+                    self.track_misses[tid] = self.track_misses.get(tid, 0) + 1
+                    
+            # Create new tracks for unmatched detections
+            for j, det in enumerate(detections):
+                if j not in used_dets and len(self.tracks) < self.max_persons:
+                    new_id = self._generate_id()
+                    self.tracks[new_id] = {
+                        'id': new_id,
+                        'position': det['position'],
+                        'velocity': det.get('velocity', [0, 0, 0]),
+                        'last_seen': time.time()
+                    }
+                    self.track_age[new_id] = 0
+                    self.track_hits[new_id] = 1
+                    self.track_misses[new_id] = 0
+                    
+                    if 'features' in det:
+                        self.appearance_features[new_id] = det['features']
+        
+        elif detections:
+            # No existing tracks, create new ones
+            for det in detections[:self.max_persons]:
+                new_id = self._generate_id()
+                self.tracks[new_id] = {
+                    'id': new_id,
+                    'position': det['position'],
+                    'velocity': det.get('velocity', [0, 0, 0]),
+                    'last_seen': time.time()
+                }
+                self.track_age[new_id] = 0
+                self.track_hits[new_id] = 1
+                self.track_misses[new_id] = 0
+                
+        # Remove stale tracks
+        stale = [tid for tid, misses in self.track_misses.items() if misses > 10]
+        for tid in stale:
+            self.tracks.pop(tid, None)
+            self.track_age.pop(tid, None)
+            self.track_hits.pop(tid, None)
+            self.track_misses.pop(tid, None)
+            self.appearance_features.pop(tid, None)
+            
+        # Age tracks
+        for tid in self.tracks:
+            self.track_age[tid] = self.track_age.get(tid, 0) + 1
+            
+        return self.tracks
+
+
+class CSIVitalSignsMonitor:
+    """Monitor vital signs (respiration, heart rate) from micro-Doppler CSI."""
+    
+    def __init__(self, sampling_rate: float = 100.0, window_seconds: float = 30.0):
+        self.sampling_rate = sampling_rate
+        self.window_size = int(window_seconds * sampling_rate)
+        
+        # Buffers per entity
+        self.signal_buffers: Dict[str, np.ndarray] = {}
+        self.vital_estimates: Dict[str, dict] = {}
+        
+        # Frequency bands
+        self.respiration_band = (0.1, 0.5)  # 6-30 breaths per minute
+        self.heart_rate_band = (0.8, 2.5)  # 48-150 BPM
+        
+    def process_sample(self, entity_id: str, csi_sample: np.ndarray) -> dict:
+        """Process CSI sample for vital signs."""
+        csi_sample = np.asarray(csi_sample).flatten()
+        
+        # Phase extraction (vital signs appear in phase)
+        phase = np.angle(csi_sample) if np.iscomplexobj(csi_sample) else csi_sample
+        avg_phase = float(np.mean(phase))
+        
+        # Buffer
+        if entity_id not in self.signal_buffers:
+            self.signal_buffers[entity_id] = np.zeros(self.window_size)
+            
+        # Shift buffer and add new sample
+        self.signal_buffers[entity_id] = np.roll(self.signal_buffers[entity_id], -1)
+        self.signal_buffers[entity_id][-1] = avg_phase
+        
+        # Analyze if buffer is full enough
+        buffer = self.signal_buffers[entity_id]
+        if np.count_nonzero(buffer) < self.window_size // 2:
+            return {'respiration_rate': 0, 'heart_rate': 0, 'confidence': 0}
+            
+        # Detrend
+        buffer = buffer - np.mean(buffer)
+        
+        # Bandpass filter approximation using FFT
+        spectrum = np.fft.rfft(buffer)
+        freqs = np.fft.rfftfreq(len(buffer), 1.0 / self.sampling_rate)
+        
+        # Respiration rate
+        resp_mask = (freqs >= self.respiration_band[0]) & (freqs <= self.respiration_band[1])
+        resp_spectrum = np.abs(spectrum) * resp_mask
+        if np.any(resp_spectrum):
+            resp_idx = np.argmax(resp_spectrum)
+            respiration_rate = freqs[resp_idx] * 60  # Convert to breaths per minute
+            resp_confidence = float(resp_spectrum[resp_idx] / (np.sum(np.abs(spectrum)) + 1e-8))
+        else:
+            respiration_rate = 0
+            resp_confidence = 0
+            
+        # Heart rate
+        hr_mask = (freqs >= self.heart_rate_band[0]) & (freqs <= self.heart_rate_band[1])
+        hr_spectrum = np.abs(spectrum) * hr_mask
+        if np.any(hr_spectrum):
+            hr_idx = np.argmax(hr_spectrum)
+            heart_rate = freqs[hr_idx] * 60  # Convert to BPM
+            hr_confidence = float(hr_spectrum[hr_idx] / (np.sum(np.abs(spectrum)) + 1e-8))
+        else:
+            heart_rate = 0
+            hr_confidence = 0
+            
+        result = {
+            'respiration_rate': float(respiration_rate),
+            'heart_rate': float(heart_rate),
+            'respiration_confidence': resp_confidence,
+            'heart_rate_confidence': hr_confidence,
+            'confidence': (resp_confidence + hr_confidence) / 2
+        }
+        
+        self.vital_estimates[entity_id] = result
+        return result
+
+
+class CSIGestureRecognizer:
+    """Recognize hand and body gestures from CSI patterns."""
+    
+    GESTURES = [
+        'none', 'wave', 'push', 'pull', 'swipe_left', 'swipe_right',
+        'swipe_up', 'swipe_down', 'circle', 'zoom_in', 'zoom_out',
+        'point', 'grab', 'release', 'thumbs_up', 'stop'
+    ]
+    
+    def __init__(self, window_size: int = 30, num_subcarriers: int = 64):
+        self.window_size = window_size
+        self.num_subcarriers = num_subcarriers
+        
+        # Feature buffers
+        self.csi_buffers: Dict[str, List[np.ndarray]] = {}
+        self.gesture_history: Dict[str, List[str]] = {}
+        
+        # Gesture templates (simplified DTW matching)
+        self.templates = self._init_templates()
+        
+    def _init_templates(self) -> Dict[str, np.ndarray]:
+        """Initialize gesture templates."""
+        templates = {}
+        
+        # Wave: oscillating pattern
+        t = np.linspace(0, 4*np.pi, 30)
+        templates['wave'] = np.sin(t) * np.exp(-t/10)
+        
+        # Push: forward motion
+        templates['push'] = np.concatenate([np.linspace(0, 1, 15), np.linspace(1, 0.5, 15)])
+        
+        # Pull: backward motion
+        templates['pull'] = np.concatenate([np.linspace(1, 0, 15), np.linspace(0, 0.5, 15)])
+        
+        # Swipe patterns
+        templates['swipe_left'] = np.linspace(1, -1, 30)
+        templates['swipe_right'] = np.linspace(-1, 1, 30)
+        templates['swipe_up'] = np.concatenate([np.zeros(10), np.linspace(0, 1, 10), np.ones(10)])
+        templates['swipe_down'] = np.concatenate([np.ones(10), np.linspace(1, 0, 10), np.zeros(10)])
+        
+        # Circle: sinusoidal in both dimensions
+        templates['circle'] = np.sin(np.linspace(0, 2*np.pi, 30))
+        
+        return templates
+        
+    def _dtw_distance(self, seq1: np.ndarray, seq2: np.ndarray) -> float:
+        """Simplified DTW distance."""
+        n, m = len(seq1), len(seq2)
+        if n == 0 or m == 0:
+            return float('inf')
+            
+        # Normalize sequences
+        seq1 = (seq1 - np.mean(seq1)) / (np.std(seq1) + 1e-8)
+        seq2 = (seq2 - np.mean(seq2)) / (np.std(seq2) + 1e-8)
+        
+        # Simple Euclidean after resampling
+        if n != m:
+            seq2 = np.interp(np.linspace(0, 1, n), np.linspace(0, 1, m), seq2)
+            
+        return float(np.mean(np.abs(seq1 - seq2)))
+        
+    def process_csi(self, entity_id: str, csi_vector: np.ndarray) -> dict:
+        """Process CSI and recognize gestures."""
+        csi_vector = np.asarray(csi_vector).flatten()
+        
+        # Buffer
+        if entity_id not in self.csi_buffers:
+            self.csi_buffers[entity_id] = []
+            
+        self.csi_buffers[entity_id].append(csi_vector)
+        if len(self.csi_buffers[entity_id]) > self.window_size:
+            self.csi_buffers[entity_id] = self.csi_buffers[entity_id][-self.window_size:]
+            
+        # Need full window
+        if len(self.csi_buffers[entity_id]) < self.window_size:
+            return {'gesture': 'none', 'confidence': 0.0}
+            
+        # Extract motion feature (variance over time)
+        buffer = np.array(self.csi_buffers[entity_id])
+        motion_signal = np.var(buffer, axis=1)
+        
+        # Match against templates
+        scores = {}
+        for gesture, template in self.templates.items():
+            dist = self._dtw_distance(motion_signal, template)
+            scores[gesture] = 1.0 / (dist + 0.1)
+            
+        # Best match
+        best_gesture = max(scores, key=scores.get)
+        confidence = scores[best_gesture] / (sum(scores.values()) + 1e-8)
+        
+        # Threshold for detection
+        if confidence < 0.3:
+            best_gesture = 'none'
+            confidence = 0.0
+            
+        # History
+        if entity_id not in self.gesture_history:
+            self.gesture_history[entity_id] = []
+        self.gesture_history[entity_id].append(best_gesture)
+        if len(self.gesture_history[entity_id]) > 50:
+            self.gesture_history[entity_id] = self.gesture_history[entity_id][-50:]
+            
+        return {
+            'gesture': best_gesture,
+            'confidence': float(confidence),
+            'scores': scores
+        }
