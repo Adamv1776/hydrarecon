@@ -91913,3 +91913,356 @@ class CSIRealtimeVisualizationEngine:
             'num_tracks': len(self.tracker.tracks),
             'active_emergencies': len(self.emergency_system.active_emergencies)
         }
+
+
+class CSIComprehensiveHumanSensingSystem:
+    """Ultimate integrated human sensing system combining all CSI capabilities."""
+    
+    def __init__(self):
+        # Core processing
+        self.visualization_engine = CSIRealtimeVisualizationEngine()
+        self.body_model = CSIAdvancedBodyModelEngine()
+        self.activity_engine = CSIActivityRecognitionEngine()
+        self.gesture_engine = CSIGestureRecognizer()
+        self.vital_monitor = CSIVitalSignsMonitor()
+        
+        # Environment
+        self.environment_mapper = CSIEnvironmentMapBuilder()
+        self.room_analyzer = CSIRoomOccupancyAnalyzer()
+        
+        # Safety
+        self.emergency_system = CSIEmergencyResponseSystem()
+        self.fall_detector = CSIFallDetector()
+        self.intrusion_detector = CSIIntrusionDetector()
+        self.sleep_monitor = CSISleepMonitor()
+        
+        # Tracking
+        self.multi_tracker = CSIMultiPersonTracker()
+        self.characterizer = CSIEntityCharacterizer()
+        
+        # Scene
+        self.scene_composer = CSISceneComposer()
+        self.avatar_renderer = CSIHumanAvatarRenderer()
+        
+        # State
+        self.is_active = False
+        self.processing_stats: Dict[str, float] = {}
+        self.entity_profiles: Dict[str, dict] = {}
+        
+    def start(self):
+        """Start the sensing system."""
+        self.is_active = True
+        self.scene_composer.add_camera("main", (5, 5, 3), (0, 0, 1))
+        self.scene_composer.add_camera("top", (0, 0, 10), (0, 0, 0))
+        self.scene_composer.add_camera("front", (10, 0, 1.5), (0, 0, 1.5))
+        
+    def stop(self):
+        """Stop the sensing system."""
+        self.is_active = False
+        
+    def configure_environment(self, room_labels: Dict[int, str], 
+                              restricted_zones: List[dict],
+                              anchors: List[Tuple[float, float, float]]):
+        """Configure environment settings."""
+        for room_id, label in room_labels.items():
+            self.room_analyzer.assign_room_label(room_id, label)
+            
+        for zone in restricted_zones:
+            self.intrusion_detector.add_restricted_zone(
+                zone['id'], zone['bounds'], zone.get('active_hours')
+            )
+            
+        for anchor in anchors:
+            self.scene_composer.scene.environment.setdefault('anchors', []).append(anchor)
+            
+    def process_csi_frame(self, entity_id: str, csi_data: np.ndarray,
+                          position: Tuple[float, float, float],
+                          timestamp: Optional[float] = None) -> dict:
+        """Process single CSI frame with full analysis pipeline."""
+        if not self.is_active:
+            return {'error': 'System not active'}
+            
+        timestamp = timestamp or time.time()
+        csi_data = np.asarray(csi_data).flatten()
+        
+        results = {
+            'entity_id': entity_id,
+            'timestamp': timestamp,
+            'position': position
+        }
+        
+        # 1. Characterization
+        t0 = time.time()
+        char_profile = self.characterizer.update_features(entity_id, csi_data)
+        char_info = self.characterizer.characterize(entity_id)
+        results['characterization'] = char_info
+        self.processing_stats['characterization'] = time.time() - t0
+        
+        # 2. Body pose estimation
+        t0 = time.time()
+        pose = self.body_model.estimate_pose(entity_id, csi_data, np.array(position))
+        results['pose'] = {
+            'joints': pose['joints_3d'].tolist(),
+            'confidence': pose['confidence'].tolist()
+        }
+        self.processing_stats['pose'] = time.time() - t0
+        
+        # 3. Activity recognition
+        t0 = time.time()
+        activity = self.activity_engine.classify_activity(entity_id, csi_data)
+        results['activity'] = activity
+        self.processing_stats['activity'] = time.time() - t0
+        
+        # 4. Gesture recognition
+        t0 = time.time()
+        gesture = self.gesture_engine.process_csi(entity_id, csi_data)
+        results['gesture'] = gesture
+        self.processing_stats['gesture'] = time.time() - t0
+        
+        # 5. Vital signs
+        t0 = time.time()
+        vitals = self.vital_monitor.process_sample(entity_id, csi_data)
+        results['vitals'] = vitals
+        self.processing_stats['vitals'] = time.time() - t0
+        
+        # 6. Sleep monitoring
+        t0 = time.time()
+        sleep = self.sleep_monitor.process_sample(entity_id, csi_data)
+        results['sleep'] = sleep
+        self.processing_stats['sleep'] = time.time() - t0
+        
+        # 7. Fall detection
+        t0 = time.time()
+        fall = self.fall_detector.process_sample(entity_id, csi_data, position)
+        results['fall'] = fall
+        self.processing_stats['fall'] = time.time() - t0
+        
+        # 8. Intrusion detection
+        t0 = time.time()
+        intrusion = self.intrusion_detector.check_intrusion(csi_data, (position[0], position[1]))
+        results['intrusion'] = intrusion
+        self.processing_stats['intrusion'] = time.time() - t0
+        
+        # 9. Room occupancy
+        room_id = self._position_to_room(position)
+        if room_id is not None:
+            self.room_analyzer.update_room(room_id, 1.0, timestamp)
+            
+        # 10. Environment mapping
+        self.environment_mapper.update_occupancy((position[0], position[1]), 1.0)
+        
+        # 11. Scene update
+        self.scene_composer.update_entity(entity_id, position, csi_features=csi_data)
+        
+        # 12. Avatar update
+        joint_dict = {name: pos for name, pos in zip(pose['joint_names'], pose['joints_3d'])}
+        self.avatar_renderer.update_pose(entity_id, joint_dict)
+        
+        # 13. Emergency check
+        emergency = self.emergency_system.process_all(entity_id, csi_data, position)
+        results['emergency'] = emergency
+        
+        # Store comprehensive profile
+        self.entity_profiles[entity_id] = {
+            'last_update': timestamp,
+            'position': position,
+            'characterization': char_info,
+            'activity': activity['activity'],
+            'gesture': gesture['gesture'],
+            'vitals': vitals,
+            'is_sleeping': sleep['is_sleeping']
+        }
+        
+        return results
+        
+    def _position_to_room(self, position: Tuple[float, float, float]) -> Optional[int]:
+        """Map position to room ID."""
+        x, y, _ = position
+        room_size = 5.0
+        room_x = int(x // room_size)
+        room_y = int(y // room_size)
+        room_id = room_x * 4 + room_y
+        return room_id if 0 <= room_id < self.room_analyzer.num_rooms else None
+        
+    def get_scene_frame(self, camera_id: str = "main") -> dict:
+        """Get rendered scene frame."""
+        return self.scene_composer.render_frame(camera_id)
+        
+    def get_all_entity_profiles(self) -> Dict[str, dict]:
+        """Get profiles for all tracked entities."""
+        return self.entity_profiles.copy()
+        
+    def get_room_status(self) -> dict:
+        """Get room occupancy status."""
+        return self.room_analyzer.get_room_status()
+        
+    def get_environment_map(self) -> dict:
+        """Get environment map."""
+        return self.environment_mapper.export_map()
+        
+    def get_system_stats(self) -> dict:
+        """Get comprehensive system statistics."""
+        return {
+            'is_active': self.is_active,
+            'num_entities': len(self.entity_profiles),
+            'processing_times_ms': {k: v * 1000 for k, v in self.processing_stats.items()},
+            'visualization': self.visualization_engine.get_stats(),
+            'active_emergencies': len(self.emergency_system.active_emergencies),
+            'total_falls_detected': len(self.fall_detector.fall_history),
+            'total_intrusion_alerts': len(self.intrusion_detector.alert_history)
+        }
+
+
+class CSIFullExperienceWidget(QWidget):
+    """Complete PyQt6 widget integrating all sensing and visualization capabilities."""
+    
+    emergency_alert = pyqtSignal(dict)
+    entity_update = pyqtSignal(str, dict)
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        self.sensing_system = CSIComprehensiveHumanSensingSystem()
+        self.sensing_system.start()
+        
+        self._setup_ui()
+        
+        self.render_timer = QTimer(self)
+        self.render_timer.timeout.connect(self._on_render)
+        self.render_timer.start(33)
+        
+        self.stats_timer = QTimer(self)
+        self.stats_timer.timeout.connect(self._update_stats)
+        self.stats_timer.start(1000)
+        
+    def _setup_ui(self):
+        """Setup the user interface."""
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+        
+        self.view_3d = CSIImmersive3DWidget()
+        splitter.addWidget(self.view_3d)
+        
+        right_panel = QWidget()
+        right_layout = QVBoxLayout(right_panel)
+        right_layout.setContentsMargins(5, 5, 5, 5)
+        
+        self.stats_frame = QFrame()
+        self.stats_frame.setStyleSheet("QFrame { background: #0d1520; border: 1px solid #1f3a5f; border-radius: 8px; padding: 10px; }")
+        stats_layout = QVBoxLayout(self.stats_frame)
+        
+        self.stats_title = QLabel("System Statistics")
+        self.stats_title.setStyleSheet("font-size: 14px; font-weight: bold; color: #00d4ff;")
+        stats_layout.addWidget(self.stats_title)
+        
+        self.stats_text = QLabel("Loading...")
+        self.stats_text.setStyleSheet("color: #aaccff; font-family: Consolas;")
+        stats_layout.addWidget(self.stats_text)
+        
+        right_layout.addWidget(self.stats_frame)
+        
+        self.entity_frame = QFrame()
+        self.entity_frame.setStyleSheet("QFrame { background: #0d1520; border: 1px solid #1f3a5f; border-radius: 8px; }")
+        entity_layout = QVBoxLayout(self.entity_frame)
+        
+        entity_title = QLabel("Tracked Entities")
+        entity_title.setStyleSheet("font-size: 14px; font-weight: bold; color: #00d4ff;")
+        entity_layout.addWidget(entity_title)
+        
+        self.entity_scroll = QScrollArea()
+        self.entity_scroll.setWidgetResizable(True)
+        self.entity_scroll.setStyleSheet("QScrollArea { border: none; }")
+        
+        self.entity_content = QWidget()
+        self.entity_content_layout = QVBoxLayout(self.entity_content)
+        self.entity_scroll.setWidget(self.entity_content)
+        
+        entity_layout.addWidget(self.entity_scroll)
+        right_layout.addWidget(self.entity_frame, stretch=1)
+        
+        self.emergency_frame = QFrame()
+        self.emergency_frame.setStyleSheet("QFrame { background: #1a0d0d; border: 2px solid #5f1f1f; border-radius: 8px; }")
+        self.emergency_frame.setVisible(False)
+        
+        emergency_layout = QVBoxLayout(self.emergency_frame)
+        self.emergency_title = QLabel("⚠️ EMERGENCY ALERT")
+        self.emergency_title.setStyleSheet("font-size: 16px; font-weight: bold; color: #ff4444;")
+        emergency_layout.addWidget(self.emergency_title)
+        
+        self.emergency_text = QLabel("")
+        self.emergency_text.setStyleSheet("color: #ffaaaa;")
+        emergency_layout.addWidget(self.emergency_text)
+        
+        right_layout.addWidget(self.emergency_frame)
+        
+        splitter.addWidget(right_panel)
+        splitter.setSizes([700, 300])
+        
+        layout.addWidget(splitter)
+        
+        self.entity_widgets: Dict[str, QFrame] = {}
+        
+    def process_csi(self, entity_id: str, csi_data: np.ndarray, position: Tuple[float, float, float]):
+        """Process incoming CSI data."""
+        results = self.sensing_system.process_csi_frame(entity_id, csi_data, position)
+        self.view_3d.ingest_csi_data(entity_id, csi_data, position)
+        
+        if results.get('emergency', {}).get('emergency'):
+            self._show_emergency(results['emergency'])
+            self.emergency_alert.emit(results['emergency'])
+            
+        self.entity_update.emit(entity_id, results)
+        
+    def _on_render(self):
+        self.view_3d.update()
+        
+    def _update_stats(self):
+        stats = self.sensing_system.get_system_stats()
+        text = f"Entities: {stats['num_entities']}\nActive: {stats['is_active']}\nEmergencies: {stats['active_emergencies']}"
+        self.stats_text.setText(text)
+        self._update_entity_list()
+        
+    def _update_entity_list(self):
+        profiles = self.sensing_system.get_all_entity_profiles()
+        for entity_id, profile in profiles.items():
+            if entity_id not in self.entity_widgets:
+                widget = self._create_entity_widget(entity_id)
+                self.entity_widgets[entity_id] = widget
+                self.entity_content_layout.addWidget(widget)
+            self._update_entity_widget(entity_id, profile)
+            
+    def _create_entity_widget(self, entity_id: str) -> QFrame:
+        widget = QFrame()
+        widget.setStyleSheet("QFrame { background: #0a0f1a; border: 1px solid #2a4a6f; border-radius: 6px; margin: 2px; }")
+        layout = QVBoxLayout(widget)
+        layout.setContentsMargins(8, 8, 8, 8)
+        widget.id_label = QLabel(f"🔵 {entity_id[:16]}")
+        widget.id_label.setStyleSheet("font-weight: bold; color: #00d4ff;")
+        layout.addWidget(widget.id_label)
+        widget.activity_label = QLabel("Activity: --")
+        widget.activity_label.setStyleSheet("color: #aaccff;")
+        layout.addWidget(widget.activity_label)
+        widget.vitals_label = QLabel("Vitals: --")
+        widget.vitals_label.setStyleSheet("color: #88ffaa;")
+        layout.addWidget(widget.vitals_label)
+        return widget
+        
+    def _update_entity_widget(self, entity_id: str, profile: dict):
+        widget = self.entity_widgets.get(entity_id)
+        if not widget:
+            return
+        activity = profile.get('activity', 'unknown')
+        widget.activity_label.setText(f"Activity: {activity}")
+        vitals = profile.get('vitals', {})
+        hr = vitals.get('heart_rate', 0)
+        rr = vitals.get('respiration_rate', 0)
+        widget.vitals_label.setText(f"HR: {hr:.0f} bpm | RR: {rr:.0f}/min")
+        
+    def _show_emergency(self, emergency: dict):
+        self.emergency_frame.setVisible(True)
+        etype = emergency.get('emergency_type', 'unknown')
+        entity = emergency.get('entity_id', 'unknown')
+        self.emergency_text.setText(f"Type: {etype}\nEntity: {entity}")
+        QTimer.singleShot(10000, lambda: self.emergency_frame.setVisible(False))
