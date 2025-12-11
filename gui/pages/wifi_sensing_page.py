@@ -91016,3 +91016,504 @@ class CSIGestureRecognizer:
             'confidence': float(confidence),
             'scores': scores
         }
+
+
+class CSIRoomOccupancyAnalyzer:
+    """Analyze room-level occupancy patterns from CSI distributions."""
+    
+    def __init__(self, num_rooms: int = 8, history_minutes: int = 60):
+        self.num_rooms = num_rooms
+        self.history_length = history_minutes * 60  # Convert to seconds
+        
+        # Per-room state
+        self.room_occupancy: Dict[int, float] = {i: 0.0 for i in range(num_rooms)}
+        self.room_history: Dict[int, List[Tuple[float, float]]] = {i: [] for i in range(num_rooms)}
+        self.room_labels: Dict[int, str] = {}
+        
+        # Patterns
+        self.daily_patterns: Dict[int, np.ndarray] = {i: np.zeros(24) for i in range(num_rooms)}
+        self.transition_matrix: np.ndarray = np.zeros((num_rooms, num_rooms))
+        
+    def assign_room_label(self, room_id: int, label: str):
+        """Assign human-readable label to room."""
+        self.room_labels[room_id] = label
+        
+    def update_room(self, room_id: int, occupancy_score: float, timestamp: Optional[float] = None):
+        """Update room occupancy."""
+        if room_id >= self.num_rooms:
+            return
+            
+        timestamp = timestamp or time.time()
+        
+        # Smooth update
+        alpha = 0.3
+        self.room_occupancy[room_id] = alpha * occupancy_score + (1 - alpha) * self.room_occupancy[room_id]
+        
+        # History
+        self.room_history[room_id].append((timestamp, occupancy_score))
+        
+        # Prune old history
+        cutoff = timestamp - self.history_length
+        self.room_history[room_id] = [
+            (t, v) for t, v in self.room_history[room_id] if t > cutoff
+        ]
+        
+        # Update daily pattern
+        hour = int((timestamp % 86400) / 3600)
+        self.daily_patterns[room_id][hour] = (
+            0.9 * self.daily_patterns[room_id][hour] + 0.1 * occupancy_score
+        )
+        
+    def record_transition(self, from_room: int, to_room: int):
+        """Record room transition for pattern analysis."""
+        if from_room < self.num_rooms and to_room < self.num_rooms:
+            self.transition_matrix[from_room, to_room] += 1
+            
+    def get_room_status(self) -> dict:
+        """Get current occupancy status for all rooms."""
+        status = {}
+        for room_id in range(self.num_rooms):
+            label = self.room_labels.get(room_id, f"Room {room_id}")
+            status[label] = {
+                'occupancy': float(self.room_occupancy[room_id]),
+                'occupied': self.room_occupancy[room_id] > 0.5,
+                'history_points': len(self.room_history[room_id])
+            }
+        return status
+        
+    def predict_occupancy(self, room_id: int, hours_ahead: int = 1) -> float:
+        """Predict future occupancy based on patterns."""
+        if room_id >= self.num_rooms:
+            return 0.0
+            
+        current_hour = int((time.time() % 86400) / 3600)
+        future_hour = (current_hour + hours_ahead) % 24
+        
+        return float(self.daily_patterns[room_id][future_hour])
+
+
+class CSIIntrusionDetector:
+    """Detect unauthorized intrusions and anomalous presence."""
+    
+    def __init__(self, baseline_hours: int = 24, sensitivity: float = 2.0):
+        self.baseline_hours = baseline_hours
+        self.sensitivity = sensitivity
+        
+        # Baseline statistics
+        self.baseline_mean: Optional[np.ndarray] = None
+        self.baseline_std: Optional[np.ndarray] = None
+        self.baseline_samples: List[np.ndarray] = []
+        
+        # Detection state
+        self.alert_history: List[dict] = []
+        self.anomaly_scores: List[float] = []
+        self.is_learning = True
+        
+        # Zone definitions
+        self.restricted_zones: List[dict] = []
+        self.schedule: Dict[str, Tuple[int, int]] = {}  # Zone: (start_hour, end_hour)
+        
+    def add_restricted_zone(self, zone_id: str, bounds: Tuple[float, float, float, float],
+                            active_hours: Optional[Tuple[int, int]] = None):
+        """Add a restricted zone for intrusion detection."""
+        self.restricted_zones.append({
+            'id': zone_id,
+            'bounds': bounds,  # (x_min, y_min, x_max, y_max)
+            'active_hours': active_hours or (0, 24)
+        })
+        
+    def update_baseline(self, csi_features: np.ndarray):
+        """Update baseline model with normal patterns."""
+        csi_features = np.asarray(csi_features).flatten()
+        
+        self.baseline_samples.append(csi_features)
+        
+        # Limit samples
+        max_samples = self.baseline_hours * 3600 // 10  # Assume 10s intervals
+        if len(self.baseline_samples) > max_samples:
+            self.baseline_samples = self.baseline_samples[-max_samples:]
+            
+        # Recompute statistics
+        if len(self.baseline_samples) >= 100:
+            samples = np.array(self.baseline_samples)
+            self.baseline_mean = np.mean(samples, axis=0)
+            self.baseline_std = np.std(samples, axis=0) + 1e-8
+            self.is_learning = len(self.baseline_samples) < max_samples // 2
+            
+    def check_intrusion(self, csi_features: np.ndarray, 
+                        position: Optional[Tuple[float, float]] = None) -> dict:
+        """Check for potential intrusion."""
+        csi_features = np.asarray(csi_features).flatten()
+        
+        result = {
+            'intrusion_detected': False,
+            'anomaly_score': 0.0,
+            'zone_violation': None,
+            'alerts': []
+        }
+        
+        # Statistical anomaly detection
+        if self.baseline_mean is not None:
+            # Pad or truncate features to match baseline
+            if csi_features.size != self.baseline_mean.size:
+                if csi_features.size < self.baseline_mean.size:
+                    csi_features = np.pad(csi_features, (0, self.baseline_mean.size - csi_features.size))
+                else:
+                    csi_features = csi_features[:self.baseline_mean.size]
+                    
+            z_scores = np.abs(csi_features - self.baseline_mean) / self.baseline_std
+            anomaly_score = float(np.mean(z_scores))
+            
+            self.anomaly_scores.append(anomaly_score)
+            if len(self.anomaly_scores) > 1000:
+                self.anomaly_scores = self.anomaly_scores[-1000:]
+                
+            result['anomaly_score'] = anomaly_score
+            
+            if anomaly_score > self.sensitivity and not self.is_learning:
+                result['intrusion_detected'] = True
+                result['alerts'].append({
+                    'type': 'statistical_anomaly',
+                    'score': anomaly_score,
+                    'timestamp': time.time()
+                })
+                
+        # Zone violation check
+        if position:
+            current_hour = int((time.time() % 86400) / 3600)
+            
+            for zone in self.restricted_zones:
+                bounds = zone['bounds']
+                start_h, end_h = zone['active_hours']
+                
+                # Check if in active hours
+                in_active = (start_h <= current_hour < end_h) if start_h < end_h else \
+                           (current_hour >= start_h or current_hour < end_h)
+                
+                if in_active:
+                    # Check if position in bounds
+                    if (bounds[0] <= position[0] <= bounds[2] and
+                        bounds[1] <= position[1] <= bounds[3]):
+                        result['zone_violation'] = zone['id']
+                        result['intrusion_detected'] = True
+                        result['alerts'].append({
+                            'type': 'zone_violation',
+                            'zone': zone['id'],
+                            'position': position,
+                            'timestamp': time.time()
+                        })
+                        
+        # Store alerts
+        if result['alerts']:
+            self.alert_history.extend(result['alerts'])
+            if len(self.alert_history) > 500:
+                self.alert_history = self.alert_history[-500:]
+                
+        return result
+
+
+class CSIFallDetector:
+    """Detect falls and emergency situations from CSI patterns."""
+    
+    def __init__(self, threshold: float = 0.8, cooldown_seconds: float = 30.0):
+        self.threshold = threshold
+        self.cooldown_seconds = cooldown_seconds
+        
+        # Detection state
+        self.fall_history: List[dict] = []
+        self.last_fall_time: float = 0
+        self.signal_buffer: List[np.ndarray] = []
+        self.buffer_size = 50
+        
+        # Fall signatures
+        self.pre_fall_duration = 0.5  # seconds
+        self.impact_duration = 0.3
+        self.post_fall_stillness = 2.0
+        
+    def _compute_motion_energy(self, signals: List[np.ndarray]) -> np.ndarray:
+        """Compute motion energy from signal sequence."""
+        if len(signals) < 2:
+            return np.array([0.0])
+            
+        signals = np.array(signals)
+        diff = np.diff(signals, axis=0)
+        energy = np.sum(diff ** 2, axis=1)
+        return energy
+        
+    def _detect_impact(self, energy: np.ndarray) -> Tuple[bool, float]:
+        """Detect sudden impact in energy signal."""
+        if len(energy) < 10:
+            return False, 0.0
+            
+        # Look for spike followed by drop
+        max_idx = np.argmax(energy)
+        peak_energy = energy[max_idx]
+        
+        # Check for pre-impact rise and post-impact stillness
+        if max_idx > 5 and max_idx < len(energy) - 5:
+            pre_energy = np.mean(energy[max_idx-5:max_idx])
+            post_energy = np.mean(energy[max_idx+1:max_idx+5])
+            
+            # Fall pattern: moderate pre, high peak, low post
+            if peak_energy > pre_energy * 3 and post_energy < peak_energy * 0.3:
+                confidence = min(1.0, peak_energy / (pre_energy + 1e-8) * 0.2)
+                return True, confidence
+                
+        return False, 0.0
+        
+    def process_sample(self, entity_id: str, csi_sample: np.ndarray, 
+                       position: Optional[Tuple[float, float, float]] = None) -> dict:
+        """Process CSI sample for fall detection."""
+        csi_sample = np.asarray(csi_sample).flatten()
+        
+        self.signal_buffer.append(csi_sample)
+        if len(self.signal_buffer) > self.buffer_size:
+            self.signal_buffer = self.signal_buffer[-self.buffer_size:]
+            
+        result = {
+            'fall_detected': False,
+            'confidence': 0.0,
+            'entity_id': entity_id,
+            'position': position
+        }
+        
+        # Need minimum samples
+        if len(self.signal_buffer) < 20:
+            return result
+            
+        # Compute motion energy
+        energy = self._compute_motion_energy(self.signal_buffer)
+        
+        # Check for impact pattern
+        is_impact, confidence = self._detect_impact(energy)
+        
+        # Check cooldown
+        current_time = time.time()
+        in_cooldown = (current_time - self.last_fall_time) < self.cooldown_seconds
+        
+        if is_impact and confidence > self.threshold and not in_cooldown:
+            result['fall_detected'] = True
+            result['confidence'] = confidence
+            self.last_fall_time = current_time
+            
+            # Record fall
+            self.fall_history.append({
+                'timestamp': current_time,
+                'entity_id': entity_id,
+                'confidence': confidence,
+                'position': position
+            })
+            
+            if len(self.fall_history) > 100:
+                self.fall_history = self.fall_history[-100:]
+                
+        return result
+
+
+class CSISleepMonitor:
+    """Monitor sleep patterns and quality from ambient CSI."""
+    
+    def __init__(self, sampling_interval: float = 1.0):
+        self.sampling_interval = sampling_interval
+        
+        # Sleep state
+        self.is_sleeping: Dict[str, bool] = {}
+        self.sleep_sessions: Dict[str, List[dict]] = {}
+        self.current_session: Dict[str, dict] = {}
+        
+        # Motion thresholds
+        self.stillness_threshold = 0.05
+        self.sleep_onset_minutes = 5
+        self.micro_movement_threshold = 0.02
+        
+        # Buffers
+        self.motion_buffers: Dict[str, List[float]] = {}
+        
+    def process_sample(self, entity_id: str, csi_sample: np.ndarray) -> dict:
+        """Process CSI sample for sleep monitoring."""
+        csi_sample = np.asarray(csi_sample).flatten()
+        
+        # Compute motion level
+        if entity_id in self.motion_buffers and len(self.motion_buffers[entity_id]) > 0:
+            prev = self.motion_buffers[entity_id][-1]
+            motion = float(np.mean(np.abs(csi_sample[:min(len(csi_sample), 64)] - prev)))
+        else:
+            motion = 0.0
+            
+        # Buffer motion
+        if entity_id not in self.motion_buffers:
+            self.motion_buffers[entity_id] = []
+        self.motion_buffers[entity_id].append(np.mean(np.abs(csi_sample)))
+        
+        window_size = int(self.sleep_onset_minutes * 60 / self.sampling_interval)
+        if len(self.motion_buffers[entity_id]) > window_size:
+            self.motion_buffers[entity_id] = self.motion_buffers[entity_id][-window_size:]
+            
+        # Detect sleep state
+        was_sleeping = self.is_sleeping.get(entity_id, False)
+        
+        if len(self.motion_buffers[entity_id]) >= window_size:
+            avg_motion = np.mean(self.motion_buffers[entity_id])
+            is_still = avg_motion < self.stillness_threshold
+            
+            if is_still and not was_sleeping:
+                # Sleep onset
+                self.is_sleeping[entity_id] = True
+                self.current_session[entity_id] = {
+                    'start_time': time.time(),
+                    'motion_events': [],
+                    'micro_movements': 0
+                }
+            elif not is_still and was_sleeping:
+                # Wake up
+                self.is_sleeping[entity_id] = False
+                if entity_id in self.current_session:
+                    session = self.current_session[entity_id]
+                    session['end_time'] = time.time()
+                    session['duration_hours'] = (session['end_time'] - session['start_time']) / 3600
+                    
+                    if entity_id not in self.sleep_sessions:
+                        self.sleep_sessions[entity_id] = []
+                    self.sleep_sessions[entity_id].append(session)
+                    
+                    if len(self.sleep_sessions[entity_id]) > 30:
+                        self.sleep_sessions[entity_id] = self.sleep_sessions[entity_id][-30:]
+                        
+        # Track micro-movements during sleep
+        if self.is_sleeping.get(entity_id, False) and entity_id in self.current_session:
+            if motion > self.micro_movement_threshold:
+                self.current_session[entity_id]['micro_movements'] += 1
+                self.current_session[entity_id]['motion_events'].append({
+                    'time': time.time(),
+                    'intensity': motion
+                })
+                
+        # Compute sleep quality if sleeping
+        sleep_quality = 0.0
+        if self.is_sleeping.get(entity_id, False) and entity_id in self.current_session:
+            session = self.current_session[entity_id]
+            duration = (time.time() - session['start_time']) / 3600
+            micro_rate = session['micro_movements'] / max(1, duration)
+            
+            # Quality based on duration and restlessness
+            duration_score = min(1.0, duration / 8.0)
+            restlessness_penalty = min(0.5, micro_rate * 0.05)
+            sleep_quality = max(0.0, duration_score - restlessness_penalty)
+            
+        return {
+            'is_sleeping': self.is_sleeping.get(entity_id, False),
+            'motion_level': motion,
+            'sleep_quality': sleep_quality,
+            'session_duration_hours': (time.time() - self.current_session.get(entity_id, {}).get('start_time', time.time())) / 3600 if entity_id in self.current_session else 0
+        }
+
+
+class CSIEmergencyResponseSystem:
+    """Integrated emergency response coordination system."""
+    
+    def __init__(self):
+        self.fall_detector = CSIFallDetector()
+        self.intrusion_detector = CSIIntrusionDetector()
+        self.vital_monitor = CSIVitalSignsMonitor()
+        
+        # Emergency state
+        self.active_emergencies: List[dict] = []
+        self.emergency_history: List[dict] = []
+        self.contacts: List[dict] = []
+        
+        # Thresholds
+        self.vital_alert_thresholds = {
+            'heart_rate_low': 40,
+            'heart_rate_high': 150,
+            'respiration_rate_low': 8,
+            'respiration_rate_high': 30
+        }
+        
+    def add_emergency_contact(self, name: str, phone: str, email: str, priority: int = 1):
+        """Add emergency contact."""
+        self.contacts.append({
+            'name': name,
+            'phone': phone,
+            'email': email,
+            'priority': priority
+        })
+        self.contacts.sort(key=lambda x: x['priority'])
+        
+    def process_all(self, entity_id: str, csi_sample: np.ndarray,
+                   position: Optional[Tuple[float, float, float]] = None) -> dict:
+        """Process sample through all emergency detection systems."""
+        results = {
+            'emergency': False,
+            'emergency_type': None,
+            'alerts': [],
+            'entity_id': entity_id
+        }
+        
+        # Fall detection
+        fall_result = self.fall_detector.process_sample(entity_id, csi_sample, position)
+        if fall_result['fall_detected']:
+            results['emergency'] = True
+            results['emergency_type'] = 'fall'
+            results['alerts'].append({
+                'type': 'fall_detected',
+                'confidence': fall_result['confidence'],
+                'position': position,
+                'timestamp': time.time()
+            })
+            
+        # Intrusion detection
+        intrusion_result = self.intrusion_detector.check_intrusion(
+            csi_sample, 
+            (position[0], position[1]) if position else None
+        )
+        if intrusion_result['intrusion_detected']:
+            results['emergency'] = True
+            results['emergency_type'] = results['emergency_type'] or 'intrusion'
+            results['alerts'].extend(intrusion_result['alerts'])
+            
+        # Vital signs
+        vital_result = self.vital_monitor.process_sample(entity_id, csi_sample)
+        hr = vital_result.get('heart_rate', 0)
+        rr = vital_result.get('respiration_rate', 0)
+        
+        if hr > 0:
+            if hr < self.vital_alert_thresholds['heart_rate_low']:
+                results['emergency'] = True
+                results['emergency_type'] = results['emergency_type'] or 'vital_signs'
+                results['alerts'].append({
+                    'type': 'low_heart_rate',
+                    'value': hr,
+                    'timestamp': time.time()
+                })
+            elif hr > self.vital_alert_thresholds['heart_rate_high']:
+                results['emergency'] = True
+                results['emergency_type'] = results['emergency_type'] or 'vital_signs'
+                results['alerts'].append({
+                    'type': 'high_heart_rate',
+                    'value': hr,
+                    'timestamp': time.time()
+                })
+                
+        # Store emergency
+        if results['emergency']:
+            emergency_record = {
+                'timestamp': time.time(),
+                'entity_id': entity_id,
+                'type': results['emergency_type'],
+                'alerts': results['alerts'],
+                'position': position,
+                'resolved': False
+            }
+            self.active_emergencies.append(emergency_record)
+            self.emergency_history.append(emergency_record)
+            
+            if len(self.emergency_history) > 500:
+                self.emergency_history = self.emergency_history[-500:]
+                
+        return results
+        
+    def resolve_emergency(self, emergency_id: int):
+        """Mark emergency as resolved."""
+        if emergency_id < len(self.active_emergencies):
+            self.active_emergencies[emergency_id]['resolved'] = True
+            self.active_emergencies = [e for e in self.active_emergencies if not e['resolved']]
