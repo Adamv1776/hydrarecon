@@ -89844,6 +89844,11 @@ class CSIImmersive3DWidget(QFrame):
             
         rel = world_pos - self.camera_pos
         
+        # Skip objects too far away
+        dist = np.linalg.norm(rel)
+        if dist > 100.0:
+            return None
+        
         # Camera basis vectors
         forward = np.array([
             np.cos(self.camera_pitch) * np.cos(self.camera_yaw),
@@ -89855,7 +89860,7 @@ class CSIImmersive3DWidget(QFrame):
         
         # Project
         depth = np.dot(rel, forward)
-        if depth < 0.1 or np.isnan(depth):
+        if depth < 0.1 or depth > 100.0 or np.isnan(depth):
             return None
         
         x_cam = np.dot(rel, right)
@@ -89868,17 +89873,24 @@ class CSIImmersive3DWidget(QFrame):
         fov = 1.2  # ~70 degrees
         aspect = self.width() / max(1, self.height())
         
-        x_ndc = x_cam / (depth * np.tan(fov / 2) * aspect)
-        y_ndc = y_cam / (depth * np.tan(fov / 2))
+        tan_half_fov = np.tan(fov / 2)
+        x_ndc = x_cam / (depth * tan_half_fov * aspect + 1e-6)
+        y_ndc = y_cam / (depth * tan_half_fov + 1e-6)
+        
+        # Clamp NDC to reasonable range (prevent overflow)
+        x_ndc = np.clip(x_ndc, -10.0, 10.0)
+        y_ndc = np.clip(y_ndc, -10.0, 10.0)
         
         screen_x = (x_ndc + 1) * self.width() / 2
         screen_y = (1 - y_ndc) * self.height() / 2
         
-        # Final NaN check
+        # Final NaN and bounds check
         if np.isnan(screen_x) or np.isnan(screen_y):
             return None
+        if abs(screen_x) > 10000 or abs(screen_y) > 10000:
+            return None
         
-        return QPointF(screen_x, screen_y)
+        return QPointF(float(screen_x), float(screen_y))
     
     def ingest_csi_data(self, entity_id: str, csi_vector: np.ndarray, 
                         position: Tuple[float, float, float]):
@@ -90036,13 +90048,18 @@ class CSIImmersive3DWidget(QFrame):
             
             # Draw entity marker
             size = int(12 + confidence * 8)
-            # Guard against NaN screen positions
+            # Guard against NaN and overflow in screen positions
             sx, sy = screen_pos.x(), screen_pos.y()
             if np.isnan(sx) or np.isnan(sy) or np.isinf(sx) or np.isinf(sy):
                 continue
+            # Clamp to safe integer range
+            sx = max(-10000, min(10000, sx))
+            sy = max(-10000, min(10000, sy))
+            if abs(sx) > 5000 or abs(sy) > 5000:
+                continue  # Skip entities too far off screen
             painter.setBrush(QBrush(color))
             painter.setPen(QPen(QColor("#ffffff"), 2))
-            painter.drawEllipse(screen_pos, size, size)
+            painter.drawEllipse(QPointF(sx, sy), size, size)
             
             # Draw label
             char_info = self.controller.characterizer.characterize(entity_id)
