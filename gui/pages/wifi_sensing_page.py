@@ -89606,12 +89606,18 @@ class CSIEntityTracker3D:
 
         innovation = measurement - track['position']
         gain = 1.0 / (self.measurement_noise + 1e-6)
-        track['position'] = track['position'] + innovation * gain * 0.5
-        track['velocity'] = (track['velocity'] * 0.8) + (innovation / dt * 0.2)
+        new_pos = track['position'] + innovation * gain * 0.5
+        new_vel = (track['velocity'] * 0.8) + (innovation / dt * 0.2)
+        # Guard against NaN
+        if not np.any(np.isnan(new_pos)) and not np.any(np.isinf(new_pos)):
+            track['position'] = new_pos
+        if not np.any(np.isnan(new_vel)) and not np.any(np.isinf(new_vel)):
+            track['velocity'] = new_vel
         track['confidence'] = float(np.clip(track['confidence'] + 0.05, 0.0, 1.0))
         self.track_covariances[entity_id] *= (1.0 - gain * 0.1)
         track['last_update'] = time.time()
-        self.track_history[entity_id].append(track['position'].copy())
+        if not np.any(np.isnan(track['position'])):
+            self.track_history[entity_id].append(track['position'].copy())
         if len(self.track_history[entity_id]) > 256:
             self.track_history[entity_id] = self.track_history[entity_id][-256:]
 
@@ -89832,6 +89838,10 @@ class CSIImmersive3DWidget(QFrame):
     
     def _world_to_screen(self, world_pos: np.ndarray) -> Optional[QPointF]:
         """Project 3D world position to 2D screen coordinates."""
+        # Guard against NaN/Inf input
+        if world_pos is None or np.any(np.isnan(world_pos)) or np.any(np.isinf(world_pos)):
+            return None
+            
         rel = world_pos - self.camera_pos
         
         # Camera basis vectors
@@ -89845,11 +89855,15 @@ class CSIImmersive3DWidget(QFrame):
         
         # Project
         depth = np.dot(rel, forward)
-        if depth < 0.1:
+        if depth < 0.1 or np.isnan(depth):
             return None
         
         x_cam = np.dot(rel, right)
         y_cam = np.dot(rel, up)
+        
+        # Guard against NaN
+        if np.isnan(x_cam) or np.isnan(y_cam):
+            return None
         
         fov = 1.2  # ~70 degrees
         aspect = self.width() / max(1, self.height())
@@ -89859,6 +89873,10 @@ class CSIImmersive3DWidget(QFrame):
         
         screen_x = (x_ndc + 1) * self.width() / 2
         screen_y = (1 - y_ndc) * self.height() / 2
+        
+        # Final NaN check
+        if np.isnan(screen_x) or np.isnan(screen_y):
+            return None
         
         return QPointF(screen_x, screen_y)
     
@@ -90018,6 +90036,10 @@ class CSIImmersive3DWidget(QFrame):
             
             # Draw entity marker
             size = int(12 + confidence * 8)
+            # Guard against NaN screen positions
+            sx, sy = screen_pos.x(), screen_pos.y()
+            if np.isnan(sx) or np.isnan(sy) or np.isinf(sx) or np.isinf(sy):
+                continue
             painter.setBrush(QBrush(color))
             painter.setPen(QPen(QColor("#ffffff"), 2))
             painter.drawEllipse(screen_pos, size, size)
@@ -90027,7 +90049,7 @@ class CSIImmersive3DWidget(QFrame):
             label = f"{entity_id[:8]} ({char_info.get('identity', '?')})"
             painter.setPen(QPen(QColor("#ffffff")))
             painter.setFont(QFont("Consolas", 9))
-            painter.drawText(int(screen_pos.x()) - 40, int(screen_pos.y()) - size - 5, label)
+            painter.drawText(int(sx) - 40, int(sy) - size - 5, label)
             
     def _draw_skeleton(self, painter: QPainter, skeleton: dict, color: QColor):
         """Draw body skeleton keypoints and connections."""
