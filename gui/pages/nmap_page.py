@@ -140,18 +140,19 @@ class NmapPage(QWidget):
         
         self.profile_combo = QComboBox()
         self.profile_combo.addItems([
-            "Quick Scan",
-            "Standard Scan",
-            "Comprehensive Scan",
-            "Stealth Scan",
-            "Aggressive Scan",
-            "Vulnerability Scan",
-            "Host Discovery",
-            "UDP Scan",
-            "Web Server Scan",
-            "Full Audit"
+            "🚀 Quick Scan (fast)",
+            "📊 Standard Scan",
+            "🔬 Comprehensive Scan",
+            "🥷 Stealth Scan (SYN)",
+            "💥 Aggressive Scan",
+            "🔓 Vulnerability Scan",
+            "📡 Host Discovery",
+            "📶 UDP Scan",
+            "🌐 Web Server Scan",
+            "🔍 Full Audit"
         ])
         self.profile_combo.setCurrentIndex(1)
+        self.profile_combo.currentIndexChanged.connect(self._on_profile_changed)
         self.profile_combo.setStyleSheet("""
             QComboBox {
                 background-color: #0d1117;
@@ -165,6 +166,12 @@ class NmapPage(QWidget):
         """)
         layout.addWidget(self.profile_combo)
         
+        # Profile description
+        self.profile_desc = QLabel("Standard port scan with service detection")
+        self.profile_desc.setStyleSheet("color: #8b949e; font-size: 11px; font-style: italic;")
+        self.profile_desc.setWordWrap(True)
+        layout.addWidget(self.profile_desc)
+        
         # Quick Port Buttons
         quick_ports_label = QLabel("Quick Port Selection")
         quick_ports_label.setStyleSheet("color: #e6e6e6; font-weight: 600;")
@@ -174,18 +181,19 @@ class NmapPage(QWidget):
         quick_btn_layout2 = QHBoxLayout()
         
         quick_port_options = [
-            ("Top 20", "21,22,23,25,53,80,110,111,135,139,143,443,445,993,995,1723,3306,3389,5900,8080"),
-            ("Top 100", "1-100,443,445,3306,3389,5900,8080,8443"),
-            ("Web", "80,443,8080,8443,8000,8888,9000"),
-            ("SSH/RDP", "22,3389,5900,5901"),
-            ("Database", "1433,1521,3306,5432,27017,6379"),
-            ("Mail", "25,110,143,465,587,993,995"),
-            ("All Ports", "1-65535"),
-            ("Common", "21,22,23,25,53,80,110,139,143,443,445,3389"),
+            ("Top 20", "21,22,23,25,53,80,110,111,135,139,143,443,445,993,995,1723,3306,3389,5900,8080", "Most commonly open ports"),
+            ("Top 100", "1-100,443,445,3306,3389,5900,8080,8443", "First 100 + common high ports"),
+            ("Web", "80,443,8080,8443,8000,8888,9000", "Web servers and proxies"),
+            ("SSH/RDP", "22,3389,5900,5901", "Remote access services"),
+            ("Database", "1433,1521,3306,5432,27017,6379", "SQL and NoSQL databases"),
+            ("Mail", "25,110,143,465,587,993,995", "Email services"),
+            ("All Ports", "1-65535", "⚠️ Full scan (very slow)"),
+            ("Common", "21,22,23,25,53,80,110,139,143,443,445,3389", "Quick essential check"),
         ]
         
-        for i, (name, ports) in enumerate(quick_port_options):
+        for i, (name, ports, tooltip) in enumerate(quick_port_options):
             btn = QPushButton(name)
+            btn.setToolTip(f"{tooltip}")
             btn.setStyleSheet("""
                 QPushButton {
                     background-color: #21262d;
@@ -458,6 +466,23 @@ class NmapPage(QWidget):
         except Exception as e:
             self.scanner = None
             self.raw_output.append_error(f"Failed to initialize Nmap scanner: {e}")
+    
+    def _on_profile_changed(self, index: int):
+        """Update profile description when changed"""
+        descriptions = [
+            "Fast scan of common ports - great for initial reconnaissance",
+            "Standard port scan with service detection and version info",
+            "Deep scan with OS detection, scripts, and traceroute",
+            "SYN scan that's harder to detect - use for stealth",
+            "Fast and comprehensive but noisy - may trigger IDS",
+            "Run vulnerability detection scripts against open services",
+            "Just find live hosts without port scanning",
+            "Scan UDP ports (slow but finds hidden services)",
+            "Focus on web-related ports and HTTP services",
+            "Complete audit with all detection features enabled"
+        ]
+        if 0 <= index < len(descriptions):
+            self.profile_desc.setText(descriptions[index])
     
     def _start_scan(self):
         """Start the Nmap scan"""

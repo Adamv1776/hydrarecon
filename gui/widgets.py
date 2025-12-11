@@ -771,6 +771,102 @@ class NavButton(QPushButton):
             animation.start(QPropertyAnimation.DeletionPolicy.DeleteWhenStopped)
 
 
+class CollapsibleMenuGroup(QWidget):
+    """
+    ╔══════════════════════════════════════════════════════════════════════════╗
+    ║  COLLAPSIBLE MENU GROUP                                                  ║
+    ║  Expandable/collapsible navigation menu with smooth animation            ║
+    ╚══════════════════════════════════════════════════════════════════════════╝
+    """
+    
+    def __init__(self, title: str, icon: str = "📁", parent=None, accent_color: str = "#00ff88"):
+        super().__init__(parent)
+        self.title = title
+        self.icon = icon
+        self.accent_color = accent_color
+        self._expanded = False
+        self._buttons = []
+        self._setup_ui()
+    
+    def _setup_ui(self):
+        self.main_layout = QVBoxLayout(self)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
+        
+        # Header button (clickable to expand/collapse)
+        self.header_btn = QPushButton(f"  {self.icon}  {self.title}")
+        self.header_btn.setCheckable(True)
+        self.header_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: transparent;
+                border: none;
+                border-radius: 8px;
+                padding: 12px 16px;
+                text-align: left;
+                color: #8b949e;
+                font-size: 12px;
+                font-weight: 600;
+                font-family: 'SF Pro Text', 'Segoe UI', sans-serif;
+                letter-spacing: 0.5px;
+            }}
+            QPushButton:hover {{
+                background-color: rgba(255, 255, 255, 0.03);
+                color: #e6e6e6;
+            }}
+            QPushButton:checked {{
+                color: {self.accent_color};
+            }}
+        """)
+        self.header_btn.clicked.connect(self._toggle)
+        self.main_layout.addWidget(self.header_btn)
+        
+        # Expand indicator
+        self.expand_indicator = QLabel("▶")
+        self.expand_indicator.setStyleSheet("color: #484f58; font-size: 10px;")
+        self.expand_indicator.setFixedWidth(20)
+        
+        # Content container (holds nav buttons)
+        self.content_widget = QWidget()
+        self.content_layout = QVBoxLayout(self.content_widget)
+        self.content_layout.setContentsMargins(16, 4, 0, 8)
+        self.content_layout.setSpacing(2)
+        self.content_widget.setVisible(False)
+        self.main_layout.addWidget(self.content_widget)
+    
+    def add_nav_button(self, btn: 'NavButton', key: str = None) -> 'NavButton':
+        """Add a navigation button to this group. Can accept an existing NavButton or create one."""
+        btn.setStyleSheet(btn.styleSheet().replace("padding: 16px 20px", "padding: 10px 16px"))
+        self._buttons.append((key, btn))
+        self.content_layout.addWidget(btn)
+        return btn
+    
+    def create_nav_button(self, key: str, text: str, icon: str) -> 'NavButton':
+        """Create and add a new navigation button to this group"""
+        btn = NavButton(text, icon_char=icon, accent_color=self.accent_color)
+        return self.add_nav_button(btn, key)
+    
+    def get_buttons(self):
+        """Return list of (key, button) tuples"""
+        return self._buttons
+    
+    def _toggle(self):
+        """Toggle expand/collapse state"""
+        self._expanded = not self._expanded
+        self.content_widget.setVisible(self._expanded)
+        self.expand_indicator.setText("▼" if self._expanded else "▶")
+        self.header_btn.setText(f"  {self.icon}  {self.title}  {'▼' if self._expanded else '▶'}")
+    
+    def expand(self):
+        """Expand the menu"""
+        if not self._expanded:
+            self._toggle()
+    
+    def collapse(self):
+        """Collapse the menu"""
+        if self._expanded:
+            self._toggle()
+
+
 class ScanProgressWidget(QWidget):
     """
     ╔══════════════════════════════════════════════════════════════════════════╗

@@ -8,13 +8,13 @@ import asyncio
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QStackedWidget,
     QFrame, QLabel, QPushButton, QSplitter, QToolBar, QStatusBar,
-    QMenuBar, QMenu, QMessageBox, QFileDialog, QApplication
+    QMenuBar, QMenu, QMessageBox, QFileDialog, QApplication, QScrollArea
 )
 from PyQt6.QtCore import Qt, QSize, QTimer
 from PyQt6.QtGui import QAction, QIcon, QFont, QKeySequence
 
 from .themes import DARK_THEME, COLORS
-from .widgets import NavButton, GlowingButton
+from .widgets import NavButton, GlowingButton, CollapsibleMenuGroup
 from .pages.dashboard import DashboardPage
 from .pages.nmap_page import NmapPage
 from .pages.hydra_page import HydraPage
@@ -73,6 +73,405 @@ try:
 except ImportError:
     PluginManagerPage = None
 
+try:
+    from .pages.wireless_attacks_page import WirelessAttacksPage
+except ImportError:
+    WirelessAttacksPage = None
+
+try:
+    from .pages.wifi_sensing_page import WifiSensingPage
+except ImportError:
+    WifiSensingPage = None
+
+try:
+    from .pages.payload_generator_page import PayloadGeneratorPage
+except ImportError:
+    PayloadGeneratorPage = None
+
+try:
+    from .pages.vuln_scanner_page import VulnScannerPage
+except ImportError:
+    VulnScannerPage = None
+
+try:
+    from .pages.social_engineering_page import SocialEngineeringPage
+except ImportError:
+    SocialEngineeringPage = None
+
+try:
+    from .pages.browser_exploitation_page import BrowserExploitationPage
+except ImportError:
+    BrowserExploitationPage = None
+
+try:
+    from .pages.network_pivoting_page import NetworkPivotingPage
+except ImportError:
+    NetworkPivotingPage = None
+
+try:
+    from .pages.cloud_security_page import CloudSecurityPage
+except ImportError:
+    CloudSecurityPage = None
+
+try:
+    from .pages.zero_day_page import ZeroDayPage
+except ImportError:
+    ZeroDayPage = None
+
+try:
+    from .pages.edr_evasion_page import EDREvasionPage
+except ImportError:
+    EDREvasionPage = None
+
+try:
+    from .pages.ad_attacks_page import ADAttacksPage
+except ImportError:
+    ADAttacksPage = None
+
+try:
+    from .pages.malware_analysis_page import MalwareAnalysisPage
+except ImportError:
+    MalwareAnalysisPage = None
+
+try:
+    from .pages.container_security_page import ContainerSecurityPage
+except ImportError:
+    ContainerSecurityPage = None
+
+try:
+    from .pages.threat_hunting_page import ThreatHuntingPage
+except ImportError:
+    ThreatHuntingPage = None
+
+try:
+    from .pages.iot_exploitation_page import IoTExploitationPage
+except ImportError:
+    IoTExploitationPage = None
+
+try:
+    from .pages.mobile_security_page import MobileSecurityPage
+except ImportError:
+    MobileSecurityPage = None
+
+try:
+    from .pages.api_security_page import APISecurityPage
+except ImportError:
+    APISecurityPage = None
+
+try:
+    from .pages.scada_security_page import SCADASecurityPage
+except ImportError:
+    SCADASecurityPage = None
+
+try:
+    from .pages.red_team_page import RedTeamPage
+except ImportError:
+    RedTeamPage = None
+
+try:
+    from .pages.blue_team_page import BlueTeamPage
+except ImportError:
+    BlueTeamPage = None
+
+try:
+    from .pages.password_audit_page import PasswordAuditPage
+except ImportError:
+    PasswordAuditPage = None
+
+try:
+    from .pages.network_traffic_page import NetworkTrafficPage
+except ImportError:
+    NetworkTrafficPage = None
+
+try:
+    from .pages.compliance_audit_page import ComplianceAuditPage
+except ImportError:
+    ComplianceAuditPage = None
+
+try:
+    from .pages.vuln_management_page import VulnManagementPage
+except ImportError:
+    VulnManagementPage = None
+
+try:
+    from .pages.asset_inventory_page import AssetInventoryPage
+except ImportError:
+    AssetInventoryPage = None
+
+try:
+    from .pages.attack_simulation_page import AttackSimulationPage
+except ImportError:
+    AttackSimulationPage = None
+
+try:
+    from .pages.security_dashboard_page import SecurityDashboardPage
+except ImportError:
+    SecurityDashboardPage = None
+
+try:
+    from .pages.ai_analysis_page import AIAnalysisPage
+except ImportError:
+    AIAnalysisPage = None
+
+try:
+    from .pages.incident_response_page import IncidentResponsePage
+except ImportError:
+    IncidentResponsePage = None
+
+try:
+    from .pages.soar_page import SOARPage
+except ImportError:
+    SOARPage = None
+
+try:
+    from .pages.deception_page import DeceptionPage
+except ImportError:
+    DeceptionPage = None
+
+try:
+    from .pages.dlp_page import DLPPage
+except ImportError:
+    DLPPage = None
+
+try:
+    from .pages.backup_assessment_page import BackupAssessmentPage
+except ImportError:
+    BackupAssessmentPage = None
+
+try:
+    from .pages.risk_scoring_page import RiskScoringPage
+except ImportError:
+    RiskScoringPage = None
+
+try:
+    from .pages.remediation_tracking_page import RemediationTrackingPage
+except ImportError:
+    RemediationTrackingPage = None
+
+try:
+    from .pages.third_party_risk_page import ThirdPartyRiskPage
+except ImportError:
+    ThirdPartyRiskPage = None
+
+try:
+    from .pages.security_awareness_page import SecurityAwarenessPage
+except ImportError:
+    SecurityAwarenessPage = None
+
+try:
+    from .pages.patch_management_page import PatchManagementPage
+except ImportError:
+    PatchManagementPage = None
+
+try:
+    from .pages.security_metrics_page import SecurityMetricsPage
+except ImportError:
+    SecurityMetricsPage = None
+
+try:
+    from .pages.audit_log_page import AuditLogPage
+except ImportError:
+    AuditLogPage = None
+
+try:
+    from .pages.cmdb_page import CMDBPage
+except ImportError:
+    CMDBPage = None
+
+try:
+    from .pages.pentest_report_page import PentestReportPage
+except ImportError:
+    PentestReportPage = None
+
+try:
+    from .pages.security_policy_page import SecurityPolicyPage
+except ImportError:
+    SecurityPolicyPage = None
+
+try:
+    from .pages.access_control_page import AccessControlPage
+except ImportError:
+    AccessControlPage = None
+
+try:
+    from .pages.bcp_page import BCPPage
+except ImportError:
+    BCPPage = None
+
+try:
+    from .pages.vuln_correlation_page import VulnCorrelationPage
+except ImportError:
+    VulnCorrelationPage = None
+
+try:
+    from .pages.security_architecture_page import SecurityArchitecturePage
+except ImportError:
+    SecurityArchitecturePage = None
+
+try:
+    from .pages.threat_modeling_page import ThreatModelingPage
+except ImportError:
+    ThreatModelingPage = None
+
+try:
+    from .pages.config_baseline_page import ConfigBaselinePage
+except ImportError:
+    ConfigBaselinePage = None
+
+# Cutting-edge AI/ML Security Modules
+try:
+    from .pages.zero_day_predictor_page import ZeroDayPredictorPage
+except ImportError:
+    ZeroDayPredictorPage = None
+
+try:
+    from .pages.quantum_crypto_page import QuantumCryptoPage
+except ImportError:
+    QuantumCryptoPage = None
+
+try:
+    from .pages.deepfake_detection_page import DeepfakeDetectionPage
+except ImportError:
+    DeepfakeDetectionPage = None
+
+try:
+    from .pages.blockchain_forensics_page import BlockchainForensicsPage
+except ImportError:
+    BlockchainForensicsPage = None
+
+try:
+    from .pages.neural_exploit_page import NeuralExploitPage
+except ImportError:
+    NeuralExploitPage = None
+
+try:
+    from .pages.dark_web_intel_page import DarkWebIntelPage
+except ImportError:
+    DarkWebIntelPage = None
+
+try:
+    from .pages.swarm_intelligence_page import SwarmIntelligencePage
+except ImportError:
+    SwarmIntelligencePage = None
+
+try:
+    from .pages.memory_forensics_page import MemoryForensicsPage
+except ImportError:
+    MemoryForensicsPage = None
+
+try:
+    from .pages.behavioral_biometrics_page import BehavioralBiometricsPage
+except ImportError:
+    BehavioralBiometricsPage = None
+
+try:
+    from .pages.adversarial_ml_page import AdversarialMLPage
+except ImportError:
+    AdversarialMLPage = None
+
+try:
+    from .pages.satellite_rf_intel_page import SatelliteRFIntelPage
+except ImportError:
+    SatelliteRFIntelPage = None
+
+# Revolutionary AI-Powered Security Modules
+try:
+    from .pages.neural_fingerprint_page import NeuralFingerprintPage
+except ImportError:
+    NeuralFingerprintPage = None
+
+try:
+    from .pages.quantum_c2_page import QuantumC2Page
+except ImportError:
+    QuantumC2Page = None
+
+try:
+    from .pages.stego_exfil_page import StegoExfilPage
+except ImportError:
+    StegoExfilPage = None
+
+try:
+    from .pages.evolutionary_exploit_page import EvolutionaryExploitPage
+except ImportError:
+    EvolutionaryExploitPage = None
+
+try:
+    from .pages.hardware_implant_page import HardwareImplantPage
+except ImportError:
+    HardwareImplantPage = None
+
+try:
+    from .pages.autonomous_attack_page import AutonomousAttackPage
+except ImportError:
+    AutonomousAttackPage = None
+
+try:
+    from .pages.cognitive_threat_page import CognitiveThreatPage
+except ImportError:
+    CognitiveThreatPage = None
+
+try:
+    from .pages.polymorphic_engine_page import PolymorphicEnginePage
+except ImportError:
+    PolymorphicEnginePage = None
+
+# Premium Experience Modules
+try:
+    from .pages.attack_map_page import LiveAttackMapPage
+except ImportError:
+    LiveAttackMapPage = None
+
+try:
+    from .pages.ai_narrator_page import AIThreatNarratorPage
+except ImportError:
+    AIThreatNarratorPage = None
+
+try:
+    from .pages.exploit_chain_page import ExploitChainBuilderPage
+except ImportError:
+    ExploitChainBuilderPage = None
+
+try:
+    from .pages.gamification_page import GamificationPage
+except ImportError:
+    GamificationPage = None
+
+try:
+    from .pages.attack_replay_page import AttackReplayPage
+except ImportError:
+    AttackReplayPage = None
+
+try:
+    from .pages.collaboration_hub_page import CollaborationHubPage
+except ImportError:
+    CollaborationHubPage = None
+
+# New Feature Modules (v2.1)
+try:
+    from .pages.bug_bounty_page import BugBountyCopilotPage
+except ImportError:
+    BugBountyCopilotPage = None
+
+try:
+    from .pages.secrets_page import SecretsPage
+except ImportError:
+    SecretsPage = None
+
+try:
+    from .pages.graphql_page import GraphQLPage
+except ImportError:
+    GraphQLPage = None
+
+try:
+    from .pages.subdomain_takeover_page import SubdomainTakeoverPage
+except ImportError:
+    SubdomainTakeoverPage = None
+
+try:
+    from .pages.email_security_page import EmailSecurityPage
+except ImportError:
+    EmailSecurityPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -125,7 +524,7 @@ class HydraReconMainWindow(QMainWindow):
         self._init_pages()
     
     def _create_sidebar(self) -> QWidget:
-        """Create the navigation sidebar"""
+        """Create the navigation sidebar with collapsible menu groups"""
         sidebar = QFrame()
         sidebar.setObjectName("sidebar")
         sidebar.setFixedWidth(280)
@@ -136,136 +535,253 @@ class HydraReconMainWindow(QMainWindow):
             }
         """)
         
-        layout = QVBoxLayout(sidebar)
-        layout.setContentsMargins(16, 20, 16, 20)
-        layout.setSpacing(8)
+        main_layout = QVBoxLayout(sidebar)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+        
+        # Header section (fixed, not scrollable)
+        header_widget = QWidget()
+        header_layout = QVBoxLayout(header_widget)
+        header_layout.setContentsMargins(16, 20, 16, 16)
+        header_layout.setSpacing(8)
         
         # Logo/Brand section
         brand_layout = QHBoxLayout()
         brand_layout.setSpacing(12)
         
-        # Logo placeholder
         logo = QLabel("⚡")
-        logo.setStyleSheet("""
-            font-size: 32px;
-            color: #00ff88;
-        """)
+        logo.setStyleSheet("font-size: 32px; color: #00ff88;")
         
         brand_text = QVBoxLayout()
         brand_text.setSpacing(0)
         
         title = QLabel("HydraRecon")
-        title.setStyleSheet("""
-            font-size: 22px;
-            font-weight: 700;
-            color: #e6e6e6;
-        """)
+        title.setStyleSheet("font-size: 22px; font-weight: 700; color: #e6e6e6;")
         
-        subtitle = QLabel("Security Suite v1.0")
-        subtitle.setStyleSheet("""
-            font-size: 11px;
-            color: #8b949e;
-        """)
+        subtitle = QLabel("Security Suite v2.0")
+        subtitle.setStyleSheet("font-size: 11px; color: #8b949e;")
         
         brand_text.addWidget(title)
         brand_text.addWidget(subtitle)
-        
         brand_layout.addWidget(logo)
         brand_layout.addLayout(brand_text)
         brand_layout.addStretch()
+        header_layout.addLayout(brand_layout)
         
-        layout.addLayout(brand_layout)
-        layout.addSpacing(24)
+        main_layout.addWidget(header_widget)
         
-        # Section: Main
-        section_main = QLabel("MAIN")
-        section_main.setStyleSheet("""
-            font-size: 11px;
-            font-weight: 700;
-            color: #8b949e;
-            letter-spacing: 1px;
-            padding-left: 12px;
+        # Scrollable navigation area
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll_area.setStyleSheet("""
+            QScrollArea {
+                background-color: transparent;
+                border: none;
+            }
+            QScrollBar:vertical {
+                background-color: #0d1117;
+                width: 8px;
+                border-radius: 4px;
+            }
+            QScrollBar::handle:vertical {
+                background-color: #21262d;
+                border-radius: 4px;
+                min-height: 30px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background-color: #30363d;
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
         """)
-        layout.addWidget(section_main)
-        layout.addSpacing(8)
         
-        # Navigation buttons
+        scroll_content = QWidget()
+        scroll_layout = QVBoxLayout(scroll_content)
+        scroll_layout.setContentsMargins(8, 8, 8, 8)
+        scroll_layout.setSpacing(4)
+        
+        # Navigation buttons dictionary
         self.nav_buttons = {}
         
-        nav_items = [
-            ("dashboard", "Dashboard", "🏠"),
-            ("nmap", "Nmap Scanner", "🔍"),
-            ("hydra", "Hydra Attack", "🔓"),
-            ("osint", "OSINT", "🌐"),
-            ("automation", "Automation", "⚡"),
-            ("attack_surface", "Attack Surface", "🗺️"),
-            ("api_discovery", "API Discovery", "🔌"),
-            ("exploit_browser", "Exploit Browser", "💀"),
-            ("c2", "C2 Framework", "📡"),
-            ("forensics", "Forensics", "🔬"),
-            ("network_mapper", "Network Mapper", "🕸️"),
-            ("credential_spray", "Credential Spray", "🔐"),
-            ("hash_cracker", "Hash Cracker", "🔨"),
-            ("threat_intel", "Threat Intel", "🛡️"),
-            ("plugins", "Plugins", "🔌"),
-        ]
+        # Define menu groups with categories
+        menu_groups = {
+            "🏠 Dashboard": [
+                ("dashboard", "Dashboard", "🏠"),
+            ],
+            "🔍 Reconnaissance": [
+                ("nmap", "Nmap Scanner", "🔍"),
+                ("osint", "OSINT", "🌐"),
+                ("attack_surface", "Attack Surface", "🗺️"),
+                ("api_discovery", "API Discovery", "🔌"),
+                ("network_mapper", "Network Mapper", "🕸️"),
+                ("threat_intel", "Threat Intel", "🛡️"),
+                ("dark_web_intel", "Dark Web Intel", "🕳️"),
+                ("subdomain_takeover", "Subdomain Takeover", "🔗"),
+            ],
+            "🔎 Advanced Scanners": [
+                ("secrets_scanner", "Secrets Scanner", "🔐"),
+                ("graphql_scanner", "GraphQL Scanner", "📊"),
+                ("email_security", "Email Security", "📧"),
+                ("bug_bounty", "Bug Bounty Copilot", "🎯"),
+            ],
+            "⚔️ Exploitation": [
+                ("hydra", "Hydra Attack", "🔓"),
+                ("exploit_browser", "Exploit Browser", "💀"),
+                ("vuln_scanner", "Vuln Scanner", "🐛"),
+                ("wireless", "Wireless Attacks", "📡"),
+                ("wifi_sensing", "WiFi Sensing 3D", "🛰️"),
+                ("payloads", "Payload Generator", "💣"),
+                ("browser_exploit", "Browser Exploitation", "🌐"),
+                ("zero_day", "Zero-Day Framework", "💀"),
+                ("iot_exploit", "IoT Exploitation", "🔌"),
+                ("scada_ics", "SCADA/ICS Security", "⚡"),
+            ],
+            "🔐 Credentials": [
+                ("password_audit", "Password Audit", "🔑"),
+                ("credential_spray", "Credential Spray", "🔐"),
+                ("hash_cracker", "Hash Cracker", "🔨"),
+                ("ad_attacks", "AD Attacks", "🏰"),
+            ],
+            "🎯 Red Team": [
+                ("red_team", "Red Team Ops", "⚔️"),
+                ("social_eng", "Social Engineering", "🎣"),
+                ("pivoting", "Network Pivoting", "🔀"),
+                ("c2", "C2 Framework", "🎮"),
+                ("edr_evasion", "EDR Evasion", "🛡️"),
+                ("attack_sim", "Attack Simulation", "💥"),
+                ("deception", "Deception Tech", "🎭"),
+            ],
+            "🛡️ Blue Team": [
+                ("blue_team", "Blue Team", "🛡️"),
+                ("threat_hunting", "Threat Hunting", "🎯"),
+                ("incident_response", "Incident Response", "🚨"),
+                ("soar", "SOAR Platform", "🔄"),
+                ("dlp", "Data Loss Prevention", "🔒"),
+                ("network_traffic", "Traffic Analysis", "📡"),
+            ],
+            "🔬 Forensics": [
+                ("forensics", "Forensics", "🔬"),
+                ("malware_analysis", "Malware Analysis", "🔬"),
+                ("memory_forensics", "Memory Forensics", "🔬"),
+                ("blockchain_forensics", "Blockchain Forensics", "⛓️"),
+            ],
+            "☁️ Cloud & Container": [
+                ("cloud_sec", "Cloud Security", "☁️"),
+                ("container_sec", "Container Security", "🐳"),
+                ("api_security", "API Security", "🔗"),
+                ("mobile_sec", "Mobile Security", "📱"),
+            ],
+            "📋 Compliance & GRC": [
+                ("compliance", "Compliance Audit", "📋"),
+                ("risk_scoring", "Risk Scoring", "📊"),
+                ("vuln_mgmt", "Vuln Management", "📊"),
+                ("vuln_correlation", "Vuln Correlation", "🔗"),
+                ("remediation", "Remediation Tracking", "🔧"),
+                ("tprm", "Third-Party Risk", "🏢"),
+                ("security_policy", "Security Policies", "📜"),
+                ("bcp", "Business Continuity", "📋"),
+            ],
+            "🏢 Asset & Config": [
+                ("asset_inv", "Asset Inventory", "🏢"),
+                ("cmdb", "CMDB", "⚙️"),
+                ("config_baseline", "Config Baselines", "📐"),
+                ("patch_mgmt", "Patch Management", "📦"),
+                ("backup_assessment", "Backup Assessment", "💾"),
+            ],
+            "📊 Dashboards & Reports": [
+                ("sec_dashboard", "Security Dashboard", "📈"),
+                ("security_metrics", "Security Metrics", "📊"),
+                ("audit_log", "Audit Logs", "📜"),
+                ("pentest_report", "Pentest Reports", "📋"),
+                ("security_awareness", "Security Awareness", "🎓"),
+            ],
+            "🧠 AI/ML Security": [
+                ("ai_analysis", "AI Analysis", "🧠"),
+                ("neural_exploit", "Neural Exploit Engine", "🧠"),
+                ("zero_day_predictor", "Zero-Day Predictor", "🔮"),
+                ("adversarial_ml", "Adversarial ML", "🤖"),
+                ("swarm_intelligence", "Swarm Intelligence", "🐝"),
+                ("deepfake_detection", "Deepfake Detection", "🎭"),
+                ("behavioral_biometrics", "Behavioral Biometrics", "🧬"),
+            ],
+            "🔐 Quantum & Advanced": [
+                ("quantum_crypto", "Quantum Crypto", "⚛️"),
+                ("quantum_c2", "Quantum C2", "🔐"),
+                ("neural_fingerprint", "Neural Fingerprinting", "🧬"),
+                ("satellite_rf_intel", "Satellite & RF Intel", "📡"),
+            ],
+            "🧬 Autonomous Ops": [
+                ("autonomous_attack", "Autonomous Attack", "🤖"),
+                ("cognitive_threat", "Cognitive Threat", "🧠"),
+                ("polymorphic_engine", "Polymorphic Engine", "🧬"),
+                ("evolutionary_exploit", "Evolutionary Exploits", "🧬"),
+                ("stego_exfil", "Steganographic Exfil", "🖼️"),
+                ("hardware_implant", "Hardware Implant", "🔧"),
+            ],
+            "⭐ Premium Experience": [
+                ("attack_map", "Live Attack Map", "🌍"),
+                ("ai_narrator", "AI Threat Narrator", "🎙️"),
+                ("exploit_chain", "Exploit Chain Builder", "⛓️"),
+                ("gamification", "Gamification Hub", "🏆"),
+                ("attack_replay", "Attack Replay", "🎬"),
+                ("collaboration", "Collaboration Hub", "👥"),
+            ],
+            "🛠️ Architecture": [
+                ("security_architecture", "Security Architecture", "🏛️"),
+                ("threat_modeling", "Threat Modeling", "🎯"),
+                ("access_control", "Access Control", "🔐"),
+                ("automation", "Automation", "⚡"),
+                ("plugins", "Plugins", "🧩"),
+            ],
+        }
         
-        for key, text, icon in nav_items:
-            btn = NavButton(text, icon_char=icon)
-            btn.clicked.connect(lambda checked, k=key: self._navigate(k))
-            self.nav_buttons[key] = btn
-            layout.addWidget(btn)
+        # Create collapsible groups
+        for group_title, items in menu_groups.items():
+            group = CollapsibleMenuGroup(group_title)
+            
+            for key, text, icon in items:
+                btn = NavButton(text, icon_char=icon)
+                btn.clicked.connect(lambda checked, k=key: self._navigate(k))
+                self.nav_buttons[key] = btn
+                group.add_nav_button(btn)
+            
+            scroll_layout.addWidget(group)
         
-        layout.addSpacing(16)
-        
-        # Section: Data
-        section_data = QLabel("DATA")
-        section_data.setStyleSheet("""
-            font-size: 11px;
-            font-weight: 700;
-            color: #8b949e;
-            letter-spacing: 1px;
-            padding-left: 12px;
-        """)
-        layout.addWidget(section_data)
-        layout.addSpacing(8)
-        
+        # Data section (separate group)
+        data_group = CollapsibleMenuGroup("🎯 Data")
         data_items = [
             ("targets", "Targets", "🎯"),
             ("credentials", "Credentials", "🔑"),
             ("vulnerabilities", "Vulnerabilities", "⚠️"),
             ("reports", "Reports", "📊"),
         ]
-        
         for key, text, icon in data_items:
             btn = NavButton(text, icon_char=icon)
             btn.clicked.connect(lambda checked, k=key: self._navigate(k))
             self.nav_buttons[key] = btn
-            layout.addWidget(btn)
+            data_group.add_nav_button(btn)
+        scroll_layout.addWidget(data_group)
         
-        layout.addStretch()
+        scroll_layout.addStretch()
         
-        # Section: System
-        section_system = QLabel("SYSTEM")
-        section_system.setStyleSheet("""
-            font-size: 11px;
-            font-weight: 700;
-            color: #8b949e;
-            letter-spacing: 1px;
-            padding-left: 12px;
-        """)
-        layout.addWidget(section_system)
-        layout.addSpacing(8)
+        scroll_area.setWidget(scroll_content)
+        main_layout.addWidget(scroll_area, 1)
+        
+        # Footer section (fixed, not scrollable)
+        footer_widget = QWidget()
+        footer_layout = QVBoxLayout(footer_widget)
+        footer_layout.setContentsMargins(16, 8, 16, 16)
+        footer_layout.setSpacing(8)
         
         # Settings button
         settings_btn = NavButton("Settings", icon_char="⚙️")
         settings_btn.clicked.connect(lambda: self._navigate("settings"))
         self.nav_buttons["settings"] = settings_btn
-        layout.addWidget(settings_btn)
+        footer_layout.addWidget(settings_btn)
         
         # Project info at bottom
-        layout.addSpacing(16)
-        
         project_frame = QFrame()
         project_frame.setStyleSheet("""
             QFrame {
@@ -279,22 +795,16 @@ class HydraReconMainWindow(QMainWindow):
         project_layout.setSpacing(4)
         
         self.project_label = QLabel("No Project")
-        self.project_label.setStyleSheet("""
-            font-size: 13px;
-            font-weight: 600;
-            color: #e6e6e6;
-        """)
+        self.project_label.setStyleSheet("font-size: 13px; font-weight: 600; color: #e6e6e6;")
         
         self.project_status = QLabel("Create or open a project")
-        self.project_status.setStyleSheet("""
-            font-size: 11px;
-            color: #8b949e;
-        """)
+        self.project_status.setStyleSheet("font-size: 11px; color: #8b949e;")
         
         project_layout.addWidget(self.project_label)
         project_layout.addWidget(self.project_status)
+        footer_layout.addWidget(project_frame)
         
-        layout.addWidget(project_frame)
+        main_layout.addWidget(footer_widget)
         
         # Set default active
         self.nav_buttons["dashboard"].setChecked(True)
@@ -336,6 +846,172 @@ class HydraReconMainWindow(QMainWindow):
             self.pages["threat_intel"] = ThreatIntelPage(self)
         if PluginManagerPage:
             self.pages["plugins"] = PluginManagerPage(self)
+        if WirelessAttacksPage:
+            self.pages["wireless"] = WirelessAttacksPage(self)
+        if WifiSensingPage:
+            self.pages["wifi_sensing"] = WifiSensingPage(self)
+        if PayloadGeneratorPage:
+            self.pages["payloads"] = PayloadGeneratorPage(self)
+        if VulnScannerPage:
+            self.pages["vuln_scanner"] = VulnScannerPage(self)
+        if SocialEngineeringPage:
+            self.pages["social_eng"] = SocialEngineeringPage(self)
+        if BrowserExploitationPage:
+            self.pages["browser_exploit"] = BrowserExploitationPage(self)
+        if NetworkPivotingPage:
+            self.pages["pivoting"] = NetworkPivotingPage(self)
+        if CloudSecurityPage:
+            self.pages["cloud_sec"] = CloudSecurityPage(self)
+        if ZeroDayPage:
+            self.pages["zero_day"] = ZeroDayPage(self)
+        if EDREvasionPage:
+            self.pages["edr_evasion"] = EDREvasionPage(self)
+        if ADAttacksPage:
+            self.pages["ad_attacks"] = ADAttacksPage(self)
+        if MalwareAnalysisPage:
+            self.pages["malware_analysis"] = MalwareAnalysisPage(self)
+        if ContainerSecurityPage:
+            self.pages["container_sec"] = ContainerSecurityPage(self)
+        if ThreatHuntingPage:
+            self.pages["threat_hunting"] = ThreatHuntingPage(self)
+        if IoTExploitationPage:
+            self.pages["iot_exploit"] = IoTExploitationPage(self)
+        if MobileSecurityPage:
+            self.pages["mobile_sec"] = MobileSecurityPage(self)
+        if APISecurityPage:
+            self.pages["api_security"] = APISecurityPage(self)
+        if SCADASecurityPage:
+            self.pages["scada_ics"] = SCADASecurityPage(self)
+        if RedTeamPage:
+            self.pages["red_team"] = RedTeamPage(self)
+        if BlueTeamPage:
+            self.pages["blue_team"] = BlueTeamPage(self)
+        if PasswordAuditPage:
+            self.pages["password_audit"] = PasswordAuditPage(self)
+        if NetworkTrafficPage:
+            self.pages["network_traffic"] = NetworkTrafficPage(self)
+        if ComplianceAuditPage:
+            self.pages["compliance"] = ComplianceAuditPage(self)
+        if VulnManagementPage:
+            self.pages["vuln_mgmt"] = VulnManagementPage(self)
+        if AssetInventoryPage:
+            self.pages["asset_inv"] = AssetInventoryPage(self)
+        if AttackSimulationPage:
+            self.pages["attack_sim"] = AttackSimulationPage(self)
+        if SecurityDashboardPage:
+            self.pages["sec_dashboard"] = SecurityDashboardPage(self)
+        if AIAnalysisPage:
+            self.pages["ai_analysis"] = AIAnalysisPage(self)
+        if IncidentResponsePage:
+            self.pages["incident_response"] = IncidentResponsePage(self)
+        if SOARPage:
+            self.pages["soar"] = SOARPage(self)
+        if DeceptionPage:
+            self.pages["deception"] = DeceptionPage(self)
+        if DLPPage:
+            self.pages["dlp"] = DLPPage(self)
+        if BackupAssessmentPage:
+            self.pages["backup_assessment"] = BackupAssessmentPage(self)
+        if RiskScoringPage:
+            self.pages["risk_scoring"] = RiskScoringPage(self)
+        if RemediationTrackingPage:
+            self.pages["remediation"] = RemediationTrackingPage(self)
+        if ThirdPartyRiskPage:
+            self.pages["tprm"] = ThirdPartyRiskPage(self)
+        if SecurityAwarenessPage:
+            self.pages["security_awareness"] = SecurityAwarenessPage(self)
+        if PatchManagementPage:
+            self.pages["patch_mgmt"] = PatchManagementPage(self)
+        if SecurityMetricsPage:
+            self.pages["security_metrics"] = SecurityMetricsPage(self)
+        if AuditLogPage:
+            self.pages["audit_log"] = AuditLogPage(self)
+        if CMDBPage:
+            self.pages["cmdb"] = CMDBPage(self)
+        if PentestReportPage:
+            self.pages["pentest_report"] = PentestReportPage(self)
+        if SecurityPolicyPage:
+            self.pages["security_policy"] = SecurityPolicyPage(self)
+        if AccessControlPage:
+            self.pages["access_control"] = AccessControlPage(self)
+        if BCPPage:
+            self.pages["bcp"] = BCPPage(self)
+        if VulnCorrelationPage:
+            self.pages["vuln_correlation"] = VulnCorrelationPage(self)
+        if SecurityArchitecturePage:
+            self.pages["security_architecture"] = SecurityArchitecturePage(self)
+        if ThreatModelingPage:
+            self.pages["threat_modeling"] = ThreatModelingPage(self)
+        if ConfigBaselinePage:
+            self.pages["config_baseline"] = ConfigBaselinePage(self)
+        
+        # Initialize cutting-edge AI/ML security pages
+        if ZeroDayPredictorPage:
+            self.pages["zero_day_predictor"] = ZeroDayPredictorPage(self.config, self.db)
+        if QuantumCryptoPage:
+            self.pages["quantum_crypto"] = QuantumCryptoPage(self.config, self.db)
+        if DeepfakeDetectionPage:
+            self.pages["deepfake_detection"] = DeepfakeDetectionPage(self.config, self.db)
+        if BlockchainForensicsPage:
+            self.pages["blockchain_forensics"] = BlockchainForensicsPage(self.config, self.db)
+        if NeuralExploitPage:
+            self.pages["neural_exploit"] = NeuralExploitPage(self.config, self.db)
+        if DarkWebIntelPage:
+            self.pages["dark_web_intel"] = DarkWebIntelPage(self.config, self.db)
+        if SwarmIntelligencePage:
+            self.pages["swarm_intelligence"] = SwarmIntelligencePage(self.config, self.db)
+        if MemoryForensicsPage:
+            self.pages["memory_forensics"] = MemoryForensicsPage(self.config, self.db)
+        if BehavioralBiometricsPage:
+            self.pages["behavioral_biometrics"] = BehavioralBiometricsPage(self.config, self.db)
+        if AdversarialMLPage:
+            self.pages["adversarial_ml"] = AdversarialMLPage(self.config, self.db)
+        if SatelliteRFIntelPage:
+            self.pages["satellite_rf_intel"] = SatelliteRFIntelPage(self.config, self.db)
+        
+        # Initialize revolutionary AI-powered security pages
+        if NeuralFingerprintPage:
+            self.pages["neural_fingerprint"] = NeuralFingerprintPage(self)
+        if QuantumC2Page:
+            self.pages["quantum_c2"] = QuantumC2Page(self)
+        if StegoExfilPage:
+            self.pages["stego_exfil"] = StegoExfilPage(self)
+        if EvolutionaryExploitPage:
+            self.pages["evolutionary_exploit"] = EvolutionaryExploitPage(self)
+        if HardwareImplantPage:
+            self.pages["hardware_implant"] = HardwareImplantPage(self)
+        if AutonomousAttackPage:
+            self.pages["autonomous_attack"] = AutonomousAttackPage(self.config, self.db, self)
+        if CognitiveThreatPage:
+            self.pages["cognitive_threat"] = CognitiveThreatPage(self.config, self.db, self)
+        if PolymorphicEnginePage:
+            self.pages["polymorphic_engine"] = PolymorphicEnginePage(self.config, self.db, self)
+        
+        # Initialize premium experience pages
+        if LiveAttackMapPage:
+            self.pages["attack_map"] = LiveAttackMapPage(self)
+        if AIThreatNarratorPage:
+            self.pages["ai_narrator"] = AIThreatNarratorPage(self)
+        if ExploitChainBuilderPage:
+            self.pages["exploit_chain"] = ExploitChainBuilderPage(self)
+        if GamificationPage:
+            self.pages["gamification"] = GamificationPage(self)
+        if AttackReplayPage:
+            self.pages["attack_replay"] = AttackReplayPage(self)
+        if CollaborationHubPage:
+            self.pages["collaboration"] = CollaborationHubPage(self)
+        
+        # Initialize new v2.1 feature pages
+        if BugBountyCopilotPage:
+            self.pages["bug_bounty"] = BugBountyCopilotPage(self)
+        if SecretsPage:
+            self.pages["secrets_scanner"] = SecretsPage(self)
+        if GraphQLPage:
+            self.pages["graphql_scanner"] = GraphQLPage(self)
+        if SubdomainTakeoverPage:
+            self.pages["subdomain_takeover"] = SubdomainTakeoverPage(self)
+        if EmailSecurityPage:
+            self.pages["email_security"] = EmailSecurityPage(self)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)

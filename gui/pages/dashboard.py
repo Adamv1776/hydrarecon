@@ -171,12 +171,62 @@ class DashboardPage(QWidget):
         
         # Console output for activity
         self.activity_console = ConsoleOutput()
-        self.activity_console.setMinimumHeight(300)
+        self.activity_console.setMinimumHeight(200)
         self.activity_console.append_info("HydraRecon initialized")
         self.activity_console.append_success("System ready for scanning")
         activity_layout.addWidget(self.activity_console)
         
         layout.addWidget(activity_frame)
+        
+        # Getting Started Guide
+        guide_frame = QFrame()
+        guide_frame.setStyleSheet("""
+            QFrame {
+                background-color: #0d1117;
+                border: 1px solid #238636;
+                border-radius: 12px;
+            }
+        """)
+        guide_layout = QVBoxLayout(guide_frame)
+        guide_layout.setContentsMargins(20, 16, 20, 16)
+        guide_layout.setSpacing(10)
+        
+        guide_header = QHBoxLayout()
+        guide_title = QLabel("🚀 Quick Start Guide")
+        guide_title.setFont(QFont("Segoe UI", 14, QFont.Weight.Bold))
+        guide_title.setStyleSheet("color: #00ff88;")
+        guide_header.addWidget(guide_title)
+        guide_header.addStretch()
+        
+        dismiss_btn = QPushButton("✕")
+        dismiss_btn.setFixedSize(24, 24)
+        dismiss_btn.setStyleSheet("""
+            QPushButton {
+                background: transparent;
+                color: #666;
+                border: none;
+                font-size: 14px;
+            }
+            QPushButton:hover { color: #fff; }
+        """)
+        dismiss_btn.clicked.connect(lambda: guide_frame.hide())
+        guide_header.addWidget(dismiss_btn)
+        guide_layout.addLayout(guide_header)
+        
+        steps = [
+            ("1️⃣", "Enter a target IP or domain in the scanner"),
+            ("2️⃣", "Run OSINT to gather intelligence"),
+            ("3️⃣", "Use Nmap to discover open ports"),
+            ("4️⃣", "Build an exploit chain or run Hydra"),
+            ("5️⃣", "Generate a report with your findings"),
+        ]
+        
+        for icon, text in steps:
+            step_label = QLabel(f"{icon} {text}")
+            step_label.setStyleSheet("color: #8b949e; font-size: 12px;")
+            guide_layout.addWidget(step_label)
+        
+        layout.addWidget(guide_frame)
         
         # Quick Actions Section
         actions_frame = QFrame()
@@ -201,14 +251,17 @@ class DashboardPage(QWidget):
         actions_grid.setSpacing(12)
         
         action_items = [
-            ("🔍 Network Scan", "#21262d"),
-            ("🔓 Brute Force", "#21262d"),
-            ("🌐 OSINT Recon", "#21262d"),
-            ("📊 Generate Report", "#21262d"),
+            ("🔍 Network Scan", "#21262d", "nmap", "Scan networks and discover hosts"),
+            ("🔓 Brute Force", "#21262d", "hydra", "Password attacks with Hydra"),
+            ("🌐 OSINT Recon", "#21262d", "osint", "Open source intelligence"),
+            ("📊 Generate Report", "#21262d", "reports", "Export findings to report"),
+            ("⛓️ Chain Builder", "#21262d", "chain", "Visual exploit chaining"),
+            ("🎯 Vuln Scanner", "#21262d", "vuln", "Vulnerability detection"),
         ]
         
-        for i, (text, color) in enumerate(action_items):
+        for i, (text, color, page_id, tooltip) in enumerate(action_items):
             btn = QPushButton(text)
+            btn.setToolTip(tooltip)
             btn.setStyleSheet(f"""
                 QPushButton {{
                     background-color: {color};
@@ -221,9 +274,10 @@ class DashboardPage(QWidget):
                 }}
                 QPushButton:hover {{
                     background-color: #30363d;
-                    border-color: #484f58;
+                    border-color: #00ff88;
                 }}
             """)
+            btn.clicked.connect(lambda checked, pid=page_id: self._navigate_to(pid))
             actions_grid.addWidget(btn, i // 2, i % 2)
         
         actions_layout.addLayout(actions_grid)
@@ -365,6 +419,30 @@ class DashboardPage(QWidget):
         """Update statistics from database"""
         # This would fetch real data from the database
         pass
+    
+    def _navigate_to(self, page_id: str):
+        """Navigate to a specific page"""
+        # Find the main window and navigate
+        parent = self.parent()
+        while parent:
+            if hasattr(parent, 'navigate_to_page'):
+                parent.navigate_to_page(page_id)
+                self.update_activity(f"Navigated to {page_id}")
+                return
+            if hasattr(parent, 'content_stack'):
+                # Find page index by id
+                page_map = {
+                    'nmap': 'Nmap Scanner',
+                    'hydra': 'Hydra',
+                    'osint': 'OSINT',
+                    'reports': 'Reports',
+                    'chain': 'Exploit Chain',
+                    'vuln': 'Vulnerability Scanner'
+                }
+                # This is a fallback - main window should handle navigation
+                self.update_activity(f"Quick action: {page_map.get(page_id, page_id)}")
+                return
+            parent = parent.parent()
     
     def update_activity(self, message: str, level: str = "info"):
         """Add activity log message"""

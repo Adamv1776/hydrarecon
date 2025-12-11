@@ -59,6 +59,79 @@ try:
 except ImportError:
     HashCrackerPage = None
 
+# Advanced AI/ML modules
+try:
+    from .neural_fingerprint_page import NeuralFingerprintPage
+except ImportError:
+    NeuralFingerprintPage = None
+
+try:
+    from .quantum_c2_page import QuantumC2Page
+except ImportError:
+    QuantumC2Page = None
+
+try:
+    from .stego_exfil_page import StegoExfilPage
+except ImportError:
+    StegoExfilPage = None
+
+try:
+    from .evolutionary_exploit_page import EvolutionaryExploitPage
+except ImportError:
+    EvolutionaryExploitPage = None
+
+try:
+    from .hardware_implant_page import HardwareImplantPage
+except ImportError:
+    HardwareImplantPage = None
+
+# Revolutionary AI-Powered Security Modules
+try:
+    from .autonomous_attack_page import AutonomousAttackPage
+except ImportError:
+    AutonomousAttackPage = None
+
+try:
+    from .cognitive_threat_page import CognitiveThreatPage
+except ImportError:
+    CognitiveThreatPage = None
+
+try:
+    from .polymorphic_engine_page import PolymorphicEnginePage
+except ImportError:
+    PolymorphicEnginePage = None
+
+# Premium Experience Modules
+try:
+    from .attack_map_page import LiveAttackMapPage
+except ImportError:
+    LiveAttackMapPage = None
+
+try:
+    from .ai_narrator_page import AIThreatNarratorPage
+except ImportError:
+    AIThreatNarratorPage = None
+
+try:
+    from .exploit_chain_page import ExploitChainBuilderPage
+except ImportError:
+    ExploitChainBuilderPage = None
+
+try:
+    from .gamification_page import GamificationPage
+except ImportError:
+    GamificationPage = None
+
+try:
+    from .attack_replay_page import AttackReplayPage
+except ImportError:
+    AttackReplayPage = None
+
+try:
+    from .collaboration_hub_page import CollaborationHubPage
+except ImportError:
+    CollaborationHubPage = None
+
 __all__ = [
     'DashboardPage',
     'NmapPage',
@@ -79,4 +152,21 @@ __all__ = [
     'ExploitBrowserPage',
     'ForensicsPage',
     'HashCrackerPage',
+    # Advanced AI/ML modules
+    'NeuralFingerprintPage',
+    'QuantumC2Page',
+    'StegoExfilPage',
+    'EvolutionaryExploitPage',
+    'HardwareImplantPage',
+    # Revolutionary AI-Powered Security Modules
+    'AutonomousAttackPage',
+    'CognitiveThreatPage',
+    'PolymorphicEnginePage',
+    # Premium Experience Modules
+    'LiveAttackMapPage',
+    'AIThreatNarratorPage',
+    'ExploitChainBuilderPage',
+    'GamificationPage',
+    'AttackReplayPage',
+    'CollaborationHubPage',
 ]

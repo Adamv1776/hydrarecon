@@ -1,0 +1,460 @@
+"""
+HydraRecon Live Attack Map Page
+Real-time 3D visualization of global attacks and threats
+"""
+
+from PyQt6.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
+    QFrame, QComboBox, QSlider, QSpinBox, QCheckBox,
+    QTableWidget, QTableWidgetItem, QHeaderView, QSplitter,
+    QGroupBox, QGridLayout, QProgressBar, QStackedWidget
+)
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QThread
+from PyQt6.QtGui import QColor, QPainter, QPen, QBrush, QFont
+
+import asyncio
+from datetime import datetime
+from typing import Dict, List, Optional
+
+
+class AttackEventWidget(QFrame):
+    """Widget displaying a single attack event"""
+    
+    def __init__(self, event_data: Dict, parent=None):
+        super().__init__(parent)
+        self.event_data = event_data
+        self.setup_ui()
+    
+    def setup_ui(self):
+        self.setFrameStyle(QFrame.Shape.StyledPanel)
+        self.setStyleSheet("""
+            QFrame {
+                background: rgba(0, 255, 0, 0.1);
+                border: 1px solid #00ff00;
+                border-radius: 4px;
+                padding: 5px;
+            }
+        """)
+        
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(8, 4, 8, 4)
+        
+        # Severity indicator
+        severity = self.event_data.get('severity', 'medium')
+        severity_colors = {
+            'info': '#0088ff',
+            'low': '#00ff00',
+            'medium': '#ffff00',
+            'high': '#ff8800',
+            'critical': '#ff0000',
+            'catastrophic': '#ff00ff'
+        }
+        
+        indicator = QLabel("●")
+        indicator.setStyleSheet(f"color: {severity_colors.get(severity, '#00ff00')}; font-size: 16px;")
+        layout.addWidget(indicator)
+        
+        # Event info
+        info_layout = QVBoxLayout()
+        
+        attack_type = self.event_data.get('attack_type', 'Unknown')
+        type_label = QLabel(f"<b>{attack_type.replace('_', ' ').title()}</b>")
+        type_label.setStyleSheet("color: #00ff00;")
+        info_layout.addWidget(type_label)
+        
+        source = self.event_data.get('source', {})
+        target = self.event_data.get('target', {})
+        route_label = QLabel(f"{source.get('country', 'Unknown')} → {target.get('country', 'Unknown')}")
+        route_label.setStyleSheet("color: #888; font-size: 11px;")
+        info_layout.addWidget(route_label)
+        
+        layout.addLayout(info_layout, 1)
+        
+        # Time
+        timestamp = self.event_data.get('timestamp', '')
+        if timestamp:
+            try:
+                dt = datetime.fromisoformat(timestamp)
+                time_str = dt.strftime('%H:%M:%S')
+            except:
+                time_str = timestamp
+        else:
+            time_str = "Now"
+        
+        time_label = QLabel(time_str)
+        time_label.setStyleSheet("color: #666; font-size: 10px;")
+        layout.addWidget(time_label)
+
+
+class GlobeWidget(QWidget):
+    """Simplified globe visualization widget"""
+    
+    attack_received = pyqtSignal(dict)
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.attacks = []
+        self.rotation = 0
+        self.setMinimumSize(400, 400)
+        
+        # Animation timer
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.animate)
+        self.timer.start(50)
+    
+    def animate(self):
+        self.rotation = (self.rotation + 0.5) % 360
+        self.update()
+    
+    def add_attack(self, attack_data: Dict):
+        self.attacks.append({
+            'data': attack_data,
+            'age': 0,
+            'max_age': 100
+        })
+        # Limit stored attacks
+        if len(self.attacks) > 50:
+            self.attacks.pop(0)
+    
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        # Background
+        painter.fillRect(self.rect(), QColor(10, 10, 15))
+        
+        center_x = self.width() // 2
+        center_y = self.height() // 2
+        radius = min(self.width(), self.height()) // 2 - 50
+        
+        # Draw globe outline
+        painter.setPen(QPen(QColor(0, 100, 0), 2))
+        painter.setBrush(QBrush(QColor(0, 30, 0)))
+        painter.drawEllipse(center_x - radius, center_y - radius, 
+                           radius * 2, radius * 2)
+        
+        # Draw grid lines
+        painter.setPen(QPen(QColor(0, 60, 0), 1))
+        for i in range(-80, 81, 20):
+            y = center_y + int(radius * i / 90)
+            width = int(radius * (1 - abs(i) / 90))
+            painter.drawEllipse(center_x - width, y - 2, width * 2, 4)
+        
+        for i in range(0, 360, 30):
+            from math import cos, sin, radians
+            angle = radians(i + self.rotation)
+            x1 = center_x + int(radius * cos(angle) * 0.1)
+            y1 = center_y - radius
+            x2 = center_x + int(radius * cos(angle) * 0.1)
+            y2 = center_y + radius
+            painter.drawLine(x1, y1, x2, y2)
+        
+        # Draw attacks
+        painter.setPen(QPen(QColor(255, 0, 0), 2))
+        for attack in self.attacks:
+            attack['age'] += 1
+            if attack['age'] > attack['max_age']:
+                continue
+            
+            alpha = int(255 * (1 - attack['age'] / attack['max_age']))
+            severity = attack['data'].get('severity', 'medium')
+            
+            if severity in ['critical', 'catastrophic']:
+                color = QColor(255, 0, 0, alpha)
+            elif severity == 'high':
+                color = QColor(255, 136, 0, alpha)
+            else:
+                color = QColor(255, 255, 0, alpha)
+            
+            painter.setPen(QPen(color, 2))
+            painter.setBrush(QBrush(color))
+            
+            # Random position for demo
+            import random
+            x = center_x + random.randint(-radius, radius)
+            y = center_y + random.randint(-radius, radius)
+            
+            # Draw attack arc
+            size = 5 + int(10 * (1 - attack['age'] / attack['max_age']))
+            painter.drawEllipse(x - size//2, y - size//2, size, size)
+        
+        # Clean up old attacks
+        self.attacks = [a for a in self.attacks if a['age'] <= a['max_age']]
+        
+        # Draw title
+        painter.setPen(QPen(QColor(0, 255, 0)))
+        painter.setFont(QFont('Consolas', 14, QFont.Weight.Bold))
+        painter.drawText(10, 25, "🌍 LIVE GLOBAL THREAT MAP")
+        
+        painter.end()
+
+
+class LiveAttackMapPage(QWidget):
+    """Live Attack Map visualization page"""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.is_running = False
+        self.events_per_second = 5
+        self.demo_timer = None
+        self.setup_ui()
+    
+    def setup_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Header
+        header = QFrame()
+        header.setStyleSheet("background: #111; border-bottom: 1px solid #00ff00;")
+        header_layout = QHBoxLayout(header)
+        
+        title = QLabel("🌍 Live Global Attack Map")
+        title.setStyleSheet("color: #00ff00; font-size: 18px; font-weight: bold;")
+        header_layout.addWidget(title)
+        
+        header_layout.addStretch()
+        
+        # Controls
+        self.start_btn = QPushButton("▶ Start Feed")
+        self.start_btn.setStyleSheet("""
+            QPushButton {
+                background: #003300;
+                color: #00ff00;
+                border: 1px solid #00ff00;
+                padding: 8px 16px;
+                border-radius: 4px;
+            }
+            QPushButton:hover { background: #004400; }
+        """)
+        self.start_btn.clicked.connect(self.toggle_feed)
+        header_layout.addWidget(self.start_btn)
+        
+        speed_label = QLabel("Speed:")
+        speed_label.setStyleSheet("color: #00ff00;")
+        header_layout.addWidget(speed_label)
+        
+        self.speed_slider = QSlider(Qt.Orientation.Horizontal)
+        self.speed_slider.setRange(1, 20)
+        self.speed_slider.setValue(5)
+        self.speed_slider.setFixedWidth(100)
+        self.speed_slider.valueChanged.connect(self.update_speed)
+        header_layout.addWidget(self.speed_slider)
+        
+        layout.addWidget(header)
+        
+        # Main content
+        content = QSplitter(Qt.Orientation.Horizontal)
+        
+        # Left - Globe
+        left_panel = QFrame()
+        left_layout = QVBoxLayout(left_panel)
+        
+        self.globe = GlobeWidget()
+        left_layout.addWidget(self.globe, 1)
+        
+        # Stats bar
+        stats_frame = QFrame()
+        stats_frame.setStyleSheet("background: #0a0a0a; border: 1px solid #333;")
+        stats_layout = QHBoxLayout(stats_frame)
+        
+        self.total_label = QLabel("Total Events: 0")
+        self.total_label.setStyleSheet("color: #00ff00;")
+        stats_layout.addWidget(self.total_label)
+        
+        self.blocked_label = QLabel("Blocked: 0")
+        self.blocked_label.setStyleSheet("color: #0088ff;")
+        stats_layout.addWidget(self.blocked_label)
+        
+        self.critical_label = QLabel("Critical: 0")
+        self.critical_label.setStyleSheet("color: #ff0000;")
+        stats_layout.addWidget(self.critical_label)
+        
+        left_layout.addWidget(stats_frame)
+        
+        content.addWidget(left_panel)
+        
+        # Right - Event feed
+        right_panel = QFrame()
+        right_panel.setStyleSheet("background: #0a0a0a;")
+        right_layout = QVBoxLayout(right_panel)
+        
+        feed_title = QLabel("📡 Live Event Feed")
+        feed_title.setStyleSheet("color: #00ff00; font-weight: bold; font-size: 14px;")
+        right_layout.addWidget(feed_title)
+        
+        # Event list
+        self.event_list = QVBoxLayout()
+        self.event_list.setSpacing(4)
+        
+        event_container = QWidget()
+        event_container.setLayout(self.event_list)
+        
+        from PyQt6.QtWidgets import QScrollArea
+        scroll = QScrollArea()
+        scroll.setWidget(event_container)
+        scroll.setWidgetResizable(True)
+        scroll.setStyleSheet("""
+            QScrollArea { border: none; background: transparent; }
+            QScrollBar:vertical { background: #111; width: 8px; }
+            QScrollBar::handle:vertical { background: #333; border-radius: 4px; }
+        """)
+        right_layout.addWidget(scroll, 1)
+        
+        # Filters
+        filter_frame = QGroupBox("Filters")
+        filter_frame.setStyleSheet("""
+            QGroupBox {
+                color: #00ff00;
+                border: 1px solid #333;
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+        """)
+        filter_layout = QGridLayout(filter_frame)
+        
+        self.show_scans = QCheckBox("Port Scans")
+        self.show_scans.setChecked(True)
+        self.show_scans.setStyleSheet("color: #00ff00;")
+        filter_layout.addWidget(self.show_scans, 0, 0)
+        
+        self.show_exploits = QCheckBox("Exploits")
+        self.show_exploits.setChecked(True)
+        self.show_exploits.setStyleSheet("color: #ff8800;")
+        filter_layout.addWidget(self.show_exploits, 0, 1)
+        
+        self.show_malware = QCheckBox("Malware")
+        self.show_malware.setChecked(True)
+        self.show_malware.setStyleSheet("color: #ff0000;")
+        filter_layout.addWidget(self.show_malware, 1, 0)
+        
+        self.show_apt = QCheckBox("APT")
+        self.show_apt.setChecked(True)
+        self.show_apt.setStyleSheet("color: #ff00ff;")
+        filter_layout.addWidget(self.show_apt, 1, 1)
+        
+        right_layout.addWidget(filter_frame)
+        
+        content.addWidget(right_panel)
+        content.setSizes([600, 400])
+        
+        layout.addWidget(content, 1)
+        
+        # Bottom stats
+        bottom = QFrame()
+        bottom.setStyleSheet("background: #0a0a0a; border-top: 1px solid #333;")
+        bottom_layout = QHBoxLayout(bottom)
+        
+        # Top countries
+        top_sources = QLabel("🔥 Top Sources: CN (45%), RU (23%), US (12%)")
+        top_sources.setStyleSheet("color: #888;")
+        bottom_layout.addWidget(top_sources)
+        
+        bottom_layout.addStretch()
+        
+        threat_level = QLabel("Threat Level: ")
+        threat_level.setStyleSheet("color: #888;")
+        bottom_layout.addWidget(threat_level)
+        
+        self.threat_indicator = QLabel("ELEVATED")
+        self.threat_indicator.setStyleSheet("""
+            color: #ff8800;
+            font-weight: bold;
+            padding: 2px 8px;
+            background: rgba(255, 136, 0, 0.2);
+            border-radius: 3px;
+        """)
+        bottom_layout.addWidget(self.threat_indicator)
+        
+        layout.addWidget(bottom)
+        
+        # Stats tracking
+        self.total_events = 0
+        self.blocked_events = 0
+        self.critical_events = 0
+    
+    def toggle_feed(self):
+        if self.is_running:
+            self.stop_feed()
+        else:
+            self.start_feed()
+    
+    def start_feed(self):
+        self.is_running = True
+        self.start_btn.setText("⏹ Stop Feed")
+        self.start_btn.setStyleSheet("""
+            QPushButton {
+                background: #330000;
+                color: #ff0000;
+                border: 1px solid #ff0000;
+                padding: 8px 16px;
+                border-radius: 4px;
+            }
+            QPushButton:hover { background: #440000; }
+        """)
+        
+        # Start demo timer
+        self.demo_timer = QTimer()
+        self.demo_timer.timeout.connect(self.generate_demo_event)
+        self.demo_timer.start(1000 // self.events_per_second)
+    
+    def stop_feed(self):
+        self.is_running = False
+        self.start_btn.setText("▶ Start Feed")
+        self.start_btn.setStyleSheet("""
+            QPushButton {
+                background: #003300;
+                color: #00ff00;
+                border: 1px solid #00ff00;
+                padding: 8px 16px;
+                border-radius: 4px;
+            }
+            QPushButton:hover { background: #004400; }
+        """)
+        
+        if self.demo_timer:
+            self.demo_timer.stop()
+    
+    def update_speed(self, value):
+        self.events_per_second = value
+        if self.demo_timer and self.is_running:
+            self.demo_timer.setInterval(1000 // value)
+    
+    def generate_demo_event(self):
+        import random
+        
+        attack_types = ['port_scan', 'sql_injection', 'brute_force', 'malware',
+                       'phishing', 'ddos', 'ransomware', 'apt', 'xss_attack']
+        severities = ['low', 'medium', 'medium', 'high', 'high', 'critical']
+        countries = ['CN', 'RU', 'US', 'DE', 'KR', 'JP', 'BR', 'IR', 'UA', 'GB']
+        
+        event = {
+            'attack_type': random.choice(attack_types),
+            'severity': random.choice(severities),
+            'source': {'country': random.choice(countries)},
+            'target': {'country': random.choice(countries)},
+            'timestamp': datetime.now().isoformat(),
+            'blocked': random.random() < 0.6
+        }
+        
+        # Update stats
+        self.total_events += 1
+        if event['blocked']:
+            self.blocked_events += 1
+        if event['severity'] in ['critical', 'catastrophic']:
+            self.critical_events += 1
+        
+        self.total_label.setText(f"Total Events: {self.total_events}")
+        self.blocked_label.setText(f"Blocked: {self.blocked_events}")
+        self.critical_label.setText(f"Critical: {self.critical_events}")
+        
+        # Add to globe
+        self.globe.add_attack(event)
+        
+        # Add to feed (limit to 20)
+        while self.event_list.count() > 20:
+            item = self.event_list.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        
+        event_widget = AttackEventWidget(event)
+        self.event_list.insertWidget(0, event_widget)

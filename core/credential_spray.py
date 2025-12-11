@@ -268,7 +268,8 @@ class CredentialSprayEngine:
             if result.success:
                 self.stats["successful"] += 1
                 self.successful_creds.append((username, password))
-                print(f"[+] SUCCESS: {username}:{password}")
+                # SECURITY: Redact password in logs
+                print(f"[+] SUCCESS: {username}:{'*' * len(password)}")
             elif result.error:
                 self.stats["errors"] += 1
             else:

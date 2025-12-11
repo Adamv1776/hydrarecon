@@ -380,29 +380,22 @@ class OSINTPage(QWidget):
         
         layout.addWidget(modules_tabs)
         
-        # Quick buttons
+        # Quick buttons with better labels
         quick_layout = QHBoxLayout()
         quick_layout.setSpacing(6)
         
-        for text, callback in [
-            ("All", lambda: self._select_all_modules(True)),
-            ("None", lambda: self._select_all_modules(False)),
-            ("🕵️ Full Recon", self._preset_full_recon)
-        ]:
+        quick_actions = [
+            ("Select All", "📋", self._select_all, "Enable all OSINT modules"),
+            ("Clear", "🗑️", self._select_none, "Disable all modules"),
+            ("🕵️ Full Recon", "🚀", self._preset_full_recon, "Complete reconnaissance preset"),
+            ("⚡ Quick", "💨", self._preset_quick_scan, "Fast essential checks"),
+        ]
+        
+        for text, icon, callback, tooltip in quick_actions:
             btn = QPushButton(text)
             btn.clicked.connect(callback)
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #21262d;
-                    border: none;
-                    border-radius: 6px;
-                    padding: 6px 12px;
-                    color: #e6e6e6;
-                    font-size: 11px;
-                }
-                QPushButton:hover { background-color: #30363d; }
-            """)
-            if "Full" in text:
+            btn.setToolTip(tooltip)
+            if "Full" in text or "Quick" in text:
                 btn.setStyleSheet("""
                     QPushButton {
                         background-color: #238636;
@@ -414,6 +407,18 @@ class OSINTPage(QWidget):
                         font-weight: 600;
                     }
                     QPushButton:hover { background-color: #2ea043; }
+                """)
+            else:
+                btn.setStyleSheet("""
+                    QPushButton {
+                        background-color: #21262d;
+                        border: none;
+                        border-radius: 6px;
+                        padding: 6px 12px;
+                        color: #e6e6e6;
+                        font-size: 11px;
+                    }
+                    QPushButton:hover { background-color: #30363d; }
                 """)
             quick_layout.addWidget(btn)
         
@@ -831,6 +836,23 @@ class OSINTPage(QWidget):
             self.console.append_success("Advanced OSINT scanner ready")
         except Exception as e:
             self.console.append_warning(f"Advanced OSINT not available: {e}")
+    
+    def _select_all(self):
+        """Select all modules"""
+        for check in self.module_checks.values():
+            check.setChecked(True)
+    
+    def _select_none(self):
+        """Deselect all modules"""
+        for check in self.module_checks.values():
+            check.setChecked(False)
+    
+    def _preset_quick_scan(self):
+        """Quick essential scan preset"""
+        quick_modules = ['dns', 'whois', 'ip_intel', 'web_tech']
+        for module_id, check in self.module_checks.items():
+            check.setChecked(module_id in quick_modules)
+        self.console.append_info("⚡ Quick scan preset loaded: DNS, WHOIS, IP Intel, Web Tech")
     
     def _select_all_modules(self, select: bool):
         for check in self.module_checks.values():

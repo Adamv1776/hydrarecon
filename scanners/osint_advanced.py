@@ -4,6 +4,16 @@ HydraRecon Advanced OSINT Module
 ██████████████████████████████████████████████████████████████████████████████
 █  CUTTING-EDGE OSINT - Deep Intelligence Gathering with Real API Support     █
 ██████████████████████████████████████████████████████████████████████████████
+
+CORS Note: CORS (Cross-Origin Resource Sharing) is a BROWSER security feature.
+Python scripts run on the server/CLI and make direct HTTP requests,
+completely bypassing CORS restrictions. This module uses advanced techniques
+to maximize data collection:
+  - Rotating User-Agents (evade bot detection)
+  - Browser fingerprint spoofing
+  - Proxy/Tor support for anonymity
+  - Rate limit handling with backoff
+  - Multiple data source aggregation
 """
 
 import asyncio
@@ -22,6 +32,13 @@ import ssl
 
 from .base import BaseScanner, ScanResult, ScanStatus
 
+# Import advanced HTTP client with anti-detection capabilities
+try:
+    from core.advanced_http import AdvancedHTTPClient, OSINTDataCollector
+    ADVANCED_HTTP_AVAILABLE = True
+except ImportError:
+    ADVANCED_HTTP_AVAILABLE = False
+
 
 @dataclass
 class OSINTFinding:
@@ -38,12 +55,39 @@ class OSINTFinding:
 
 
 class BaseOSINTModule(ABC):
-    """Base class for all OSINT modules"""
+    """
+    Base class for all OSINT modules.
     
-    def __init__(self, config):
+    Uses advanced HTTP client with anti-detection measures:
+    - Rotating User-Agents (Chrome, Firefox, Safari, Edge, Mobile)
+    - Browser-like headers (Accept, Accept-Language, sec-ch-ua, etc.)
+    - Optional Tor/proxy support for anonymity
+    - Automatic retry with exponential backoff
+    - Rate limit detection and handling
+    """
+    
+    def __init__(self, config, use_tor: bool = False, proxy: Optional[str] = None):
         self.config = config
         self._session: Optional[aiohttp.ClientSession] = None
-        self.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        self._advanced_client: Optional[AdvancedHTTPClient] = None
+        self._osint_collector: Optional[OSINTDataCollector] = None
+        self.use_tor = use_tor
+        self.proxy = proxy
+        
+        # User agent pool for rotation
+        self.user_agents = [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0",
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        ]
+        self.user_agent = self.user_agents[0]
+    
+    def _get_random_ua(self) -> str:
+        """Get a random User-Agent for rotation."""
+        import random
+        return random.choice(self.user_agents)
     
     @property
     @abstractmethod
@@ -59,21 +103,74 @@ class BaseOSINTModule(ABC):
     async def gather(self, target: str) -> List[OSINTFinding]:
         pass
     
+    async def get_advanced_client(self) -> AdvancedHTTPClient:
+        """Get advanced HTTP client with anti-detection features."""
+        if ADVANCED_HTTP_AVAILABLE:
+            if self._advanced_client is None:
+                self._advanced_client = AdvancedHTTPClient(
+                    use_tor=self.use_tor,
+                    proxy=self.proxy,
+                    rotate_ua=True,
+                    respect_rate_limits=True
+                )
+            return self._advanced_client
+        else:
+            # Fallback to regular session
+            return None
+    
+    async def get_osint_collector(self) -> OSINTDataCollector:
+        """Get specialized OSINT data collector."""
+        if ADVANCED_HTTP_AVAILABLE:
+            if self._osint_collector is None:
+                client = await self.get_advanced_client()
+                self._osint_collector = OSINTDataCollector(client)
+            return self._osint_collector
+        return None
+    
     async def get_session(self) -> aiohttp.ClientSession:
+        """Get HTTP session with rotating User-Agent and browser-like headers."""
         if self._session is None or self._session.closed:
-            connector = aiohttp.TCPConnector(ssl=False, limit=30)
+            # Create SSL context that accepts most certificates
+            ssl_context = ssl.create_default_context()
+            ssl_context.check_hostname = False
+            ssl_context.verify_mode = ssl.CERT_NONE
+            
+            connector = aiohttp.TCPConnector(
+                ssl=ssl_context,
+                limit=50,
+                limit_per_host=10
+            )
             timeout = aiohttp.ClientTimeout(total=30)
-            headers = {"User-Agent": self.user_agent}
+            
+            # Browser-like headers
+            headers = {
+                "User-Agent": self._get_random_ua(),
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Connection": "keep-alive",
+                "Upgrade-Insecure-Requests": "1",
+                "Sec-Fetch-Dest": "document",
+                "Sec-Fetch-Mode": "navigate",
+                "Sec-Fetch-Site": "none",
+            }
+            
             self._session = aiohttp.ClientSession(
                 connector=connector, 
                 timeout=timeout,
-                headers=headers
+                headers=headers,
+                trust_env=True  # Use system proxy if set
             )
         return self._session
     
     async def close(self):
+        """Close all HTTP sessions."""
         if self._session and not self._session.closed:
             await self._session.close()
+        if self._advanced_client:
+            await self._advanced_client.close()
+        if self._osint_collector:
+            await self._osint_collector.close()
 
 
 class EmailOSINT(BaseOSINTModule):

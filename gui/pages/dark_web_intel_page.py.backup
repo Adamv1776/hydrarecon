@@ -1,0 +1,739 @@
+"""
+Dark Web Intelligence GUI Page
+Dark web monitoring, hidden service crawling, and threat intelligence.
+"""
+
+from PyQt6.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
+    QTableWidget, QTableWidgetItem, QHeaderView, QFrame,
+    QTextEdit, QLineEdit, QComboBox, QProgressBar, QTabWidget,
+    QGroupBox, QSpinBox, QCheckBox, QSplitter, QGridLayout,
+    QListWidget, QListWidgetItem, QTreeWidget, QTreeWidgetItem
+)
+from PyQt6.QtCore import Qt, QThread, pyqtSignal, QTimer
+from PyQt6.QtGui import QFont, QColor
+from datetime import datetime
+
+
+class DarkWebCrawlWorker(QThread):
+    """Worker for dark web crawling"""
+    progress = pyqtSignal(int)
+    result = pyqtSignal(dict)
+    service_found = pyqtSignal(dict)
+    finished = pyqtSignal()
+    
+    def __init__(self, crawler, search_params):
+        super().__init__()
+        self.crawler = crawler
+        self.search_params = search_params
+    
+    def run(self):
+        try:
+            for i in range(100):
+                self.progress.emit(i + 1)
+                if i % 20 == 0:
+                    self.service_found.emit({
+                        "url": f"http://abc{i}xyz.onion",
+                        "type": "marketplace"
+                    })
+                self.msleep(50)
+            
+            self.result.emit({
+                "status": "completed",
+                "services_found": 15,
+                "threats_detected": 3
+            })
+        except Exception as e:
+            self.result.emit({"error": str(e)})
+        finally:
+            self.finished.emit()
+
+
+class DarkWebIntelPage(QWidget):
+    """Dark Web Intelligence Crawler GUI"""
+    
+    def __init__(self, config, db):
+        super().__init__()
+        self.config = config
+        self.db = db
+        self.crawler = None
+        self.worker = None
+        
+        self._init_crawler()
+        self._setup_ui()
+        self._apply_styles()
+    
+    def _init_crawler(self):
+        """Initialize dark web crawler"""
+        try:
+            from core.dark_web_intel import DarkWebCrawler
+            self.crawler = DarkWebCrawler(self.config, self.db)
+        except ImportError:
+            self.crawler = None
+    
+    def _setup_ui(self):
+        """Setup user interface"""
+        layout = QVBoxLayout(self)
+        layout.setSpacing(15)
+        layout.setContentsMargins(20, 20, 20, 20)
+        
+        # Header
+        header = self._create_header()
+        layout.addWidget(header)
+        
+        # Main tabs
+        tabs = QTabWidget()
+        tabs.setObjectName("darkwebTabs")
+        
+        tabs.addTab(self._create_search_tab(), "🔍 Search")
+        tabs.addTab(self._create_monitoring_tab(), "👁️ Monitoring")
+        tabs.addTab(self._create_marketplace_tab(), "🛒 Marketplaces")
+        tabs.addTab(self._create_actors_tab(), "🎭 Threat Actors")
+        tabs.addTab(self._create_alerts_tab(), "🚨 Alerts")
+        
+        layout.addWidget(tabs)
+    
+    def _create_header(self) -> QFrame:
+        """Create header section"""
+        frame = QFrame()
+        frame.setObjectName("headerFrame")
+        layout = QHBoxLayout(frame)
+        
+        # Title
+        title_layout = QVBoxLayout()
+        title = QLabel("🌑 Dark Web Intelligence")
+        title.setFont(QFont("Segoe UI", 24, QFont.Weight.Bold))
+        title.setStyleSheet("color: #9b59b6;")
+        title_layout.addWidget(title)
+        
+        subtitle = QLabel("Hidden service monitoring, threat intelligence, and dark web analysis")
+        subtitle.setStyleSheet("color: #888; font-size: 12px;")
+        title_layout.addWidget(subtitle)
+        layout.addLayout(title_layout)
+        
+        layout.addStretch()
+        
+        # Status
+        status_layout = QHBoxLayout()
+        
+        self.tor_status = QLabel("● Tor: Connected")
+        self.tor_status.setStyleSheet("color: #00ff88; font-size: 11px;")
+        status_layout.addWidget(self.tor_status)
+        
+        self.crawl_status = QLabel("Crawlers: 3 Active")
+        self.crawl_status.setStyleSheet("color: #00d4ff; font-size: 11px;")
+        status_layout.addWidget(self.crawl_status)
+        
+        layout.addLayout(status_layout)
+        
+        # Action button
+        self.crawl_btn = QPushButton("🌑 Start Crawl")
+        self.crawl_btn.setObjectName("primaryButton")
+        self.crawl_btn.clicked.connect(self._start_crawl)
+        layout.addWidget(self.crawl_btn)
+        
+        return frame
+    
+    def _create_search_tab(self) -> QWidget:
+        """Create search tab"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        
+        # Search bar
+        search_layout = QHBoxLayout()
+        
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Search dark web for keywords, domains, or threat actors...")
+        search_layout.addWidget(self.search_input)
+        
+        self.search_type = QComboBox()
+        self.search_type.addItems([
+            "All", "Marketplaces", "Forums", "Paste Sites",
+            "Data Leaks", "Threat Actors"
+        ])
+        search_layout.addWidget(self.search_type)
+        
+        search_btn = QPushButton("🔍 Search")
+        search_btn.setObjectName("primaryButton")
+        search_btn.clicked.connect(self._search_darkweb)
+        search_layout.addWidget(search_btn)
+        
+        layout.addLayout(search_layout)
+        
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+        
+        # Left - Search results
+        results_panel = QFrame()
+        results_layout = QVBoxLayout(results_panel)
+        
+        results_layout.addWidget(QLabel("Search Results:"))
+        
+        self.results_table = QTableWidget()
+        self.results_table.setColumnCount(5)
+        self.results_table.setHorizontalHeaderLabels([
+            "Source", "Type", "Title", "Relevance", "Date"
+        ])
+        self.results_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.results_table.itemClicked.connect(self._show_result_details)
+        
+        # Sample results
+        results = [
+            ("🧅 xyz...onion", "Marketplace", "Stolen Credentials Sale", "95%", "2024-02-15"),
+            ("🧅 abc...onion", "Forum", "New Ransomware Discussion", "87%", "2024-02-14"),
+            ("🧅 def...onion", "Paste Site", "Data Leak - Company X", "82%", "2024-02-13"),
+            ("🧅 ghi...onion", "Forum", "Exploit Development Thread", "78%", "2024-02-12"),
+        ]
+        
+        self.results_table.setRowCount(len(results))
+        for row, result in enumerate(results):
+            for col, value in enumerate(result):
+                item = QTableWidgetItem(value)
+                if col == 3:  # Relevance
+                    rel = int(value.replace("%", ""))
+                    if rel >= 90:
+                        item.setForeground(QColor("#ff4444"))
+                    elif rel >= 80:
+                        item.setForeground(QColor("#ff8800"))
+                self.results_table.setItem(row, col, item)
+        
+        results_layout.addWidget(self.results_table)
+        splitter.addWidget(results_panel)
+        
+        # Right - Details
+        details_panel = QFrame()
+        details_layout = QVBoxLayout(details_panel)
+        
+        details_layout.addWidget(QLabel("Details:"))
+        
+        self.result_details = QTextEdit()
+        self.result_details.setReadOnly(True)
+        self.result_details.setHtml("""
+<h3>Stolen Credentials Sale</h3>
+<p><b>Source:</b> Dark Web Marketplace</p>
+<p><b>First Seen:</b> 2024-02-15 08:32:15</p>
+<p><b>Threat Level:</b> <span style="color: #ff4444;">HIGH</span></p>
+
+<h4>Description:</h4>
+<p>Listing for corporate credentials including:</p>
+<ul>
+<li>1,247 email/password combinations</li>
+<li>Corporate VPN access credentials</li>
+<li>Admin panel login details</li>
+</ul>
+
+<h4>Recommended Actions:</h4>
+<ol>
+<li>Verify if credentials belong to your organization</li>
+<li>Force password reset for affected accounts</li>
+<li>Monitor for unauthorized access</li>
+</ol>
+""")
+        details_layout.addWidget(self.result_details)
+        
+        splitter.addWidget(details_panel)
+        layout.addWidget(splitter)
+        
+        return widget
+    
+    def _create_monitoring_tab(self) -> QWidget:
+        """Create monitoring tab"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        
+        # Monitoring controls
+        controls = QHBoxLayout()
+        
+        add_monitor_btn = QPushButton("➕ Add Monitor")
+        add_monitor_btn.clicked.connect(self._add_monitor)
+        controls.addWidget(add_monitor_btn)
+        
+        controls.addStretch()
+        
+        refresh_btn = QPushButton("🔄 Refresh")
+        controls.addWidget(refresh_btn)
+        
+        layout.addLayout(controls)
+        
+        # Active monitors
+        monitors_group = QGroupBox("Active Monitors")
+        monitors_layout = QVBoxLayout(monitors_group)
+        
+        self.monitors_table = QTableWidget()
+        self.monitors_table.setColumnCount(6)
+        self.monitors_table.setHorizontalHeaderLabels([
+            "Monitor", "Type", "Keywords", "Status", "Matches", "Last Check"
+        ])
+        self.monitors_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        
+        monitors = [
+            ("Company Leaks", "Data Leak", "company.com, @company", "● Active", "3", "5 min ago"),
+            ("Credential Sales", "Marketplace", "admin, password", "● Active", "12", "10 min ago"),
+            ("Brand Abuse", "All", "company name, logo", "● Active", "7", "15 min ago"),
+            ("Exec Mentions", "Forum", "CEO name, CFO name", "● Active", "2", "20 min ago"),
+        ]
+        
+        self.monitors_table.setRowCount(len(monitors))
+        for row, monitor in enumerate(monitors):
+            for col, value in enumerate(monitor):
+                item = QTableWidgetItem(value)
+                if col == 3:  # Status
+                    item.setForeground(QColor("#00ff88"))
+                elif col == 4:  # Matches
+                    if int(value) > 5:
+                        item.setForeground(QColor("#ff8800"))
+                self.monitors_table.setItem(row, col, item)
+        
+        monitors_layout.addWidget(self.monitors_table)
+        layout.addWidget(monitors_group)
+        
+        # Recent findings
+        findings_group = QGroupBox("Recent Findings")
+        findings_layout = QVBoxLayout(findings_group)
+        
+        self.findings_list = QListWidget()
+        
+        findings = [
+            "🚨 [HIGH] New credential sale matching 'company.com' detected",
+            "⚠️ [MEDIUM] Brand mention in dark web forum",
+            "ℹ️ [LOW] Employee email found in paste site",
+            "🚨 [HIGH] Data dump containing company data",
+        ]
+        
+        for finding in findings:
+            item = QListWidgetItem(finding)
+            if "[HIGH]" in finding:
+                item.setForeground(QColor("#ff4444"))
+            elif "[MEDIUM]" in finding:
+                item.setForeground(QColor("#ff8800"))
+            self.findings_list.addItem(item)
+        
+        findings_layout.addWidget(self.findings_list)
+        layout.addWidget(findings_group)
+        
+        return widget
+    
+    def _create_marketplace_tab(self) -> QWidget:
+        """Create marketplace monitoring tab"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        
+        # Marketplace overview
+        overview_layout = QHBoxLayout()
+        
+        for name, count, color in [
+            ("Active Marketplaces", "47", "#9b59b6"),
+            ("Monitored Listings", "1,247", "#00d4ff"),
+            ("Relevant Items", "89", "#ff8800"),
+            ("Threats Detected", "12", "#ff4444")
+        ]:
+            stat_frame = QFrame()
+            stat_frame.setObjectName("statCard")
+            stat_v = QVBoxLayout(stat_frame)
+            
+            val = QLabel(count)
+            val.setFont(QFont("Segoe UI", 18, QFont.Weight.Bold))
+            val.setStyleSheet(f"color: {color};")
+            val.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            stat_v.addWidget(val)
+            
+            lbl = QLabel(name)
+            lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            lbl.setStyleSheet("color: #888;")
+            stat_v.addWidget(lbl)
+            
+            overview_layout.addWidget(stat_frame)
+        
+        layout.addLayout(overview_layout)
+        
+        # Marketplace listings
+        listings_group = QGroupBox("Marketplace Listings")
+        listings_layout = QVBoxLayout(listings_group)
+        
+        self.listings_table = QTableWidget()
+        self.listings_table.setColumnCount(6)
+        self.listings_table.setHorizontalHeaderLabels([
+            "Marketplace", "Category", "Title", "Price", "Vendor Rating", "Date"
+        ])
+        self.listings_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        
+        listings = [
+            ("DarkMarket", "Credentials", "Corporate VPN Access", "$500", "⭐⭐⭐⭐⭐", "2024-02-15"),
+            ("BlackBay", "Data", "Customer Database Dump", "$2,500", "⭐⭐⭐⭐", "2024-02-14"),
+            ("Hydra", "Malware", "Custom Ransomware Kit", "$10,000", "⭐⭐⭐⭐⭐", "2024-02-13"),
+            ("Tor Market", "Exploits", "0-day Windows RCE", "$50,000", "⭐⭐⭐⭐⭐", "2024-02-12"),
+        ]
+        
+        self.listings_table.setRowCount(len(listings))
+        for row, listing in enumerate(listings):
+            for col, value in enumerate(listing):
+                item = QTableWidgetItem(value)
+                if col == 3:  # Price
+                    item.setForeground(QColor("#00ff88"))
+                self.listings_table.setItem(row, col, item)
+        
+        listings_layout.addWidget(self.listings_table)
+        layout.addWidget(listings_group)
+        
+        return widget
+    
+    def _create_actors_tab(self) -> QWidget:
+        """Create threat actors tab"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        
+        splitter = QSplitter(Qt.Orientation.Horizontal)
+        
+        # Left - Actor list
+        actors_panel = QFrame()
+        actors_layout = QVBoxLayout(actors_panel)
+        
+        actors_layout.addWidget(QLabel("Known Threat Actors:"))
+        
+        self.actors_tree = QTreeWidget()
+        self.actors_tree.setHeaderLabels(["Actor", "Type", "Threat Level"])
+        self.actors_tree.itemClicked.connect(self._show_actor_details)
+        
+        categories = [
+            ("Ransomware Groups", [
+                ("LockBit 3.0", "Ransomware", "Critical"),
+                ("BlackCat/ALPHV", "Ransomware", "Critical"),
+                ("Royal", "Ransomware", "High"),
+            ]),
+            ("APT Groups", [
+                ("APT28 (Fancy Bear)", "State-Sponsored", "Critical"),
+                ("APT29 (Cozy Bear)", "State-Sponsored", "Critical"),
+                ("Lazarus Group", "State-Sponsored", "Critical"),
+            ]),
+            ("Cybercrime Groups", [
+                ("FIN7", "Financial Crime", "High"),
+                ("Cobalt Group", "Financial Crime", "High"),
+                ("TA505", "Malware Distribution", "High"),
+            ]),
+        ]
+        
+        for category, actors in categories:
+            parent = QTreeWidgetItem([category, "", ""])
+            for name, atype, level in actors:
+                child = QTreeWidgetItem([name, atype, level])
+                if level == "Critical":
+                    child.setForeground(2, QColor("#ff4444"))
+                elif level == "High":
+                    child.setForeground(2, QColor("#ff8800"))
+                parent.addChild(child)
+            self.actors_tree.addTopLevelItem(parent)
+        
+        self.actors_tree.expandAll()
+        actors_layout.addWidget(self.actors_tree)
+        splitter.addWidget(actors_panel)
+        
+        # Right - Actor details
+        details_panel = QFrame()
+        details_layout = QVBoxLayout(details_panel)
+        
+        details_layout.addWidget(QLabel("Actor Profile:"))
+        
+        self.actor_details = QTextEdit()
+        self.actor_details.setReadOnly(True)
+        self.actor_details.setHtml("""
+<h3>LockBit 3.0</h3>
+<p><b>Type:</b> Ransomware-as-a-Service (RaaS)</p>
+<p><b>Threat Level:</b> <span style="color: #ff4444;">CRITICAL</span></p>
+<p><b>Active Since:</b> 2019</p>
+<p><b>Estimated Victims:</b> 1,500+</p>
+
+<h4>Tactics, Techniques, and Procedures (TTPs):</h4>
+<ul>
+<li>Initial Access: Phishing, RDP brute force, exploited vulnerabilities</li>
+<li>Execution: PowerShell, scheduled tasks</li>
+<li>Persistence: Registry run keys, scheduled tasks</li>
+<li>Defense Evasion: Process injection, obfuscation</li>
+<li>Impact: Data encryption, data exfiltration, extortion</li>
+</ul>
+
+<h4>Known Infrastructure:</h4>
+<ul>
+<li>Multiple .onion leak sites</li>
+<li>Affiliate program with profit sharing</li>
+<li>StealBit data exfiltration tool</li>
+</ul>
+
+<h4>Recent Activity:</h4>
+<p>15 new victims posted in last 30 days</p>
+""")
+        details_layout.addWidget(self.actor_details)
+        
+        splitter.addWidget(details_panel)
+        layout.addWidget(splitter)
+        
+        return widget
+    
+    def _create_alerts_tab(self) -> QWidget:
+        """Create alerts tab"""
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        
+        # Alert controls
+        controls = QHBoxLayout()
+        
+        self.alert_filter = QComboBox()
+        self.alert_filter.addItems(["All Alerts", "Critical", "High", "Medium", "Low"])
+        controls.addWidget(self.alert_filter)
+        
+        controls.addStretch()
+        
+        mark_read_btn = QPushButton("✓ Mark All Read")
+        controls.addWidget(mark_read_btn)
+        
+        export_btn = QPushButton("📤 Export")
+        controls.addWidget(export_btn)
+        
+        layout.addLayout(controls)
+        
+        # Alerts table
+        self.alerts_table = QTableWidget()
+        self.alerts_table.setColumnCount(5)
+        self.alerts_table.setHorizontalHeaderLabels([
+            "Severity", "Alert", "Source", "Time", "Status"
+        ])
+        self.alerts_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        
+        alerts = [
+            ("🔴 Critical", "Company credentials found on marketplace", "DarkMarket", "10 min ago", "New"),
+            ("🔴 Critical", "Data breach containing customer info", "Paste Site", "1 hour ago", "New"),
+            ("🟠 High", "Executive mentioned in threat forum", "Forum", "3 hours ago", "Reviewed"),
+            ("🟠 High", "New ransomware targeting industry", "Forum", "5 hours ago", "Reviewed"),
+            ("🟡 Medium", "Brand impersonation detected", "Marketplace", "1 day ago", "Closed"),
+        ]
+        
+        self.alerts_table.setRowCount(len(alerts))
+        for row, alert in enumerate(alerts):
+            for col, value in enumerate(alert):
+                item = QTableWidgetItem(value)
+                if col == 0:  # Severity
+                    if "Critical" in value:
+                        item.setForeground(QColor("#ff4444"))
+                    elif "High" in value:
+                        item.setForeground(QColor("#ff8800"))
+                    elif "Medium" in value:
+                        item.setForeground(QColor("#ffff00"))
+                elif col == 4:  # Status
+                    if value == "New":
+                        item.setForeground(QColor("#ff4444"))
+                self.alerts_table.setItem(row, col, item)
+        
+        layout.addWidget(self.alerts_table)
+        
+        # Alert actions
+        actions = QHBoxLayout()
+        
+        investigate_btn = QPushButton("🔍 Investigate")
+        investigate_btn.setObjectName("primaryButton")
+        actions.addWidget(investigate_btn)
+        
+        escalate_btn = QPushButton("📢 Escalate")
+        actions.addWidget(escalate_btn)
+        
+        dismiss_btn = QPushButton("✕ Dismiss")
+        actions.addWidget(dismiss_btn)
+        
+        layout.addLayout(actions)
+        
+        return widget
+    
+    def _apply_styles(self):
+        """Apply custom styles"""
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #1a1a2e;
+                color: #ffffff;
+                font-family: 'Segoe UI', Arial, sans-serif;
+            }
+            
+            QFrame#headerFrame {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #2d1f3d, stop:1 #1a1a2e);
+                border-radius: 10px;
+                padding: 15px;
+            }
+            
+            QFrame#statCard {
+                background-color: #16213e;
+                border: 1px solid #0f3460;
+                border-radius: 8px;
+                padding: 15px;
+            }
+            
+            QGroupBox {
+                font-weight: bold;
+                border: 1px solid #0f3460;
+                border-radius: 8px;
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+            
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px;
+            }
+            
+            QPushButton {
+                background-color: #0f3460;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                color: white;
+                font-weight: bold;
+            }
+            
+            QPushButton:hover {
+                background-color: #1a4a7a;
+            }
+            
+            QPushButton#primaryButton {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #9b59b6, stop:1 #8e44ad);
+                color: #fff;
+            }
+            
+            QPushButton#primaryButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #a569bd, stop:1 #9e55b6);
+            }
+            
+            QTableWidget {
+                background-color: #0d1b2a;
+                border: 1px solid #0f3460;
+                border-radius: 5px;
+                gridline-color: #1a3a5c;
+            }
+            
+            QTableWidget::item {
+                padding: 8px;
+            }
+            
+            QTableWidget::item:selected {
+                background-color: #0f3460;
+            }
+            
+            QHeaderView::section {
+                background-color: #16213e;
+                padding: 8px;
+                border: none;
+                border-bottom: 2px solid #9b59b6;
+                font-weight: bold;
+            }
+            
+            QLineEdit, QComboBox, QSpinBox {
+                background-color: #0d1b2a;
+                border: 1px solid #0f3460;
+                border-radius: 5px;
+                padding: 8px;
+                color: white;
+            }
+            
+            QLineEdit:focus, QComboBox:focus {
+                border: 1px solid #9b59b6;
+            }
+            
+            QTextEdit {
+                background-color: #0d1b2a;
+                border: 1px solid #0f3460;
+                border-radius: 5px;
+                padding: 10px;
+            }
+            
+            QProgressBar {
+                border: 1px solid #0f3460;
+                border-radius: 5px;
+                text-align: center;
+                background-color: #0d1b2a;
+            }
+            
+            QProgressBar::chunk {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #9b59b6, stop:1 #8e44ad);
+                border-radius: 4px;
+            }
+            
+            QTabWidget::pane {
+                border: 1px solid #0f3460;
+                border-radius: 5px;
+            }
+            
+            QTabBar::tab {
+                background-color: #16213e;
+                padding: 10px 20px;
+                margin-right: 2px;
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+            }
+            
+            QTabBar::tab:selected {
+                background-color: #0f3460;
+                border-bottom: 2px solid #9b59b6;
+            }
+            
+            QTreeWidget {
+                background-color: #0d1b2a;
+                border: 1px solid #0f3460;
+                border-radius: 5px;
+            }
+            
+            QTreeWidget::item {
+                padding: 5px;
+            }
+            
+            QTreeWidget::item:selected {
+                background-color: #0f3460;
+            }
+            
+            QListWidget {
+                background-color: #0d1b2a;
+                border: 1px solid #0f3460;
+                border-radius: 5px;
+            }
+            
+            QListWidget::item {
+                padding: 10px;
+            }
+            
+            QListWidget::item:selected {
+                background-color: #0f3460;
+            }
+        """)
+    
+    def _start_crawl(self):
+        """Start dark web crawl"""
+        self.crawl_btn.setEnabled(False)
+        self.crawl_btn.setText("🔄 Crawling...")
+        
+        # Simulate crawl (in real implementation, use worker thread)
+        QTimer.singleShot(3000, self._crawl_complete)
+    
+    def _crawl_complete(self):
+        """Handle crawl completion"""
+        self.crawl_btn.setEnabled(True)
+        self.crawl_btn.setText("🌑 Start Crawl")
+    
+    def _search_darkweb(self):
+        """Search dark web"""
+        query = self.search_input.text()
+        if query:
+            self.result_details.setHtml(f"<p>Searching for: {query}...</p>")
+    
+    def _show_result_details(self, item):
+        """Show search result details"""
+        row = item.row()
+        title = self.results_table.item(row, 2).text()
+        self.result_details.setHtml(f"<h3>{title}</h3><p>Loading details...</p>")
+    
+    def _add_monitor(self):
+        """Add new monitor"""
+        pass
+    
+    def _show_actor_details(self, item, column):
+        """Show threat actor details"""
+        actor = item.text(0)
+        if item.childCount() == 0:  # Leaf node
+            self.actor_details.setHtml(f"<h3>{actor}</h3><p>Loading actor profile...</p>")

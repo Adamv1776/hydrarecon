@@ -201,6 +201,7 @@ class HydraPage(QWidget):
         for name, _, _ in self.PROTOCOLS:
             self.protocol_combo.addItem(name)
         self.protocol_combo.currentIndexChanged.connect(self._on_protocol_changed)
+        self.protocol_combo.setToolTip("Select the protocol/service to attack")
         self.protocol_combo.setStyleSheet("""
             QComboBox {
                 background-color: #0d1117;
@@ -212,6 +213,12 @@ class HydraPage(QWidget):
             }
         """)
         proto_layout.addWidget(self.protocol_combo)
+        
+        # Protocol hint
+        self.proto_hint = QLabel("SSH secure shell remote access")
+        self.proto_hint.setStyleSheet("color: #8b949e; font-size: 10px;")
+        proto_layout.addWidget(self.proto_hint)
+        
         proto_port_layout.addLayout(proto_layout)
         
         port_layout = QVBoxLayout()
@@ -523,10 +530,38 @@ class HydraPage(QWidget):
             self.output_console.append_error(f"Failed to initialize Hydra scanner: {e}")
     
     def _on_protocol_changed(self, index: int):
-        """Update port when protocol changes"""
+        """Update port and hint when protocol changes"""
         if 0 <= index < len(self.PROTOCOLS):
-            _, _, default_port = self.PROTOCOLS[index]
+            name, proto, default_port = self.PROTOCOLS[index]
             self.port_spin.setValue(default_port)
+            
+            # Protocol hints
+            hints = {
+                "ssh": "SSH secure shell - use for remote server access",
+                "ftp": "FTP file transfer - often has weak credentials",
+                "telnet": "Telnet legacy protocol - usually unencrypted",
+                "http-get": "HTTP Basic Auth - web server authentication",
+                "http-post": "HTTP POST login - form-based authentication",
+                "http-form-post": "HTTP Form - for login forms",
+                "https-get": "HTTPS Basic Auth - encrypted web auth",
+                "https-post": "HTTPS POST - encrypted form login",
+                "smb": "SMB Windows shares - domain/workgroup access",
+                "mysql": "MySQL database - default: root with no password",
+                "mssql": "MSSQL Server - default: sa account",
+                "postgres": "PostgreSQL - default: postgres user",
+                "oracle": "Oracle DB - check for scott/tiger",
+                "vnc": "VNC remote desktop - often single password",
+                "rdp": "RDP Windows remote - domain or local accounts",
+                "smtp": "SMTP mail server - check for relaying",
+                "pop3": "POP3 mail - email account access",
+                "imap": "IMAP mail - email account access",
+                "ldap": "LDAP directory - Active Directory",
+                "redis": "Redis cache - often no auth by default",
+                "mongodb": "MongoDB NoSQL - often no auth",
+            }
+            hint = hints.get(proto, f"Protocol: {proto}")
+            if hasattr(self, 'proto_hint'):
+                self.proto_hint.setText(hint)
     
     def _browse_file(self, line_edit):
         """Browse for wordlist file"""

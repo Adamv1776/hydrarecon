@@ -55,14 +55,52 @@ class HydraConfig:
 @dataclass  
 class OSINTConfig:
     """OSINT module configuration"""
+    # Network Intelligence
     shodan_api_key: str = ""
     censys_api_id: str = ""
     censys_api_secret: str = ""
+    zoomeye_api_key: str = ""
+    binaryedge_api_key: str = ""
+    
+    # Threat Intelligence
     virustotal_api_key: str = ""
+    abuseipdb_api_key: str = ""
+    alienvault_otx_key: str = ""
+    pulsedive_api_key: str = ""
+    threatfox_api_key: str = ""
+    
+    # Domain/DNS Intelligence
+    securitytrails_api_key: str = ""
+    passivetotal_api_key: str = ""
+    passivetotal_username: str = ""
+    dnsdb_api_key: str = ""
+    
+    # Email Intelligence
     hunter_api_key: str = ""
     haveibeenpwned_api_key: str = ""
-    securitytrails_api_key: str = ""
+    emailrep_api_key: str = ""
+    
+    # Vulnerability Intelligence
+    vulners_api_key: str = ""
+    nvd_api_key: str = ""
+    
+    # Blockchain Intelligence
+    etherscan_api_key: str = ""
+    blockchain_api_key: str = ""
+    chainalysis_api_key: str = ""
+    
+    # Additional Sources
     builtwith_api_key: str = ""
+    fullhunt_api_key: str = ""
+    intelx_api_key: str = ""
+    leakix_api_key: str = ""
+    urlscan_api_key: str = ""
+    
+    # Geolocation
+    ipinfo_api_key: str = ""
+    ipapi_api_key: str = ""
+    
+    # Rate Limiting & Timeouts
     whois_timeout: int = 30
     dns_timeout: int = 10
     max_concurrent_requests: int = 50
@@ -94,7 +132,7 @@ class ScanConfig:
     max_threads: int = 100
     timeout: int = 60
     retry_count: int = 3
-    verify_ssl: bool = False
+    verify_ssl: bool = True  # SECURITY: SSL verification enabled by default
     follow_redirects: bool = True
     user_agent: str = "HydraRecon/1.0 Security Scanner"
     proxy: str = ""
