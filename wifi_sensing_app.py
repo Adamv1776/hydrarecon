@@ -137,6 +137,7 @@ class WifiSensingWindow(QMainWindow):
         self._setup_window()
         self._setup_menubar()
         self._setup_toolbar()
+        self._setup_signal_dock()
         self._setup_statusbar()
         self._setup_central_widget()
         self._apply_settings()
@@ -397,6 +398,48 @@ class WifiSensingWindow(QMainWindow):
         toolbar.addSeparator()
         toolbar.addAction("📐 Calibrate").triggered.connect(self._calibrate_room)
         toolbar.addAction("🔄 Reset Camera").triggered.connect(self._reset_camera)
+        toolbar.addSeparator()
+        self.signal_dock_action = toolbar.addAction("📊 Signals")
+        self.signal_dock_action.setCheckable(True)
+        self.signal_dock_action.setChecked(True)
+        self.signal_dock_action.triggered.connect(self._toggle_signal_dock)
+        
+    def _setup_signal_dock(self):
+        """Create signal analyzer dock widget."""
+        from PyQt6.QtWidgets import QDockWidget
+        
+        self.signal_dock = QDockWidget("📊 Signal Analyzer", self)
+        self.signal_dock.setStyleSheet("""
+            QDockWidget {
+                color: #d7e7ff;
+                font-weight: bold;
+            }
+            QDockWidget::title {
+                background: #0d1520;
+                padding: 8px;
+                border-bottom: 1px solid #1f3a5f;
+            }
+        """)
+        
+        dock_widget = QWidget()
+        dock_layout = QVBoxLayout(dock_widget)
+        dock_layout.setContentsMargins(5, 5, 5, 5)
+        dock_layout.setSpacing(5)
+        
+        # CSI Waveform
+        self.waveform = CSIWaveformWidget()
+        dock_layout.addWidget(self.waveform)
+        
+        # Spectrum Analyzer
+        self.spectrum = SpectrumAnalyzerWidget()
+        dock_layout.addWidget(self.spectrum)
+        
+        self.signal_dock.setWidget(dock_widget)
+        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.signal_dock)
+        
+    def _toggle_signal_dock(self):
+        if hasattr(self, 'signal_dock'):
+            self.signal_dock.setVisible(not self.signal_dock.isVisible())
         
     def _setup_statusbar(self):
         self.status_bar = WifiSensingStatusBar(self)
@@ -607,10 +650,364 @@ Examples:
                         help="Record session to file")
     parser.add_argument("--playback", metavar="FILE",
                         help="Playback recorded session")
+    parser.add_argument("--no-splash", action="store_true",
+                        help="Skip splash screen")
     parser.add_argument("--version", "-v", action="version",
                         version="WiFi Sensing Studio 1.0.0")
     
     return parser.parse_args()
+
+
+class WifiSensingSplash(QWidget):
+    """Animated splash screen for WiFi Sensing Studio."""
+    
+    finished = pyqtSignal()
+    
+    def __init__(self):
+        super().__init__()
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setFixedSize(600, 400)
+        
+        # Center on screen
+        screen = QApplication.primaryScreen().geometry()
+        self.move((screen.width() - 600) // 2, (screen.height() - 400) // 2)
+        
+        self._progress = 0
+        self._status = "Initializing..."
+        self._glow = 0
+        self._glow_dir = 1
+        
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self._animate)
+        
+    def start(self):
+        self._timer.start(30)
+        QTimer.singleShot(2500, self._finish)
+        
+    def _animate(self):
+        self._glow += self._glow_dir * 3
+        if self._glow >= 60:
+            self._glow_dir = -1
+        elif self._glow <= 10:
+            self._glow_dir = 1
+        self._progress = min(100, self._progress + 2)
+        self.update()
+        
+    def _finish(self):
+        self._timer.stop()
+        self.finished.emit()
+        self.close()
+        
+    def paintEvent(self, event):
+        from PyQt6.QtGui import QPainter, QPainterPath, QLinearGradient, QRadialGradient, QPen, QBrush
+        
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        w, h = self.width(), self.height()
+        
+        # Background with rounded corners
+        path = QPainterPath()
+        path.addRoundedRect(0, 0, w, h, 20, 20)
+        
+        # Gradient background
+        grad = QLinearGradient(0, 0, 0, h)
+        grad.setColorAt(0, QColor("#0a0f1a"))
+        grad.setColorAt(0.5, QColor("#0d1520"))
+        grad.setColorAt(1, QColor("#0a0f1a"))
+        painter.fillPath(path, grad)
+        
+        # Border glow
+        glow_color = QColor("#00d4ff")
+        glow_color.setAlpha(self._glow + 40)
+        painter.setPen(QPen(glow_color, 2))
+        painter.drawPath(path)
+        
+        # Title
+        painter.setPen(QColor("#00d4ff"))
+        font = QFont("Segoe UI", 28, QFont.Weight.Bold)
+        painter.setFont(font)
+        painter.drawText(0, 80, w, 50, Qt.AlignmentFlag.AlignCenter, "🛰️ WiFi Sensing Studio")
+        
+        # Subtitle
+        painter.setPen(QColor("#8fb3ff"))
+        font = QFont("Segoe UI", 12)
+        painter.setFont(font)
+        painter.drawText(0, 130, w, 30, Qt.AlignmentFlag.AlignCenter, "Advanced CSI-Based Human Sensing Platform")
+        
+        # Animated wave visualization
+        painter.setPen(QPen(QColor("#00ff88"), 2))
+        import math
+        cx = w // 2
+        cy = 200
+        for i in range(100):
+            x = cx - 150 + i * 3
+            amp = 20 * math.sin((i + self._progress * 2) * 0.15) * math.exp(-abs(i - 50) / 40)
+            y = cy + amp
+            if i > 0:
+                prev_x = cx - 150 + (i - 1) * 3
+                prev_amp = 20 * math.sin((i - 1 + self._progress * 2) * 0.15) * math.exp(-abs(i - 1 - 50) / 40)
+                prev_y = cy + prev_amp
+                painter.drawLine(int(prev_x), int(prev_y), int(x), int(y))
+        
+        # Progress bar
+        bar_x, bar_y, bar_w, bar_h = 100, 280, w - 200, 8
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QColor("#1a2a40"))
+        painter.drawRoundedRect(bar_x, bar_y, bar_w, bar_h, 4, 4)
+        
+        # Progress fill
+        fill_w = int(bar_w * self._progress / 100)
+        grad = QLinearGradient(bar_x, 0, bar_x + bar_w, 0)
+        grad.setColorAt(0, QColor("#00d4ff"))
+        grad.setColorAt(1, QColor("#00ff88"))
+        painter.setBrush(grad)
+        painter.drawRoundedRect(bar_x, bar_y, fill_w, bar_h, 4, 4)
+        
+        # Status text
+        painter.setPen(QColor("#667788"))
+        font = QFont("Consolas", 10)
+        painter.setFont(font)
+        statuses = ["Loading modules...", "Initializing 3D engine...", "Starting CSI processor...", "Ready!"]
+        status = statuses[min(len(statuses) - 1, self._progress // 30)]
+        painter.drawText(0, 310, w, 30, Qt.AlignmentFlag.AlignCenter, status)
+        
+        # Version and copyright
+        painter.setPen(QColor("#445566"))
+        font = QFont("Segoe UI", 9)
+        painter.setFont(font)
+        painter.drawText(0, h - 40, w, 30, Qt.AlignmentFlag.AlignCenter, "v1.0.0 • HydraRecon Security Suite • 2024-2025")
+
+
+class ESP32ConnectionDialog(QWidget):
+    """Dialog for ESP32 connection configuration."""
+    
+    connected = pyqtSignal(str, int)
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Connect to ESP32")
+        self.setFixedSize(400, 300)
+        self.setWindowFlags(Qt.WindowType.Dialog)
+        self.setStyleSheet("""
+            QWidget {
+                background: #0d1520;
+                color: #d7e7ff;
+            }
+            QLineEdit, QSpinBox {
+                background: #0a0f1a;
+                border: 1px solid #1f3a5f;
+                border-radius: 6px;
+                padding: 8px;
+                color: #d7e7ff;
+            }
+            QPushButton {
+                background: #1a3050;
+                border: 1px solid #2a5080;
+                border-radius: 6px;
+                padding: 10px 20px;
+                color: #00d4ff;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background: #2a4060;
+            }
+            QPushButton#connect {
+                background: #00aa66;
+                border-color: #00dd88;
+            }
+            QPushButton#connect:hover {
+                background: #00cc77;
+            }
+            QLabel {
+                color: #8fb3ff;
+            }
+        """)
+        
+        from PyQt6.QtWidgets import QLineEdit, QSpinBox, QPushButton, QFormLayout, QGroupBox
+        
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
+        
+        # Title
+        title = QLabel("📡 ESP32 CSI Connection")
+        title.setStyleSheet("font-size: 18px; font-weight: bold; color: #00d4ff;")
+        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(title)
+        
+        # Connection settings
+        group = QGroupBox("Connection Settings")
+        group.setStyleSheet("QGroupBox { border: 1px solid #1f3a5f; border-radius: 8px; padding-top: 15px; margin-top: 10px; } QGroupBox::title { color: #8fb3ff; }")
+        form = QFormLayout(group)
+        
+        self.host_input = QLineEdit("192.168.1.100")
+        form.addRow("Host:", self.host_input)
+        
+        self.port_input = QSpinBox()
+        self.port_input.setRange(1, 65535)
+        self.port_input.setValue(5555)
+        form.addRow("Port:", self.port_input)
+        
+        layout.addWidget(group)
+        
+        # Recent connections
+        recent_label = QLabel("Recent: 192.168.1.100:5555, 10.0.0.50:5555")
+        recent_label.setStyleSheet("color: #445566; font-size: 10px;")
+        layout.addWidget(recent_label)
+        
+        layout.addStretch()
+        
+        # Buttons
+        btn_layout = QHBoxLayout()
+        
+        cancel_btn = QPushButton("Cancel")
+        cancel_btn.clicked.connect(self.close)
+        btn_layout.addWidget(cancel_btn)
+        
+        connect_btn = QPushButton("🔗 Connect")
+        connect_btn.setObjectName("connect")
+        connect_btn.clicked.connect(self._connect)
+        btn_layout.addWidget(connect_btn)
+        
+        layout.addLayout(btn_layout)
+        
+    def _connect(self):
+        host = self.host_input.text()
+        port = self.port_input.value()
+        self.connected.emit(host, port)
+        self.close()
+
+
+class CSIWaveformWidget(QFrame):
+    """Real-time CSI waveform visualization widget."""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setMinimumHeight(150)
+        self.setStyleSheet("QFrame { background: #0a0f1a; border: 1px solid #1f3a5f; border-radius: 8px; }")
+        
+        self.data = []
+        self.max_points = 200
+        
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self._generate_demo)
+        self._timer.start(50)
+        
+    def _generate_demo(self):
+        import random, math
+        t = len(self.data) * 0.05
+        val = math.sin(t * 2) * 0.5 + math.sin(t * 5) * 0.3 + random.gauss(0, 0.1)
+        self.data.append(val)
+        if len(self.data) > self.max_points:
+            self.data = self.data[-self.max_points:]
+        self.update()
+        
+    def add_sample(self, value: float):
+        self.data.append(value)
+        if len(self.data) > self.max_points:
+            self.data = self.data[-self.max_points:]
+        self.update()
+        
+    def paintEvent(self, event):
+        from PyQt6.QtGui import QPainter, QPen, QLinearGradient
+        
+        super().paintEvent(event)
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        w, h = self.width(), self.height()
+        
+        # Draw grid
+        painter.setPen(QPen(QColor("#1a2a40"), 1))
+        for i in range(1, 5):
+            y = h * i // 5
+            painter.drawLine(0, y, w, y)
+        for i in range(1, 10):
+            x = w * i // 10
+            painter.drawLine(x, 0, x, h)
+            
+        # Draw center line
+        painter.setPen(QPen(QColor("#2a4060"), 1))
+        painter.drawLine(0, h // 2, w, h // 2)
+        
+        # Draw waveform
+        if len(self.data) < 2:
+            return
+            
+        painter.setPen(QPen(QColor("#00d4ff"), 2))
+        
+        min_val = min(self.data) - 0.1
+        max_val = max(self.data) + 0.1
+        val_range = max_val - min_val or 1
+        
+        for i in range(1, len(self.data)):
+            x1 = int((i - 1) / self.max_points * w)
+            x2 = int(i / self.max_points * w)
+            y1 = int(h - (self.data[i - 1] - min_val) / val_range * h * 0.9 - h * 0.05)
+            y2 = int(h - (self.data[i] - min_val) / val_range * h * 0.9 - h * 0.05)
+            painter.drawLine(x1, y1, x2, y2)
+            
+        # Label
+        painter.setPen(QColor("#445566"))
+        font = QFont("Consolas", 9)
+        painter.setFont(font)
+        painter.drawText(10, 20, "CSI Amplitude")
+
+
+class SpectrumAnalyzerWidget(QFrame):
+    """Real-time spectrum analyzer visualization."""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setMinimumHeight(120)
+        self.setStyleSheet("QFrame { background: #0a0f1a; border: 1px solid #1f3a5f; border-radius: 8px; }")
+        
+        self.bins = 32
+        self.values = [0.0] * self.bins
+        
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self._generate_demo)
+        self._timer.start(80)
+        
+    def _generate_demo(self):
+        import random, math
+        t = random.random() * 10
+        for i in range(self.bins):
+            target = 0.3 + 0.5 * math.exp(-((i - self.bins/3)**2) / 50) + random.gauss(0, 0.1)
+            self.values[i] = self.values[i] * 0.7 + target * 0.3
+        self.update()
+        
+    def paintEvent(self, event):
+        from PyQt6.QtGui import QPainter, QPen, QLinearGradient, QBrush
+        
+        super().paintEvent(event)
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        w, h = self.width(), self.height()
+        bar_w = (w - 20) / self.bins - 2
+        
+        for i, val in enumerate(self.values):
+            x = 10 + i * (bar_w + 2)
+            bar_h = max(4, val * (h - 30))
+            y = h - 15 - bar_h
+            
+            # Gradient from cyan to green
+            grad = QLinearGradient(x, y + bar_h, x, y)
+            grad.setColorAt(0, QColor("#00d4ff"))
+            grad.setColorAt(1, QColor("#00ff88"))
+            
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(grad)
+            painter.drawRoundedRect(int(x), int(y), int(bar_w), int(bar_h), 2, 2)
+            
+        # Label
+        painter.setPen(QColor("#445566"))
+        font = QFont("Consolas", 9)
+        painter.setFont(font)
+        painter.drawText(10, 15, "Subcarrier Spectrum")
 
 
 def main():
@@ -639,11 +1036,22 @@ def main():
     font = QFont("Segoe UI", 10)
     app.setFont(font)
     
-    # Create and show main window
-    window = WifiSensingWindow(args)
-    window.show()
+    # Show splash screen
+    window = None
     
-    logger.info("WiFi Sensing Studio initialized successfully")
+    def show_main_window():
+        nonlocal window
+        window = WifiSensingWindow(args)
+        window.show()
+        logger.info("WiFi Sensing Studio initialized successfully")
+    
+    if not args.no_splash:
+        splash = WifiSensingSplash()
+        splash.finished.connect(show_main_window)
+        splash.show()
+        splash.start()
+    else:
+        show_main_window()
 
     sys.exit(app.exec())
 
