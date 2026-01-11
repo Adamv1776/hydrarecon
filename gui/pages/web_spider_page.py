@@ -142,45 +142,55 @@ class SpiderWorker(QThread):
         if self.spider:
             self.spider.stop()
     
-    def _endpoint_to_dict(self, endpoint: Endpoint) -> Dict:
+    def _endpoint_to_dict(self, endpoint) -> Dict:
         """Convert endpoint to dict"""
-        return {
-            'url': endpoint.url,
-            'method': endpoint.method.value,
-            'content_type': endpoint.content_type.name,
-            'status': endpoint.response_codes[0] if endpoint.response_codes else 0,
-            'size': endpoint.response_size,
-            'time': endpoint.response_time,
-            'technologies': endpoint.technologies,
-            'parameters': [vars(p) for p in endpoint.parameters],
-            'forms': endpoint.forms,
-            'vulnerabilities': endpoint.vulnerabilities,
-            'links': len(endpoint.links),
-            'comments': len(endpoint.comments)
-        }
+        if endpoint is None:
+            return {}
+        try:
+            return {
+                'url': getattr(endpoint, 'url', ''),
+                'method': getattr(endpoint.method, 'value', 'GET') if hasattr(endpoint, 'method') else 'GET',
+                'content_type': getattr(endpoint.content_type, 'name', 'HTML') if hasattr(endpoint, 'content_type') else 'HTML',
+                'status': endpoint.response_codes[0] if hasattr(endpoint, 'response_codes') and endpoint.response_codes else 0,
+                'size': getattr(endpoint, 'response_size', 0),
+                'time': getattr(endpoint, 'response_time', 0),
+                'technologies': getattr(endpoint, 'technologies', []),
+                'parameters': [vars(p) for p in getattr(endpoint, 'parameters', [])],
+                'forms': getattr(endpoint, 'forms', []),
+                'vulnerabilities': getattr(endpoint, 'vulnerabilities', []),
+                'links': len(getattr(endpoint, 'links', [])),
+                'comments': len(getattr(endpoint, 'comments', []))
+            }
+        except Exception:
+            return {'url': str(endpoint), 'method': 'GET', 'status': 0}
     
-    def _result_to_dict(self, result: CrawlResult) -> Dict:
+    def _result_to_dict(self, result) -> Dict:
         """Convert result to dict"""
-        return {
-            'target': result.target,
-            'start_time': str(result.start_time),
-            'end_time': str(result.end_time),
-            'total_endpoints': len(result.endpoints),
-            'total_parameters': len(result.parameters),
-            'total_forms': len(result.forms),
-            'total_vulnerabilities': len(result.vulnerabilities),
-            'technologies': result.technologies,
-            'api_endpoints': result.api_endpoints,
-            'graphql_endpoints': result.graphql_endpoints,
-            'websocket_endpoints': result.websocket_endpoints,
-            'authentication_endpoints': result.authentication_endpoints,
-            'interesting_files': result.interesting_files,
-            'robots_txt': result.robots_txt,
-            'sitemap_urls': result.sitemap_urls,
-            'total_requests': result.total_requests,
-            'total_errors': result.total_errors,
-            'coverage': result.coverage_percentage
-        }
+        if result is None:
+            return {}
+        try:
+            return {
+                'target': getattr(result, 'target', ''),
+                'start_time': str(getattr(result, 'start_time', '')),
+                'end_time': str(getattr(result, 'end_time', '')),
+                'total_endpoints': len(getattr(result, 'endpoints', [])),
+                'total_parameters': len(getattr(result, 'parameters', [])),
+                'total_forms': len(getattr(result, 'forms', [])),
+                'total_vulnerabilities': len(getattr(result, 'vulnerabilities', [])),
+                'technologies': getattr(result, 'technologies', []),
+                'api_endpoints': getattr(result, 'api_endpoints', []),
+                'graphql_endpoints': getattr(result, 'graphql_endpoints', []),
+                'websocket_endpoints': getattr(result, 'websocket_endpoints', []),
+                'authentication_endpoints': getattr(result, 'authentication_endpoints', []),
+                'interesting_files': getattr(result, 'interesting_files', []),
+                'robots_txt': getattr(result, 'robots_txt', ''),
+                'sitemap_urls': getattr(result, 'sitemap_urls', []),
+                'total_requests': getattr(result, 'total_requests', 0),
+                'total_errors': getattr(result, 'total_errors', 0),
+                'coverage': getattr(result, 'coverage_percentage', 0)
+            }
+        except Exception:
+            return {}
 
 
 class WebSpiderPage(QWidget):
