@@ -1,0 +1,59 @@
+# HydraRecon - Docker Compose Configuration
+# ==========================================
+# Quick start: docker-compose up -d
+
+version: '3.8'
+
+services:
+  hydrarecon:
+    build: .
+    image: hydrarecon:latest
+    container_name: hydrarecon
+    
+    # For GUI access (requires X11 forwarding)
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    
+    volumes:
+      # Mount X11 socket for GUI
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # Persist data
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./evidence:/app/evidence
+      # Share reports
+      - ./reports:/app/reports
+    
+    # Network scanning requires host network
+    network_mode: host
+    
+    # Security settings
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2'
+        reservations:
+          memory: 1G
+
+  # Optional: API server mode
+  hydrarecon-api:
+    build: .
+    image: hydrarecon:latest
+    container_name: hydrarecon-api
+    command: ["python3", "-m", "core.api_server"]
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - HYDRARECON_API_MODE=1
+    profiles:
+      - api

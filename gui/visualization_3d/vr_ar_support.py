@@ -548,8 +548,29 @@ class SpatialPanel:
     def update(self, dt: float):
         """Update panel"""
         if self.look_at_user:
-            # TODO: Rotate to face user
-            pass
+            # Rotate panel to face user (billboard effect)
+            # Assumes user/camera is at origin looking down -Z
+            # Calculate direction from panel to user
+            panel_pos = np.array(self.position)
+            user_pos = np.array([0.0, panel_pos[1], 0.0])  # Keep same height
+            
+            direction = user_pos - panel_pos
+            distance = np.linalg.norm(direction)
+            
+            if distance > 0.01:  # Avoid division by zero
+                direction = direction / distance
+                
+                # Calculate yaw angle to face user
+                yaw = np.arctan2(direction[0], direction[2])
+                
+                # Update orientation (quaternion from yaw)
+                half_yaw = yaw / 2.0
+                self.orientation = (
+                    0.0,  # x
+                    np.sin(half_yaw),  # y
+                    0.0,  # z
+                    np.cos(half_yaw)   # w
+                )
     
     def raycast(self, origin: Tuple[float, float, float],
                 direction: Tuple[float, float, float]) -> Optional[Tuple[float, Tuple[float, float]]]:

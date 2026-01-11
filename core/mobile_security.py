@@ -562,7 +562,7 @@ class MobileSecurityScanner:
                                     "description": f"Found in {filename}",
                                     "evidence": match[:50] if isinstance(match, str) else str(match)[:50],
                                 })
-                    except:
+                    except Exception:
                         pass
     
     async def perform_static_analysis(self, app_id: str) -> StaticAnalysisResult:
@@ -720,7 +720,7 @@ class MobileSecurityScanner:
                                         "value": match[:50] if isinstance(match, str) else str(match)[:50],
                                         "file": filename,
                                     })
-                        except:
+                        except Exception:
                             pass
                 
                 # Deduplicate

@@ -127,17 +127,27 @@ class WifiSensingWindow(QMainWindow):
     
     connection_changed = pyqtSignal(bool, str)
     
+    # Auto-discovery addresses to try (samiam network first)
+    AUTO_DISCOVER_HOSTS = [
+        "192.168.0.139",        # ESP32 on samiam network
+        "hydrasense.local",     # mDNS name
+        "192.168.4.1",          # AP mode fallback
+        "192.168.1.100",        # Common router DHCP
+        "192.168.0.100",
+    ]
+    
     def __init__(self, args: argparse.Namespace):
         super().__init__()
         self.args = args
         self.settings = QSettings("HydraRecon", "WifiSensingStudio")
         self.recording = False
         self.record_file = None
+        self.esp32_host = None
+        self.esp32_connected = False
         
         self._setup_window()
         self._setup_menubar()
         self._setup_toolbar()
-        self._setup_signal_dock()
         self._setup_statusbar()
         self._setup_central_widget()
         self._apply_settings()
@@ -152,6 +162,9 @@ class WifiSensingWindow(QMainWindow):
         self.metrics_timer = QTimer(self)
         self.metrics_timer.timeout.connect(self._update_metrics)
         self.metrics_timer.start(500)
+        
+        # Auto-connect on startup
+        QTimer.singleShot(1000, self._auto_connect_esp32)
         
     def _setup_window(self):
         self.setWindowTitle("🛰️ WiFi Sensing Studio - Advanced Human Sensing")
@@ -398,48 +411,9 @@ class WifiSensingWindow(QMainWindow):
         toolbar.addSeparator()
         toolbar.addAction("📐 Calibrate").triggered.connect(self._calibrate_room)
         toolbar.addAction("🔄 Reset Camera").triggered.connect(self._reset_camera)
-        toolbar.addSeparator()
-        self.signal_dock_action = toolbar.addAction("📊 Signals")
-        self.signal_dock_action.setCheckable(True)
-        self.signal_dock_action.setChecked(True)
-        self.signal_dock_action.triggered.connect(self._toggle_signal_dock)
-        
-    def _setup_signal_dock(self):
-        """Create signal analyzer dock widget."""
-        from PyQt6.QtWidgets import QDockWidget
-        
-        self.signal_dock = QDockWidget("📊 Signal Analyzer", self)
-        self.signal_dock.setStyleSheet("""
-            QDockWidget {
-                color: #d7e7ff;
-                font-weight: bold;
-            }
-            QDockWidget::title {
-                background: #0d1520;
-                padding: 8px;
-                border-bottom: 1px solid #1f3a5f;
-            }
-        """)
-        
-        dock_widget = QWidget()
-        dock_layout = QVBoxLayout(dock_widget)
-        dock_layout.setContentsMargins(5, 5, 5, 5)
-        dock_layout.setSpacing(5)
-        
-        # CSI Waveform
-        self.waveform = CSIWaveformWidget()
-        dock_layout.addWidget(self.waveform)
-        
-        # Spectrum Analyzer
-        self.spectrum = SpectrumAnalyzerWidget()
-        dock_layout.addWidget(self.spectrum)
-        
-        self.signal_dock.setWidget(dock_widget)
-        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.signal_dock)
         
     def _toggle_signal_dock(self):
-        if hasattr(self, 'signal_dock'):
-            self.signal_dock.setVisible(not self.signal_dock.isVisible())
+        pass  # Signal dock removed
         
     def _setup_statusbar(self):
         self.status_bar = WifiSensingStatusBar(self)
@@ -471,7 +445,7 @@ class WifiSensingWindow(QMainWindow):
             import psutil
             process = psutil.Process()
             memory_mb = process.memory_info().rss / 1024 / 1024
-        except:
+        except Exception:
             memory_mb = 0
             
         # These would ideally come from the sensing page
@@ -537,10 +511,81 @@ class WifiSensingWindow(QMainWindow):
     def _connect_esp32(self):
         from PyQt6.QtWidgets import QInputDialog
         text, ok = QInputDialog.getText(self, "Connect ESP32", 
-            "Enter ESP32 address (host:port):", text="192.168.1.100:5555")
+            "Enter ESP32 address (host:port):", text="hydrasense.local:80")
         if ok and text:
-            self.status_bar.set_connected(True, text)
-            self.status_bar.showMessage(f"Connecting to {text}...", 3000)
+            host = text.split(":")[0] if ":" in text else text
+            port = int(text.split(":")[1]) if ":" in text else 80
+            self._try_connect_host(host, port)
+    
+    def _auto_connect_esp32(self):
+        """Auto-discover and connect to ESP32 devices."""
+        import socket
+        import urllib.request
+        
+        self.status_bar.showMessage("🔍 Auto-discovering ESP32 devices...", 2000)
+        logging.getLogger().info("Auto-discovering ESP32 devices...")
+        
+        for host in self.AUTO_DISCOVER_HOSTS:
+            try:
+                # Quick connectivity check
+                url = f"http://{host}/status"
+                req = urllib.request.Request(url, method='GET')
+                req.add_header('User-Agent', 'HydraSenseStudio/1.0')
+                
+                with urllib.request.urlopen(req, timeout=2) as response:
+                    if response.status == 200:
+                        data = response.read().decode('utf-8')
+                        import json
+                        status = json.loads(data)
+                        
+                        # Found a HydraSense device!
+                        self.esp32_host = host
+                        self.esp32_connected = True
+                        
+                        sta_ip = status.get('sta_ip', host)
+                        pps = status.get('pps', 0)
+                        remotes = status.get('remotes', 0)
+                        
+                        self.status_bar.set_connected(True, f"{host} ({sta_ip})")
+                        self.status_bar.showMessage(
+                            f"✓ Connected to HydraSense @ {host} | PPS: {pps} | Remotes: {remotes}", 
+                            5000
+                        )
+                        logging.getLogger().info(f"Auto-connected to ESP32 at {host}")
+                        
+                        # Disable demo mode when connected to real device
+                        if hasattr(self, 'demo_action'):
+                            self.demo_action.setChecked(False)
+                        
+                        return True
+                        
+            except Exception as e:
+                logging.getLogger().debug(f"Host {host} not reachable: {e}")
+                continue
+        
+        # No device found - show message
+        self.status_bar.showMessage("⚠️ No ESP32 found - using demo mode. Connect devices and try Connection → Connect ESP32", 5000)
+        logging.getLogger().warning("No ESP32 devices found during auto-discovery")
+        return False
+    
+    def _try_connect_host(self, host: str, port: int = 80):
+        """Try to connect to a specific host."""
+        import urllib.request
+        import json
+        
+        try:
+            url = f"http://{host}:{port}/status"
+            req = urllib.request.Request(url, method='GET')
+            with urllib.request.urlopen(req, timeout=3) as response:
+                if response.status == 200:
+                    self.esp32_host = host
+                    self.esp32_connected = True
+                    self.status_bar.set_connected(True, f"{host}:{port}")
+                    self.status_bar.showMessage(f"✓ Connected to {host}:{port}", 3000)
+                    return True
+        except Exception as e:
+            self.status_bar.showMessage(f"❌ Failed to connect: {e}", 3000)
+        return False
             
     def _toggle_demo(self):
         enabled = self.demo_action.isChecked()

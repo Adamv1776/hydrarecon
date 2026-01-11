@@ -1318,7 +1318,7 @@ class DarkWebIntelligence:
                 breach_date = datetime.fromisoformat(cred["breach_date"])
                 if (datetime.now() - breach_date).days < 30:
                     risk += 0.1
-            except:
+            except Exception:
                 pass
         
         return min(risk, 1.0)

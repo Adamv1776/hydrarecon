@@ -665,7 +665,7 @@ class AutonomousAttackOrchestrator:
                 await asyncio.wait_for(proc.communicate(), timeout=5)
                 result["success"] = proc.returncode == 0
                 result["details"]["host_alive"] = result["success"]
-            except:
+            except Exception:
                 result["success"] = False
         
         return result
@@ -689,7 +689,7 @@ class AutonomousAttackOrchestrator:
                 
                 if result_code == 0:
                     open_ports.append(port)
-            except:
+            except Exception:
                 pass
         
         result["success"] = len(open_ports) > 0
@@ -725,7 +725,7 @@ class AutonomousAttackOrchestrator:
                         "port": port,
                         "banner": banner[:200]
                     })
-            except:
+            except Exception:
                 pass
         
         result["success"] = len(services_found) > 0

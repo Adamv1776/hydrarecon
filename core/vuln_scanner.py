@@ -440,7 +440,7 @@ class VulnerabilityScanner:
                                 remediation="Restrict access to sensitive files"
                             )
                             vulns.append(vuln)
-                except:
+                except Exception:
                     continue
             
             # Check security headers

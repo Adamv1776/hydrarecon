@@ -824,9 +824,57 @@ class MyScanner(ScannerPlugin):
         self.worker.start()
     
     def _configure_plugin(self, plugin_id: str):
-        """Open plugin configuration"""
-        # TODO: Show config dialog
-        pass
+        """Open plugin configuration dialog"""
+        from PyQt6.QtWidgets import QDialog, QVBoxLayout, QFormLayout, QLineEdit, QTextEdit, QPushButton, QHBoxLayout, QMessageBox
+        
+        dialog = QDialog(self)
+        dialog.setWindowTitle(f"Configure Plugin: {plugin_id}")
+        dialog.setMinimumWidth(400)
+        
+        layout = QVBoxLayout(dialog)
+        form = QFormLayout()
+        
+        # Get current config if exists
+        config_path = Path(f"plugins/{plugin_id}/config.json")
+        current_config = {}
+        if config_path.exists():
+            try:
+                import json
+                current_config = json.loads(config_path.read_text())
+            except Exception:
+                pass
+        
+        # Config editor
+        config_edit = QTextEdit()
+        config_edit.setPlainText(json.dumps(current_config, indent=2) if current_config else '{}')
+        config_edit.setMinimumHeight(200)
+        form.addRow("Configuration (JSON):", config_edit)
+        
+        layout.addLayout(form)
+        
+        # Buttons
+        btn_layout = QHBoxLayout()
+        save_btn = QPushButton("Save")
+        cancel_btn = QPushButton("Cancel")
+        
+        def save_config():
+            try:
+                import json
+                new_config = json.loads(config_edit.toPlainText())
+                config_path.parent.mkdir(parents=True, exist_ok=True)
+                config_path.write_text(json.dumps(new_config, indent=2))
+                QMessageBox.information(dialog, "Success", "Configuration saved")
+                dialog.accept()
+            except json.JSONDecodeError as e:
+                QMessageBox.warning(dialog, "Invalid JSON", str(e))
+        
+        save_btn.clicked.connect(save_config)
+        cancel_btn.clicked.connect(dialog.reject)
+        btn_layout.addWidget(save_btn)
+        btn_layout.addWidget(cancel_btn)
+        layout.addLayout(btn_layout)
+        
+        dialog.exec()
     
     def _create_new_plugin(self):
         """Create a new plugin"""

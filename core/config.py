@@ -199,7 +199,7 @@ class Config:
             return ""
         try:
             return self._cipher.decrypt(data.encode()).decode()
-        except:
+        except Exception:
             return ""
     
     def to_dict(self) -> Dict[str, Any]:

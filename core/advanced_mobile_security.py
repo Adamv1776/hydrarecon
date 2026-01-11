@@ -682,7 +682,7 @@ class MobileSecurityScanner:
                                 'category': finding.category.value,
                                 'remediation': finding.remediation
                             })
-                    except:
+                    except Exception:
                         pass
                         
                     break

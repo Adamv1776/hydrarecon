@@ -15,6 +15,8 @@ from enum import Enum
 import re
 from pathlib import Path
 
+from .free_api_integrations import FreeAPIClient
+
 
 class ThreatLevel(Enum):
     """Threat severity levels"""
@@ -133,6 +135,9 @@ class ThreatIntelligence:
         }
         self.cache: Dict[str, Any] = {}
         self.cache_ttl = timedelta(hours=1)
+
+        # Free enrichments (no API key). Enabled by default.
+        self.enable_free_enrichment = bool(self.config.get('enable_free_enrichment', True))
         
         # Known malicious patterns
         self.malicious_patterns = {
@@ -161,6 +166,9 @@ class ThreatIntelligence:
             if self.api_keys['virustotal']:
                 tasks.append(self._query_virustotal_ip(target))
             tasks.append(self._query_threatcrowd_ip(target))
+
+            if self.enable_free_enrichment:
+                tasks.append(self._query_free_ip_enrichment(target))
             
         elif ioc_type == IOCType.DOMAIN:
             if self.api_keys['virustotal']:
@@ -168,17 +176,31 @@ class ThreatIntelligence:
             tasks.append(self._query_threatcrowd_domain(target))
             if self.api_keys['urlscan']:
                 tasks.append(self._query_urlscan(target))
+
+            if self.enable_free_enrichment:
+                # Public search is often usable without a key.
+                tasks.append(self._query_free_domain_enrichment(target))
                 
         elif ioc_type == IOCType.FILE_HASH:
             if self.api_keys['virustotal']:
                 tasks.append(self._query_virustotal_hash(target))
             tasks.append(self._query_malwarebazaar(target))
+
+            if self.enable_free_enrichment:
+                tasks.append(self._query_free_hash_enrichment(target))
             
         elif ioc_type == IOCType.URL:
             if self.api_keys['virustotal']:
                 tasks.append(self._query_virustotal_url(target))
             if self.api_keys['urlscan']:
                 tasks.append(self._query_urlscan(target))
+
+            if self.enable_free_enrichment:
+                tasks.append(self._query_free_url_enrichment(target))
+
+        elif ioc_type == IOCType.EMAIL:
+            if self.enable_free_enrichment:
+                tasks.append(self._query_free_email_enrichment(target))
         
         # Execute all queries in parallel
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -215,6 +237,147 @@ class ThreatIntelligence:
         report.summary = self._generate_summary(report)
         
         return report
+
+    async def _query_free_ip_enrichment(self, ip: str) -> List[ThreatIndicator]:
+        """Free IP enrichment (geo + RDAP)."""
+        indicators: List[ThreatIndicator] = []
+        try:
+            async with FreeAPIClient() as client:
+                geo = await client.ip_geolocation(ip)
+                if geo.ok and geo.data:
+                    indicators.append(
+                        ThreatIndicator(
+                            ioc_type=IOCType.IP_ADDRESS,
+                            value=ip,
+                            sources=['ip-api'],
+                            tags=['geolocation'],
+                            description=f"Geo: {geo.data.get('country', '')} {geo.data.get('city', '')}".strip(),
+                            raw_data={'ip_api': geo.data},
+                            confidence=60,
+                        )
+                    )
+
+                rdap = await client.ipwhois_rdap(ip)
+                if rdap.ok and rdap.data:
+                    name = rdap.data.get('name') or rdap.data.get('handle') or ''
+                    indicators.append(
+                        ThreatIndicator(
+                            ioc_type=IOCType.IP_ADDRESS,
+                            value=ip,
+                            sources=['rdap'],
+                            tags=['rdap'],
+                            description=f"RDAP: {name}".strip(),
+                            raw_data={'rdap': rdap.data},
+                            confidence=60,
+                        )
+                    )
+        except Exception:
+            pass
+        return indicators
+
+    async def _query_free_domain_enrichment(self, domain: str) -> List[ThreatIndicator]:
+        """Free domain enrichment via urlscan public search."""
+        indicators: List[ThreatIndicator] = []
+        try:
+            async with FreeAPIClient() as client:
+                res = await client.urlscan_search(domain)
+                if res.ok and res.data:
+                    indicators.append(
+                        ThreatIndicator(
+                            ioc_type=IOCType.DOMAIN,
+                            value=domain,
+                            sources=['urlscan'],
+                            tags=['urlscan'],
+                            description="URLScan public search results",
+                            raw_data={'urlscan': res.data},
+                            confidence=55,
+                        )
+                    )
+        except Exception:
+            pass
+        return indicators
+
+    async def _query_free_hash_enrichment(self, sha256: str) -> List[ThreatIndicator]:
+        """Free hash enrichment via MalwareBazaar + ThreatFox."""
+        indicators: List[ThreatIndicator] = []
+        try:
+            async with FreeAPIClient() as client:
+                mb = await client.malwarebazaar_hash(sha256)
+                if mb.ok and mb.data:
+                    indicators.append(
+                        ThreatIndicator(
+                            ioc_type=IOCType.FILE_HASH,
+                            value=sha256,
+                            sources=['malwarebazaar'],
+                            tags=['malware'],
+                            description="MalwareBazaar lookup",
+                            raw_data={'malwarebazaar': mb.data},
+                            confidence=70,
+                        )
+                    )
+
+                tf = await client.threatfox_search(sha256)
+                if tf.ok and tf.data:
+                    indicators.append(
+                        ThreatIndicator(
+                            ioc_type=IOCType.FILE_HASH,
+                            value=sha256,
+                            sources=['threatfox'],
+                            tags=['threatfox'],
+                            description="ThreatFox IOC search",
+                            raw_data={'threatfox': tf.data},
+                            confidence=65,
+                        )
+                    )
+        except Exception:
+            pass
+        return indicators
+
+    async def _query_free_url_enrichment(self, url: str) -> List[ThreatIndicator]:
+        """Free URL enrichment via urlscan public search."""
+        indicators: List[ThreatIndicator] = []
+        try:
+            async with FreeAPIClient() as client:
+                res = await client.urlscan_search(url)
+                if res.ok and res.data:
+                    indicators.append(
+                        ThreatIndicator(
+                            ioc_type=IOCType.URL,
+                            value=url,
+                            sources=['urlscan'],
+                            tags=['urlscan'],
+                            description="URLScan public search results",
+                            raw_data={'urlscan': res.data},
+                            confidence=55,
+                        )
+                    )
+        except Exception:
+            pass
+        return indicators
+
+    async def _query_free_email_enrichment(self, email: str) -> List[ThreatIndicator]:
+        """Free email enrichment via emailrep.io."""
+        indicators: List[ThreatIndicator] = []
+        try:
+            async with FreeAPIClient() as client:
+                rep = await client.email_reputation(email)
+                if rep.ok and rep.data:
+                    reputation = rep.data.get('reputation', '')
+                    suspicious = rep.data.get('suspicious')
+                    indicators.append(
+                        ThreatIndicator(
+                            ioc_type=IOCType.EMAIL,
+                            value=email,
+                            sources=['emailrep'],
+                            tags=['emailrep'],
+                            description=f"EmailRep: {reputation} suspicious={suspicious}",
+                            raw_data={'emailrep': rep.data},
+                            confidence=70,
+                        )
+                    )
+        except Exception:
+            pass
+        return indicators
     
     def _identify_ioc_type(self, target: str) -> IOCType:
         """Identify the type of indicator"""

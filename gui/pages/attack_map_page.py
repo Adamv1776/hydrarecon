@@ -174,7 +174,7 @@ class RealThreatDataFetcher(QObject):
                             "source": "GreyNoise"
                         }
         except Exception:
-            pass
+            pass  # Consider: logger.exception('Unexpected error')
         return None
     
     async def geolocate_ip(self, ip: str) -> Dict:
@@ -200,7 +200,7 @@ class RealThreatDataFetcher(QObject):
                             "source": "IPInfo"
                         }
         except Exception:
-            pass
+            pass  # Consider: logger.exception('Unexpected error')
         
         # Fallback to country-based approximation
         return self._fallback_geo(ip)
@@ -320,7 +320,7 @@ class AttackEventWidget(QFrame):
                 else:
                     dt = timestamp
                 time_str = dt.strftime('%H:%M:%S')
-            except:
+            except Exception:
                 time_str = str(timestamp)[:8]
         else:
             time_str = "Now"

@@ -649,7 +649,7 @@ class ThreatHuntingPlatform:
                                     affected_assets=[str(file_path)],
                                     iocs=[ioc]
                                 ))
-                        except:
+                        except Exception:
                             pass
             except Exception as e:
                 self._log(f"Hash sweep error in {scan_path}: {e}", "warning")
@@ -749,7 +749,7 @@ class ThreatHuntingPlatform:
                                 "pattern": name,
                                 "found_in": "running processes"
                             })
-                except:
+                except Exception:
                     pass
         
         if indicators_found:

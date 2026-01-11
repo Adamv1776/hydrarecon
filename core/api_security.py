@@ -536,7 +536,7 @@ class APISecurityTester:
                             cvss_score=9.8,
                         )
                         vulnerabilities.append(vuln)
-            except:
+            except Exception:
                 pass
             
             # Test for weak JWT
@@ -564,7 +564,7 @@ class APISecurityTester:
                                 cvss_score=9.8,
                             )
                             vulnerabilities.append(vuln)
-                except:
+                except Exception:
                     pass
         
         return vulnerabilities
@@ -622,7 +622,7 @@ class APISecurityTester:
                                     )
                                     vulnerabilities.append(vuln)
                                     break
-                        except:
+                        except Exception:
                             pass
         
         return vulnerabilities
@@ -649,7 +649,7 @@ class APISecurityTester:
                     ) as response:
                         if response.status == 200:
                             success_count += 1
-                except:
+                except Exception:
                     pass
             
             if success_count >= 45:  # 90% success rate
@@ -715,7 +715,7 @@ class APISecurityTester:
                             )
                             vulnerabilities.append(vuln)
                             break
-                except:
+                except Exception:
                     pass
         
         return vulnerabilities
@@ -768,7 +768,7 @@ class APISecurityTester:
                             cvss_score=3.1,
                         )
                         vulnerabilities.append(vuln)
-            except:
+            except Exception:
                 pass
         
         return vulnerabilities
@@ -837,7 +837,7 @@ class APISecurityTester:
                         )
                         vulnerabilities.append(vuln)
                         
-            except:
+            except Exception:
                 pass
         
         return vulnerabilities
@@ -895,7 +895,7 @@ class APISecurityTester:
                                         cvss_score=8.1,
                                     )
                                     vulnerabilities.append(vuln)
-                except:
+                except Exception:
                     pass
         
         return vulnerabilities
@@ -1060,7 +1060,7 @@ class APISecurityTester:
                             cvss_score=5.3,
                         )
                         vulnerabilities.append(vuln)
-            except:
+            except Exception:
                 pass
             
             # Test for query depth/complexity issues
@@ -1104,7 +1104,7 @@ class APISecurityTester:
                             cvss_score=5.3,
                         )
                         vulnerabilities.append(vuln)
-            except:
+            except Exception:
                 pass
         
         return vulnerabilities

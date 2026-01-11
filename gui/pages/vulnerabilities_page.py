@@ -593,7 +593,7 @@ class VulnerabilitiesPage(QWidget):
                 cvss_item.setForeground(QColor('#d29922'))
             else:
                 cvss_item.setForeground(QColor('#238636'))
-        except:
+        except Exception:
             pass
         self.vuln_table.setItem(row, 4, cvss_item)
         

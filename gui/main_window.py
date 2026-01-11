@@ -34,6 +34,11 @@ except ImportError:
     APIDiscoveryPage = None
 
 try:
+    from .pages.web_spider_page import WebSpiderPage
+except ImportError:
+    WebSpiderPage = None
+
+try:
     from .pages.c2_page import C2Page
 except ImportError:
     C2Page = None
@@ -82,6 +87,11 @@ try:
     from .pages.wifi_sensing_page import WifiSensingPage
 except ImportError:
     WifiSensingPage = None
+
+try:
+    from .pages.drone_detection_page import DroneDetectionPage
+except ImportError:
+    DroneDetectionPage = None
 
 try:
     from .pages.payload_generator_page import PayloadGeneratorPage
@@ -472,6 +482,11 @@ try:
 except ImportError:
     EmailSecurityPage = None
 
+try:
+    from .pages.word_scrubber_page import WordScrubberPage
+except ImportError:
+    WordScrubberPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -614,6 +629,7 @@ class HydraReconMainWindow(QMainWindow):
                 ("nmap", "Nmap Scanner", "🔍"),
                 ("osint", "OSINT", "🌐"),
                 ("attack_surface", "Attack Surface", "🗺️"),
+                ("web_spider", "Web Spider", "🕷️"),
                 ("api_discovery", "API Discovery", "🔌"),
                 ("network_mapper", "Network Mapper", "🕸️"),
                 ("threat_intel", "Threat Intel", "🛡️"),
@@ -625,6 +641,7 @@ class HydraReconMainWindow(QMainWindow):
                 ("graphql_scanner", "GraphQL Scanner", "📊"),
                 ("email_security", "Email Security", "📧"),
                 ("bug_bounty", "Bug Bounty Copilot", "🎯"),
+                ("word_scrubber", "Word Scrubber", "🧹"),
             ],
             "⚔️ Exploitation": [
                 ("hydra", "Hydra Attack", "🔓"),
@@ -632,6 +649,7 @@ class HydraReconMainWindow(QMainWindow):
                 ("vuln_scanner", "Vuln Scanner", "🐛"),
                 ("wireless", "Wireless Attacks", "📡"),
                 ("wifi_sensing", "WiFi Sensing 3D", "🛰️"),
+                ("drone_detection", "Drone Detection", "🚁"),
                 ("payloads", "Payload Generator", "💣"),
                 ("browser_exploit", "Browser Exploitation", "🌐"),
                 ("zero_day", "Zero-Day Framework", "💀"),
@@ -725,11 +743,6 @@ class HydraReconMainWindow(QMainWindow):
                 ("ai_narrator", "AI Threat Narrator", "🎙️"),
                 ("exploit_chain", "Exploit Chain Builder", "⛓️"),
                 ("gamification", "Gamification Hub", "🏆"),
-                ("attack_replay", "Attack Replay", "🎬"),
-                ("collaboration", "Collaboration Hub", "👥"),
-            ],
-            "🛠️ Architecture": [
-                ("security_architecture", "Security Architecture", "🏛️"),
                 ("threat_modeling", "Threat Modeling", "🎯"),
                 ("access_control", "Access Control", "🔐"),
                 ("automation", "Automation", "⚡"),
@@ -830,6 +843,8 @@ class HydraReconMainWindow(QMainWindow):
         # Add advanced pages if available
         if APIDiscoveryPage:
             self.pages["api_discovery"] = APIDiscoveryPage(self)
+        if WebSpiderPage:
+            self.pages["web_spider"] = WebSpiderPage(self.config, self.db)
         if ExploitBrowserPage:
             self.pages["exploit_browser"] = ExploitBrowserPage(self)
         if C2Page:
@@ -850,6 +865,8 @@ class HydraReconMainWindow(QMainWindow):
             self.pages["wireless"] = WirelessAttacksPage(self)
         if WifiSensingPage:
             self.pages["wifi_sensing"] = WifiSensingPage(self)
+        if DroneDetectionPage:
+            self.pages["drone_detection"] = DroneDetectionPage(self)
         if PayloadGeneratorPage:
             self.pages["payloads"] = PayloadGeneratorPage(self)
         if VulnScannerPage:
@@ -1012,6 +1029,8 @@ class HydraReconMainWindow(QMainWindow):
             self.pages["subdomain_takeover"] = SubdomainTakeoverPage(self)
         if EmailSecurityPage:
             self.pages["email_security"] = EmailSecurityPage(self)
+        if WordScrubberPage:
+            self.pages["word_scrubber"] = WordScrubberPage(self)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)

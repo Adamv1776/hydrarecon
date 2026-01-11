@@ -279,7 +279,7 @@ class AssetDiscoverer:
             )
             await proc.wait()
             return proc.returncode == 0
-        except:
+        except Exception:
             return False
     
     async def dns_discovery(self, domain: str) -> List[Dict[str, Any]]:
@@ -381,7 +381,7 @@ class AssetDiscoverer:
                 await writer.drain()
                 data = await asyncio.wait_for(reader.read(1024), timeout=2.0)
                 banner = data.decode('utf-8', errors='ignore').strip()
-            except:
+            except Exception:
                 pass
             
             writer.close()
@@ -394,7 +394,7 @@ class AssetDiscoverer:
                 state="open",
                 banner=banner[:256] if banner else ""
             )
-        except:
+        except Exception:
             return None
     
     def _guess_service(self, port: int) -> str:
@@ -582,7 +582,7 @@ class AssetInventoryEngine:
                 hostname = ""
                 try:
                     hostname = socket.gethostbyaddr(ip)[0]
-                except:
+                except Exception:
                     pass
                 
                 # Determine asset type
@@ -699,7 +699,7 @@ class AssetInventoryEngine:
                     network = ipaddress.ip_network(ip_range, strict=False)
                     if ipaddress.ip_address(asset.primary_ip) not in network:
                         continue
-                except:
+                except Exception:
                     pass
             
             # OS filter

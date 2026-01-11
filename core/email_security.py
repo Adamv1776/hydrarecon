@@ -492,7 +492,31 @@ class EmailSecurityAnalyzer:
             if part.startswith("id="):
                 mta_sts.id = part[3:]
         
-        # TODO: Fetch and parse the policy file at https://mta-sts.{domain}/.well-known/mta-sts.txt
+        # Fetch and parse the MTA-STS policy file
+        try:
+            import aiohttp
+            policy_url = f"https://mta-sts.{domain}/.well-known/mta-sts.txt"
+            async with aiohttp.ClientSession() as session:
+                async with session.get(policy_url, timeout=aiohttp.ClientTimeout(total=10)) as response:
+                    if response.status == 200:
+                        policy_text = await response.text()
+                        # Parse policy file
+                        for line in policy_text.strip().split('\n'):
+                            line = line.strip()
+                            if line.startswith('version:'):
+                                pass  # Already have version
+                            elif line.startswith('mode:'):
+                                mta_sts.mode = line.split(':', 1)[1].strip()
+                            elif line.startswith('mx:'):
+                                mta_sts.mx.append(line.split(':', 1)[1].strip())
+                            elif line.startswith('max_age:'):
+                                try:
+                                    mta_sts.max_age = int(line.split(':', 1)[1].strip())
+                                except ValueError:
+                                    pass
+        except Exception:
+            # Policy fetch failed, but DNS record exists
+            pass
         
         return mta_sts
     

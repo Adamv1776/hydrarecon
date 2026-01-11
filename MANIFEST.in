@@ -1,0 +1,26 @@
+include LICENSE
+include README.md
+include INSTALL.md
+include DISCLAIMER.md
+include SECURITY.md
+include requirements*.txt
+include pyproject.toml
+include Makefile
+include Dockerfile
+include docker-compose.yml
+include start.sh
+include install-quick.sh
+
+recursive-include core *.py
+recursive-include gui *.py
+recursive-include scanners *.py
+recursive-include tools *.py
+recursive-include tests *.py
+recursive-include docs *.md
+recursive-include data *.json *.yaml *.yml
+
+global-exclude __pycache__
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude .DS_Store
+global-exclude *.db

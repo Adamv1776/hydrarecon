@@ -1,0 +1,177 @@
+HydraRecon Commercial Software License Agreement
+Version 1.0 - Effective Date: January 2026
+
+═══════════════════════════════════════════════════════════════════════════════
+                        HYDRARECON SOFTWARE LICENSE
+═══════════════════════════════════════════════════════════════════════════════
+
+Copyright (c) 2024-2026 HydraRecon Security Software
+All Rights Reserved.
+
+IMPORTANT: READ CAREFULLY BEFORE USING THIS SOFTWARE
+
+This Commercial Software License Agreement ("Agreement") is a legal agreement 
+between you (either an individual or a single entity) ("Licensee") and 
+HydraRecon Security Software ("Licensor") for the HydraRecon Enterprise 
+Security Assessment Suite software product, which includes computer software 
+and may include associated media, printed materials, and online or electronic 
+documentation ("Software").
+
+BY INSTALLING, COPYING, OR OTHERWISE USING THE SOFTWARE, YOU AGREE TO BE BOUND 
+BY THE TERMS OF THIS AGREEMENT. IF YOU DO NOT AGREE TO THE TERMS OF THIS 
+AGREEMENT, DO NOT INSTALL OR USE THE SOFTWARE.
+
+═══════════════════════════════════════════════════════════════════════════════
+1. LICENSE GRANT
+═══════════════════════════════════════════════════════════════════════════════
+
+1.1 AUTHORIZED USE ONLY
+This Software is designed exclusively for:
+   a) Authorized penetration testing with explicit written permission
+   b) Security assessments within scope of engagement contracts
+   c) Educational and research purposes in controlled environments
+   d) Internal security auditing of systems you own or are authorized to test
+
+1.2 LICENSE TIERS
+   a) Personal License: Single user, non-commercial use
+   b) Professional License: Single organization, commercial use permitted
+   c) Enterprise License: Unlimited users within organization, priority support
+
+═══════════════════════════════════════════════════════════════════════════════
+2. RESTRICTIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+2.1 PROHIBITED USES - THE LICENSEE SHALL NOT:
+   a) Use this Software to attack, scan, or probe systems without explicit
+      written authorization from the system owner
+   b) Use this Software for any illegal activities including but not limited
+      to unauthorized access, data theft, or service disruption
+   c) Use this Software against critical infrastructure, healthcare systems,
+      emergency services, or financial systems without proper authorization
+   d) Distribute, sublicense, or resell the Software
+   e) Reverse engineer, decompile, or disassemble the Software
+   f) Remove or modify any proprietary notices or labels
+   g) Use the Software for malicious purposes, including but not limited to:
+      - Creating botnets or malware distribution networks
+      - Conducting DDoS attacks
+      - Stealing personal or financial information
+      - Unauthorized surveillance or monitoring
+   
+2.2 EXPORT CONTROLS
+The Software may be subject to export control laws. You agree to comply with
+all applicable export and import laws and regulations.
+
+═══════════════════════════════════════════════════════════════════════════════
+3. LEGAL COMPLIANCE
+═══════════════════════════════════════════════════════════════════════════════
+
+3.1 LICENSEE RESPONSIBILITIES
+The Licensee is solely responsible for:
+   a) Obtaining proper written authorization before any security testing
+   b) Complying with all applicable laws, including but not limited to:
+      - Computer Fraud and Abuse Act (CFAA) - United States
+      - Computer Misuse Act 1990 - United Kingdom
+      - General Data Protection Regulation (GDPR) - European Union
+      - National and local cybersecurity laws
+   c) Maintaining scope documentation for all engagements
+   d) Proper handling and protection of discovered vulnerabilities
+   e) Responsible disclosure practices
+
+3.2 INDEMNIFICATION
+Licensee agrees to indemnify, defend, and hold harmless the Licensor from any
+claims, damages, losses, or legal fees arising from Licensee's use of the
+Software, including any unauthorized or illegal use.
+
+═══════════════════════════════════════════════════════════════════════════════
+4. DISCLAIMER OF WARRANTIES
+═══════════════════════════════════════════════════════════════════════════════
+
+4.1 THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+4.2 THE LICENSOR DOES NOT WARRANT THAT:
+   a) The Software will meet your requirements
+   b) The Software will operate uninterrupted or error-free
+   c) Defects in the Software will be corrected
+   d) The Software is free of viruses or harmful components
+
+═══════════════════════════════════════════════════════════════════════════════
+5. LIMITATION OF LIABILITY
+═══════════════════════════════════════════════════════════════════════════════
+
+5.1 IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES ARISING OUT OF OR IN CONNECTION
+WITH THIS AGREEMENT OR USE OF THE SOFTWARE.
+
+5.2 THE TOTAL LIABILITY OF LICENSOR SHALL NOT EXCEED THE AMOUNT PAID BY
+LICENSEE FOR THE SOFTWARE.
+
+5.3 THE LICENSOR SHALL NOT BE LIABLE FOR ANY DAMAGES ARISING FROM:
+   a) Unauthorized or illegal use of the Software
+   b) Use of the Software beyond its intended purpose
+   c) Third-party claims against Licensee
+
+═══════════════════════════════════════════════════════════════════════════════
+6. INTELLECTUAL PROPERTY
+═══════════════════════════════════════════════════════════════════════════════
+
+6.1 The Software, including all copies, modifications, and derivatives, is
+owned by the Licensor and is protected by copyright, trade secret, and other
+intellectual property laws.
+
+6.2 This Agreement does not transfer any ownership rights in the Software.
+
+═══════════════════════════════════════════════════════════════════════════════
+7. TERMINATION
+═══════════════════════════════════════════════════════════════════════════════
+
+7.1 This license is effective until terminated. It will terminate automatically
+if you fail to comply with any term of this Agreement.
+
+7.2 Upon termination, you must destroy all copies of the Software.
+
+7.3 Sections 2, 3, 4, 5, 6, and 8 shall survive any termination.
+
+═══════════════════════════════════════════════════════════════════════════════
+8. GENERAL PROVISIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+8.1 GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws
+of the jurisdiction in which the Licensor is established.
+
+8.2 SEVERABILITY
+If any provision of this Agreement is held invalid, the remaining provisions
+shall continue in full force and effect.
+
+8.3 ENTIRE AGREEMENT
+This Agreement constitutes the entire agreement between the parties and
+supersedes all prior agreements and understandings.
+
+8.4 AMENDMENTS
+This Agreement may only be modified by a written amendment signed by both
+parties.
+
+═══════════════════════════════════════════════════════════════════════════════
+9. CONTACT INFORMATION
+═══════════════════════════════════════════════════════════════════════════════
+
+For licensing inquiries, support, or legal questions:
+   Email: legal@hydrarecon.security
+   Web: https://hydrarecon.security/licensing
+
+═══════════════════════════════════════════════════════════════════════════════
+                              ACKNOWLEDGMENT
+═══════════════════════════════════════════════════════════════════════════════
+
+BY USING THIS SOFTWARE, YOU ACKNOWLEDGE THAT YOU HAVE READ THIS AGREEMENT,
+UNDERSTAND IT, AND AGREE TO BE BOUND BY ITS TERMS AND CONDITIONS. YOU ALSO
+AGREE THAT THIS AGREEMENT IS THE COMPLETE AND EXCLUSIVE STATEMENT OF THE
+AGREEMENT BETWEEN YOU AND THE LICENSOR.
+
+If you do not agree to these terms, do not install or use the Software.
+
+═══════════════════════════════════════════════════════════════════════════════
+                     END OF LICENSE AGREEMENT
+═══════════════════════════════════════════════════════════════════════════════

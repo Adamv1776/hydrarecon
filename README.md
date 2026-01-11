@@ -3,35 +3,137 @@
 ```
 ╔═══════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                   ║
-║   ⚡ HYDRARECON                                                                   ║
+║   ⚡ HYDRARECON v1.0                                                              ║
 ║   Enterprise Security Assessment Suite                                            ║
 ║                                                                                   ║
-║   ████████╗██╗  ██╗██████╗ ██████╗  █████╗ ██████╗ ███████╗ ██████╗ ██████╗ ███╗  ║
-║   ██╔═════╝██║  ██║██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔════╝██╔═══██╗████╗ ║
-║   ███████╗ ████████║██║  ██║██████╔╝███████║██████╔╝█████╗  ██║     ██║   ██║██╔██╗║
-║   ██╔═════╝██╔══██║██║  ██║██╔══██╗██╔══██║██╔══██╗██╔══╝  ██║     ██║   ██║██║ ╚╝║
-║   ██║      ██║  ██║██████╔╝██║  ██║██║  ██║██║  ██║███████╗╚██████╗╚██████╔╝██║   ║
-║   ╚═╝      ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝   ║
+║   ██╗  ██╗██╗   ██╗██████╗ ██████╗  █████╗ ██████╗ ███████╗ ██████╗ ██████╗ ███╗  ║
+║   ██║  ██║╚██╗ ██╔╝██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔════╝██╔═══██╗████╗ ║
+║   ███████║ ╚████╔╝ ██║  ██║██████╔╝███████║██████╔╝█████╗  ██║     ██║   ██║██╔██╗║
+║   ██╔══██║  ╚██╔╝  ██║  ██║██╔══██╗██╔══██║██╔══██╗██╔══╝  ██║     ██║   ██║██║ ╚╝║
+║   ██║  ██║   ██║   ██████╔╝██║  ██║██║  ██║██║  ██║███████╗╚██████╗╚██████╔╝██║   ║
+║   ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝   ║
 ║                                                                                   ║
-║   Combining Nmap • Hydra • OSINT into one powerful unified interface              ║
+║   Professional Penetration Testing • OSINT • Vulnerability Assessment             ║
 ║                                                                                   ║
 ╚═══════════════════════════════════════════════════════════════════════════════════╝
 ```
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-1.0.0-00ff88?style=for-the-badge&logo=github" alt="Version">
+  <img src="https://img.shields.io/badge/Version-1.0.0-00ff88?style=for-the-badge&logo=security" alt="Version">
   <img src="https://img.shields.io/badge/Python-3.10+-0088ff?style=for-the-badge&logo=python" alt="Python">
   <img src="https://img.shields.io/badge/PyQt6-6.6+-a855f7?style=for-the-badge&logo=qt" alt="PyQt6">
-  <img src="https://img.shields.io/badge/License-Educational-ff8800?style=for-the-badge" alt="License">
+  <img src="https://img.shields.io/badge/License-Commercial-ff8800?style=for-the-badge" alt="License">
+  <img src="https://img.shields.io/badge/Lines-408K+-00d4ff?style=for-the-badge" alt="Lines of Code">
+</p>
+
+<p align="center">
+  <b>⚠️ FOR AUTHORIZED SECURITY TESTING ONLY ⚠️</b>
 </p>
 
 ---
 
-## 🎯 Overview
+## 🚨 Important Legal Notice
 
-**HydraRecon** is a **professional-grade security assessment platform** that integrates network scanning, brute-force capabilities, and open-source intelligence gathering into a single, unified application with a **stunning cyberpunk-themed GUI**.
+**READ BEFORE USE**: This software is designed **EXCLUSIVELY** for:
+- ✅ Authorized penetration testing with written permission
+- ✅ Security assessments of systems you own or are authorized to test
+- ✅ Educational research in controlled environments
+- ✅ Bug bounty programs with defined scope
+- ✅ Compliance auditing (PCI-DSS, HIPAA, SOC2, ISO 27001)
 
-This is NOT your average security tool. Built with a focus on visual excellence and professional-grade functionality, HydraRecon surpasses commercial applications with its **animated glassmorphism interface**, **real-time scanning visualization**, and **comprehensive threat intelligence integration**.
+**❌ UNAUTHORIZED USE IS A CRIMINAL OFFENSE** that may result in prosecution.
+
+See [LICENSE](LICENSE) and [DISCLAIMER.md](DISCLAIMER.md) for full terms.
+
+---
+
+## ⬇️ Quick Download
+
+### One-Line Install (Linux/Mac)
+```bash
+git clone https://github.com/hydrarecon/hydrarecon.git && cd hydrarecon && ./install-quick.sh
+```
+
+### Other Methods
+| Method | Command |
+|--------|---------|
+| **pip** | `pip install hydrarecon && hydrarecon-gui` |
+| **Manual** | `./install-quick.sh` |
+| **Docker** | `docker pull hydrarecon/hydrarecon` |
+| **Windows** | Download ZIP → Run `install-windows.bat` |
+
+📖 **Full installation guide**: [INSTALL.md](INSTALL.md)
+
+---
+
+## 🎯 What is HydraRecon?
+
+**HydraRecon** is a **comprehensive enterprise security assessment platform** with **408,000+ lines** of professional-grade code. It integrates:
+
+- 🔍 **Network Scanning** - Nmap integration with 10+ scan profiles
+- 🔓 **Credential Testing** - Hydra integration with 21+ protocols
+- 🌐 **OSINT Reconnaissance** - Automated intelligence gathering
+- 🛡️ **Vulnerability Assessment** - CVE discovery and management
+- 🔴 **Red Team Tools** - Advanced attack simulation
+- 🔵 **Blue Team Defense** - Detection and response capabilities
+- 🧠 **AI-Powered Analysis** - Machine learning threat detection
+- 📊 **Professional Reporting** - Executive and technical reports
+
+### Key Statistics
+
+| Metric | Value |
+|--------|-------|
+| Total Lines of Code | 408,000+ |
+| Core Security Modules | 130+ |
+| GUI Pages | 100+ |
+| Supported Protocols | 21+ |
+| Scan Profiles | 10+ |
+| Report Formats | 4 |
+
+---
+
+## ✨ Features
+
+### 🎨 **Modern Cyberpunk Interface**
+- **Glassmorphism Design** - Frosted glass UI components
+- **Neon Glow Effects** - Dynamic button and status animations
+- **3D Visualizations** - Network topology, attack paths, threat globe
+- **Real-time Updates** - Live scan progress and results
+- **Dark Theme** - Professional eye-friendly aesthetic
+
+### 🔒 **Security Assessment Modules**
+
+#### Offensive Security
+| Module | Description |
+|--------|-------------|
+| Network Scanning | Comprehensive port/service discovery |
+| Credential Testing | Multi-protocol password attacks |
+| Vulnerability Scanning | CVE detection and exploitation |
+| Web Application Testing | OWASP Top 10 assessment |
+| Wireless Attacks | WiFi security testing |
+| Social Engineering | Phishing and pretexting tools |
+| Exploit Framework | Research-grade exploit chains |
+| C2 Framework | Command and control simulation |
+
+#### Defensive Security
+| Module | Description |
+|--------|-------------|
+| Threat Intelligence | Real-time threat feeds |
+| SOAR Integration | Security orchestration |
+| Incident Response | IR playbook automation |
+| Forensics | Memory and disk analysis |
+| Blue Team Tools | Detection engineering |
+| Compliance Audit | Framework assessments |
+
+#### Advanced Capabilities
+| Module | Description |
+|--------|-------------|
+| AI Threat Analysis | ML-powered detection |
+| Quantum Cryptography | Post-quantum security |
+| WiFi Sensing | CSI-based environment mapping |
+| Blockchain Forensics | Cryptocurrency tracking |
+| Cloud Security | AWS/Azure/GCP assessment |
+| IoT/SCADA | Industrial security testing |
 
 ---
 

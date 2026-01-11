@@ -794,7 +794,7 @@ class NetworkTrafficAnalyzer:
             # Clean up
             try:
                 os.unlink(pcap_file)
-            except:
+            except Exception:
                 pass
         
         return result

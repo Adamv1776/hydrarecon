@@ -34,7 +34,8 @@ class DashboardUpdateThread(QThread):
                 summary = self.engine.get_dashboard_summary()
                 self.updated.emit(summary)
             except Exception as e:
-                pass
+                import logging
+                logging.getLogger(__name__).debug(f"Dashboard update skipped: {e}")
             
             time.sleep(10)  # Update every 10 seconds
     

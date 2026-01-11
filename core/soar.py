@@ -431,7 +431,7 @@ class ActionExecutor:
                 try:
                     ips = socket.gethostbyname_ex(domain)[2]
                     enrichment["dns_records"]["A"] = ips
-                except:
+                except Exception:
                     pass
                 
                 # Try to get MX records
@@ -445,7 +445,7 @@ class ActionExecutor:
                         mx_records = [line.split()[-1].rstrip('.') for line in result.stdout.strip().split('\n') if line]
                         if mx_records:
                             enrichment["dns_records"]["MX"] = mx_records
-                except:
+                except Exception:
                     pass
                 
                 enrichment["source"] = "DNS lookup"
@@ -1068,7 +1068,7 @@ class ActionExecutor:
                                 "domain_valid": True,
                                 "mx_records": result.stdout.strip().split('\n')[:3]
                             })
-                    except:
+                    except Exception:
                         pass
                 
         except Exception as e:
@@ -1462,7 +1462,7 @@ class ActionExecutor:
                     if mx_result.returncode == 0 and mx_result.stdout.strip():
                         results["domain_info"]["mx_records"] = mx_result.stdout.strip().split('\n')[:5]
                         results["domain_info"]["has_mx"] = True
-                except:
+                except Exception:
                     pass
                 
                 # Get person info if Clearbit available

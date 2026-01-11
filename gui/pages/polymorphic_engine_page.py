@@ -1038,7 +1038,7 @@ _start:
         try:
             parts = ip.split('.')
             return ''.join(f'{int(p):02x}' for p in reversed(parts))
-        except:
+        except Exception:
             return "7f000001"
     
     def _on_progress(self, progress: int, status: str):

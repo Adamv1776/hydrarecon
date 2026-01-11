@@ -264,7 +264,7 @@ class BinaryAnalyzer:
             
             return machine_map.get(e_machine, Architecture.UNKNOWN)
             
-        except:
+        except Exception:
             return Architecture.UNKNOWN
             
     def detect_endianness(self, data: bytes) -> str:
@@ -646,7 +646,7 @@ class CryptoAnalyzer:
         # Convert to string for searching
         try:
             text = data.decode('utf-8', errors='ignore')
-        except:
+        except Exception:
             text = str(data)
             
         for algo in self.weak_algorithms:
@@ -873,7 +873,7 @@ class FirmwareAnalysisEngine:
                         'is_private': key.is_private
                     })
                     
-            except:
+            except Exception:
                 pass
                 
         # Binary analysis for dangerous functions

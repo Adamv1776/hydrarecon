@@ -1,0 +1,3235 @@
+{
+  "version": 1,
+  "created_at": 1765935685.882906,
+  "intelligence": 5.1524999999999235,
+  "successful_fixes": {
+    "trailing-whitespace": {
+      "count": 263,
+      "contexts": [
+        {
+          "timestamp": 1765935686.9778626,
+          "file": "/home/adam/hydra 1/hydrarecon/run.py"
+        },
+        {
+          "timestamp": 1765935687.0746877,
+          "file": "/home/adam/hydra 1/hydrarecon/main.py"
+        },
+        {
+          "timestamp": 1765935687.1482167,
+          "file": "/home/adam/hydra 1/hydrarecon/test_osint_bypass.py"
+        },
+        {
+          "timestamp": 1765935687.1761825,
+          "file": "/home/adam/hydra 1/hydrarecon/test_esp32_serial.py"
+        },
+        {
+          "timestamp": 1765935687.3943434,
+          "file": "/home/adam/hydra 1/hydrarecon/wifi_sensing_app.py"
+        },
+        {
+          "timestamp": 1765935687.5314982,
+          "file": "/home/adam/hydra 1/hydrarecon/test_apis.py"
+        },
+        {
+          "timestamp": 1765935687.5851946,
+          "file": "/home/adam/hydra 1/hydrarecon/test_real_data.py"
+        },
+        {
+          "timestamp": 1765935687.621875,
+          "file": "/home/adam/hydra 1/hydrarecon/test_esp32_integration.py"
+        },
+        {
+          "timestamp": 1765935687.6390584,
+          "file": "/home/adam/hydra 1/hydrarecon/test_esp32_advanced.py"
+        },
+        {
+          "timestamp": 1765935687.6858745,
+          "file": "/home/adam/hydra 1/hydrarecon/quick_test.py"
+        },
+        {
+          "timestamp": 1765935687.7784908,
+          "file": "/home/adam/hydra 1/hydrarecon/core/threat_modeling.py"
+        },
+        {
+          "timestamp": 1765935687.9516788,
+          "file": "/home/adam/hydra 1/hydrarecon/core/scada_security.py"
+        },
+        {
+          "timestamp": 1765935688.3856144,
+          "file": "/home/adam/hydra 1/hydrarecon/core/security_policy.py"
+        },
+        {
+          "timestamp": 1765935688.5070312,
+          "file": "/home/adam/hydra 1/hydrarecon/core/exploit_framework.py"
+        },
+        {
+          "timestamp": 1765935688.7011523,
+          "file": "/home/adam/hydra 1/hydrarecon/core/polymorphic_engine.py"
+        },
+        {
+          "timestamp": 1765935689.7444792,
+          "file": "/home/adam/hydra 1/hydrarecon/core/wifi_sensing.py"
+        },
+        {
+          "timestamp": 1765935692.1377335,
+          "file": "/home/adam/hydra 1/hydrarecon/core/security_architecture.py"
+        },
+        {
+          "timestamp": 1765935692.498236,
+          "file": "/home/adam/hydra 1/hydrarecon/core/zero_day_detection.py"
+        },
+        {
+          "timestamp": 1765935692.751252,
+          "file": "/home/adam/hydra 1/hydrarecon/core/reporting.py"
+        },
+        {
+          "timestamp": 1765935692.8785896,
+          "file": "/home/adam/hydra 1/hydrarecon/core/compliance_audit.py"
+        },
+        {
+          "timestamp": 1765935692.9813242,
+          "file": "/home/adam/hydra 1/hydrarecon/core/voice_control.py"
+        },
+        {
+          "timestamp": 1765935693.1162164,
+          "file": "/home/adam/hydra 1/hydrarecon/core/graphql_scanner.py"
+        },
+        {
+          "timestamp": 1765935693.310357,
+          "file": "/home/adam/hydra 1/hydrarecon/core/subdomain_takeover.py"
+        },
+        {
+          "timestamp": 1765935693.3546526,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_database_security.py"
+        },
+        {
+          "timestamp": 1765935693.3940854,
+          "file": "/home/adam/hydra 1/hydrarecon/core/neural_fingerprint.py"
+        },
+        {
+          "timestamp": 1765935693.422141,
+          "file": "/home/adam/hydra 1/hydrarecon/core/bug_bounty_copilot.py"
+        },
+        {
+          "timestamp": 1765935693.4733033,
+          "file": "/home/adam/hydra 1/hydrarecon/core/neural_interface.py"
+        },
+        {
+          "timestamp": 1765935693.7501683,
+          "file": "/home/adam/hydra 1/hydrarecon/core/hardware_integration.py"
+        },
+        {
+          "timestamp": 1765935693.9889772,
+          "file": "/home/adam/hydra 1/hydrarecon/core/plugin_system.py"
+        },
+        {
+          "timestamp": 1765935694.040893,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_ad_security.py"
+        },
+        {
+          "timestamp": 1765935694.0704353,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_ssl_security.py"
+        },
+        {
+          "timestamp": 1765935694.0957494,
+          "file": "/home/adam/hydra 1/hydrarecon/core/neural_exploit_engine.py"
+        },
+        {
+          "timestamp": 1765935694.1338263,
+          "file": "/home/adam/hydra 1/hydrarecon/core/pentest_report.py"
+        },
+        {
+          "timestamp": 1765935694.1681643,
+          "file": "/home/adam/hydra 1/hydrarecon/core/api_security.py"
+        },
+        {
+          "timestamp": 1765935694.3306851,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_reporting.py"
+        },
+        {
+          "timestamp": 1765935694.3546636,
+          "file": "/home/adam/hydra 1/hydrarecon/core/social_engineering.py"
+        },
+        {
+          "timestamp": 1765935694.4095802,
+          "file": "/home/adam/hydra 1/hydrarecon/core/vuln_management.py"
+        },
+        {
+          "timestamp": 1765935694.525353,
+          "file": "/home/adam/hydra 1/hydrarecon/core/data_sources.py"
+        },
+        {
+          "timestamp": 1765935694.626592,
+          "file": "/home/adam/hydra 1/hydrarecon/core/attack_replay.py"
+        },
+        {
+          "timestamp": 1765935695.0382137,
+          "file": "/home/adam/hydra 1/hydrarecon/core/gamification_engine.py"
+        },
+        {
+          "timestamp": 1765935695.2681818,
+          "file": "/home/adam/hydra 1/hydrarecon/core/quantum_crypto.py"
+        },
+        {
+          "timestamp": 1765935695.6005614,
+          "file": "/home/adam/hydra 1/hydrarecon/core/api_discovery.py"
+        },
+        {
+          "timestamp": 1765935695.7927418,
+          "file": "/home/adam/hydra 1/hydrarecon/core/blockchain_evidence.py"
+        },
+        {
+          "timestamp": 1765935696.4448035,
+          "file": "/home/adam/hydra 1/hydrarecon/core/satellite_rf_intel.py"
+        },
+        {
+          "timestamp": 1765935696.8241751,
+          "file": "/home/adam/hydra 1/hydrarecon/core/dark_web_intel.py"
+        },
+        {
+          "timestamp": 1765935697.2752306,
+          "file": "/home/adam/hydra 1/hydrarecon/core/soar.py"
+        },
+        {
+          "timestamp": 1765935698.817221,
+          "file": "/home/adam/hydra 1/hydrarecon/core/risk_scoring.py"
+        },
+        {
+          "timestamp": 1765935698.9628794,
+          "file": "/home/adam/hydra 1/hydrarecon/core/red_team_automation.py"
+        },
+        {
+          "timestamp": 1765935699.0061388,
+          "file": "/home/adam/hydra 1/hydrarecon/core/dlp.py"
+        },
+        {
+          "timestamp": 1765935699.0261164,
+          "file": "/home/adam/hydra 1/hydrarecon/core/__init__.py"
+        },
+        {
+          "timestamp": 1765935699.067611,
+          "file": "/home/adam/hydra 1/hydrarecon/core/audit_log.py"
+        },
+        {
+          "timestamp": 1765935699.1180933,
+          "file": "/home/adam/hydra 1/hydrarecon/core/attack_simulation.py"
+        },
+        {
+          "timestamp": 1765935699.1983566,
+          "file": "/home/adam/hydra 1/hydrarecon/core/blue_team.py"
+        },
+        {
+          "timestamp": 1765935699.3149796,
+          "file": "/home/adam/hydra 1/hydrarecon/core/incident_response_automation.py"
+        },
+        {
+          "timestamp": 1765935699.3686178,
+          "file": "/home/adam/hydra 1/hydrarecon/core/collaboration.py"
+        },
+        {
+          "timestamp": 1765935699.4640162,
+          "file": "/home/adam/hydra 1/hydrarecon/core/database.py"
+        },
+        {
+          "timestamp": 1765935699.8252459,
+          "file": "/home/adam/hydra 1/hydrarecon/core/memory_forensics.py"
+        },
+        {
+          "timestamp": 1765935700.0738804,
+          "file": "/home/adam/hydra 1/hydrarecon/core/biometric_security.py"
+        },
+        {
+          "timestamp": 1765935700.4622364,
+          "file": "/home/adam/hydra 1/hydrarecon/core/access_control.py"
+        },
+        {
+          "timestamp": 1765935700.7631197,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_iot_security.py"
+        },
+        {
+          "timestamp": 1765935700.968631,
+          "file": "/home/adam/hydra 1/hydrarecon/core/email_security.py"
+        },
+        {
+          "timestamp": 1765935701.1699398,
+          "file": "/home/adam/hydra 1/hydrarecon/core/threat_hunting.py"
+        },
+        {
+          "timestamp": 1765935701.876704,
+          "file": "/home/adam/hydra 1/hydrarecon/core/blockchain_forensics.py"
+        },
+        {
+          "timestamp": 1765935702.1127992,
+          "file": "/home/adam/hydra 1/hydrarecon/core/edr_evasion.py"
+        },
+        {
+          "timestamp": 1765935702.3893461,
+          "file": "/home/adam/hydra 1/hydrarecon/core/exploit_chain_builder.py"
+        },
+        {
+          "timestamp": 1765935702.4648864,
+          "file": "/home/adam/hydra 1/hydrarecon/core/network_traffic.py"
+        },
+        {
+          "timestamp": 1765935702.769615,
+          "file": "/home/adam/hydra 1/hydrarecon/core/secrets_scanner.py"
+        },
+        {
+          "timestamp": 1765935703.0253959,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_api_security.py"
+        },
+        {
+          "timestamp": 1765935703.202859,
+          "file": "/home/adam/hydra 1/hydrarecon/core/social_engineering_defense.py"
+        },
+        {
+          "timestamp": 1765935703.2631404,
+          "file": "/home/adam/hydra 1/hydrarecon/core/iot_exploitation.py"
+        },
+        {
+          "timestamp": 1765935703.515524,
+          "file": "/home/adam/hydra 1/hydrarecon/core/swarm_intelligence.py"
+        },
+        {
+          "timestamp": 1765935703.5865607,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_wireless_security.py"
+        },
+        {
+          "timestamp": 1765935703.8586931,
+          "file": "/home/adam/hydra 1/hydrarecon/core/cloud_posture_management.py"
+        },
+        {
+          "timestamp": 1765935704.1031473,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_firmware_analysis.py"
+        },
+        {
+          "timestamp": 1765935704.5226576,
+          "file": "/home/adam/hydra 1/hydrarecon/core/container_security.py"
+        },
+        {
+          "timestamp": 1765935705.1911097,
+          "file": "/home/adam/hydra 1/hydrarecon/core/automation.py"
+        },
+        {
+          "timestamp": 1765935705.49723,
+          "file": "/home/adam/hydra 1/hydrarecon/core/evolutionary_exploit.py"
+        },
+        {
+          "timestamp": 1765935705.6510215,
+          "file": "/home/adam/hydra 1/hydrarecon/core/drone_integration.py"
+        },
+        {
+          "timestamp": 1765935705.9166515,
+          "file": "/home/adam/hydra 1/hydrarecon/core/zero_day_framework.py"
+        },
+        {
+          "timestamp": 1765935706.2339797,
+          "file": "/home/adam/hydra 1/hydrarecon/core/security_utils.py"
+        },
+        {
+          "timestamp": 1765935706.606147,
+          "file": "/home/adam/hydra 1/hydrarecon/core/third_party_risk.py"
+        },
+        {
+          "timestamp": 1765935706.8010156,
+          "file": "/home/adam/hydra 1/hydrarecon/core/network_attack_simulation.py"
+        },
+        {
+          "timestamp": 1765935707.2115407,
+          "file": "/home/adam/hydra 1/hydrarecon/core/asset_inventory.py"
+        },
+        {
+          "timestamp": 1765935707.5263486,
+          "file": "/home/adam/hydra 1/hydrarecon/core/cognitive_threat_engine.py"
+        },
+        {
+          "timestamp": 1765935707.5852814,
+          "file": "/home/adam/hydra 1/hydrarecon/core/ai_threat_narrator.py"
+        },
+        {
+          "timestamp": 1765935707.8146005,
+          "file": "/home/adam/hydra 1/hydrarecon/core/dark_web_intelligence.py"
+        },
+        {
+          "timestamp": 1765935707.9071393,
+          "file": "/home/adam/hydra 1/hydrarecon/core/vuln_correlation.py"
+        },
+        {
+          "timestamp": 1765935707.9933627,
+          "file": "/home/adam/hydra 1/hydrarecon/core/network_pivoting.py"
+        },
+        {
+          "timestamp": 1765935708.202591,
+          "file": "/home/adam/hydra 1/hydrarecon/core/config_baseline.py"
+        },
+        {
+          "timestamp": 1765935708.3176532,
+          "file": "/home/adam/hydra 1/hydrarecon/core/c2_framework.py"
+        },
+        {
+          "timestamp": 1765935708.5020914,
+          "file": "/home/adam/hydra 1/hydrarecon/core/backup_assessment.py"
+        },
+        {
+          "timestamp": 1765935708.587423,
+          "file": "/home/adam/hydra 1/hydrarecon/core/deception.py"
+        },
+        {
+          "timestamp": 1765935708.7113008,
+          "file": "/home/adam/hydra 1/hydrarecon/core/mobile_security.py"
+        },
+        {
+          "timestamp": 1765935709.102742,
+          "file": "/home/adam/hydra 1/hydrarecon/core/quantum_resistant_c2.py"
+        },
+        {
+          "timestamp": 1765935709.3458035,
+          "file": "/home/adam/hydra 1/hydrarecon/core/security_questionnaire.py"
+        },
+        {
+          "timestamp": 1765935709.5299382,
+          "file": "/home/adam/hydra 1/hydrarecon/core/realtime_collaboration.py"
+        },
+        {
+          "timestamp": 1765935709.801567,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_mobile_security.py"
+        },
+        {
+          "timestamp": 1765935710.3877635,
+          "file": "/home/adam/hydra 1/hydrarecon/core/incident_response.py"
+        },
+        {
+          "timestamp": 1765935710.623093,
+          "file": "/home/adam/hydra 1/hydrarecon/core/ics_scada_security.py"
+        },
+        {
+          "timestamp": 1765935710.8563888,
+          "file": "/home/adam/hydra 1/hydrarecon/core/logger.py"
+        },
+        {
+          "timestamp": 1765935710.9014444,
+          "file": "/home/adam/hydra 1/hydrarecon/core/security_awareness.py"
+        },
+        {
+          "timestamp": 1765935710.981498,
+          "file": "/home/adam/hydra 1/hydrarecon/core/ad_attacks.py"
+        },
+        {
+          "timestamp": 1765935711.078373,
+          "file": "/home/adam/hydra 1/hydrarecon/core/collaboration_hub.py"
+        },
+        {
+          "timestamp": 1765935711.143143,
+          "file": "/home/adam/hydra 1/hydrarecon/core/vuln_scanner.py"
+        },
+        {
+          "timestamp": 1765935711.5775945,
+          "file": "/home/adam/hydra 1/hydrarecon/core/network_mapper.py"
+        },
+        {
+          "timestamp": 1765935712.1717343,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_ml_engine.py"
+        },
+        {
+          "timestamp": 1765935712.2771277,
+          "file": "/home/adam/hydra 1/hydrarecon/core/credential_spray.py"
+        },
+        {
+          "timestamp": 1765935712.373096,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_traffic_analysis.py"
+        },
+        {
+          "timestamp": 1765935712.4097219,
+          "file": "/home/adam/hydra 1/hydrarecon/core/payload_generator.py"
+        },
+        {
+          "timestamp": 1765935712.4870036,
+          "file": "/home/adam/hydra 1/hydrarecon/core/adversarial_ml.py"
+        },
+        {
+          "timestamp": 1765935712.5434816,
+          "file": "/home/adam/hydra 1/hydrarecon/core/threat_hunting_automation.py"
+        },
+        {
+          "timestamp": 1765935712.788643,
+          "file": "/home/adam/hydra 1/hydrarecon/core/malware_analysis.py"
+        },
+        {
+          "timestamp": 1765935713.3065994,
+          "file": "/home/adam/hydra 1/hydrarecon/core/remediation_tracking.py"
+        },
+        {
+          "timestamp": 1765935713.3793683,
+          "file": "/home/adam/hydra 1/hydrarecon/core/exploit_browser.py"
+        },
+        {
+          "timestamp": 1765935713.4474592,
+          "file": "/home/adam/hydra 1/hydrarecon/core/steganographic_exfil.py"
+        },
+        {
+          "timestamp": 1765935713.4946017,
+          "file": "/home/adam/hydra 1/hydrarecon/core/ai_assistant.py"
+        },
+        {
+          "timestamp": 1765935713.6708333,
+          "file": "/home/adam/hydra 1/hydrarecon/core/bcp.py"
+        },
+        {
+          "timestamp": 1765935713.9232633,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_dns_security.py"
+        },
+        {
+          "timestamp": 1765935714.1373806,
+          "file": "/home/adam/hydra 1/hydrarecon/core/config.py"
+        },
+        {
+          "timestamp": 1765935714.3380103,
+          "file": "/home/adam/hydra 1/hydrarecon/core/cmdb.py"
+        },
+        {
+          "timestamp": 1765935714.5778563,
+          "file": "/home/adam/hydra 1/hydrarecon/core/forensics.py"
+        },
+        {
+          "timestamp": 1765935714.9632144,
+          "file": "/home/adam/hydra 1/hydrarecon/core/zero_day_predictor.py"
+        },
+        {
+          "timestamp": 1765935715.1116018,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_malware_sandbox.py"
+        },
+        {
+          "timestamp": 1765935715.4260738,
+          "file": "/home/adam/hydra 1/hydrarecon/core/password_audit.py"
+        },
+        {
+          "timestamp": 1765935715.6704319,
+          "file": "/home/adam/hydra 1/hydrarecon/core/autonomous_attack.py"
+        },
+        {
+          "timestamp": 1765935715.9649837,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_http.py"
+        },
+        {
+          "timestamp": 1765935716.0728405,
+          "file": "/home/adam/hydra 1/hydrarecon/core/threat_intelligence.py"
+        },
+        {
+          "timestamp": 1765935716.173056,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_memory_forensics.py"
+        },
+        {
+          "timestamp": 1765935716.3578146,
+          "file": "/home/adam/hydra 1/hydrarecon/core/hardware_implant.py"
+        },
+        {
+          "timestamp": 1765935716.5458424,
+          "file": "/home/adam/hydra 1/hydrarecon/core/cloud_security.py"
+        },
+        {
+          "timestamp": 1765935716.6842523,
+          "file": "/home/adam/hydra 1/hydrarecon/core/browser_exploitation.py"
+        },
+        {
+          "timestamp": 1765935716.9309292,
+          "file": "/home/adam/hydra 1/hydrarecon/core/deepfake_detection.py"
+        },
+        {
+          "timestamp": 1765935717.06307,
+          "file": "/home/adam/hydra 1/hydrarecon/core/supply_chain_security.py"
+        },
+        {
+          "timestamp": 1765935717.2266123,
+          "file": "/home/adam/hydra 1/hydrarecon/core/ai_engine.py"
+        },
+        {
+          "timestamp": 1765935717.3588462,
+          "file": "/home/adam/hydra 1/hydrarecon/core/quantum_security.py"
+        },
+        {
+          "timestamp": 1765935717.4744065,
+          "file": "/home/adam/hydra 1/hydrarecon/core/session_manager.py"
+        },
+        {
+          "timestamp": 1765935717.777976,
+          "file": "/home/adam/hydra 1/hydrarecon/core/live_attack_map.py"
+        },
+        {
+          "timestamp": 1765935718.1650524,
+          "file": "/home/adam/hydra 1/hydrarecon/core/wireless_attacks.py"
+        },
+        {
+          "timestamp": 1765935718.3482676,
+          "file": "/home/adam/hydra 1/hydrarecon/core/autonomous_pentest.py"
+        },
+        {
+          "timestamp": 1765935718.4346886,
+          "file": "/home/adam/hydra 1/hydrarecon/core/hash_cracker.py"
+        },
+        {
+          "timestamp": 1765935718.6509347,
+          "file": "/home/adam/hydra 1/hydrarecon/core/threat_intel.py"
+        },
+        {
+          "timestamp": 1765935718.8600476,
+          "file": "/home/adam/hydra 1/hydrarecon/core/patch_management.py"
+        },
+        {
+          "timestamp": 1765935719.2955408,
+          "file": "/home/adam/hydra 1/hydrarecon/core/security_dashboard.py"
+        },
+        {
+          "timestamp": 1765935719.5800643,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/splash_screen.py"
+        },
+        {
+          "timestamp": 1765935719.6681817,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/themes.py"
+        },
+        {
+          "timestamp": 1765935719.9179,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/main_window.py"
+        },
+        {
+          "timestamp": 1765935720.1568737,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/widgets.py"
+        },
+        {
+          "timestamp": 1765935720.273519,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/notifications.py"
+        },
+        {
+          "timestamp": 1765935720.4179225,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualizations.py"
+        },
+        {
+          "timestamp": 1765935720.5466347,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/vr_ar_support.py"
+        },
+        {
+          "timestamp": 1765935720.5770166,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/__init__.py"
+        },
+        {
+          "timestamp": 1765935722.2820797,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/wifi_sensing_3d.py"
+        },
+        {
+          "timestamp": 1765935724.4145567,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/exploit_chain_3d.py"
+        },
+        {
+          "timestamp": 1765935724.5313618,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/data_flow_3d.py"
+        },
+        {
+          "timestamp": 1765935724.7700841,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/holographic_display.py"
+        },
+        {
+          "timestamp": 1765935725.1179802,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/engine_3d.py"
+        },
+        {
+          "timestamp": 1765935725.239331,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/network_topology_3d.py"
+        },
+        {
+          "timestamp": 1765935725.2742124,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/threat_globe_3d.py"
+        },
+        {
+          "timestamp": 1765935725.3374805,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/particle_system.py"
+        },
+        {
+          "timestamp": 1765935725.4960494,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/attack_path_3d.py"
+        },
+        {
+          "timestamp": 1765935725.5447338,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/dashboard.py"
+        },
+        {
+          "timestamp": 1765935725.7610192,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/credentials_page.py"
+        },
+        {
+          "timestamp": 1765935726.0711346,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/third_party_risk_page.py"
+        },
+        {
+          "timestamp": 1765935726.6176126,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/quantum_crypto_page.py"
+        },
+        {
+          "timestamp": 1765935726.6954138,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/ai_narrator_page.py"
+        },
+        {
+          "timestamp": 1765935742.735764,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/wifi_sensing_page.py"
+        },
+        {
+          "timestamp": 1765935775.9155467,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/vuln_correlation_page.py"
+        },
+        {
+          "timestamp": 1765935776.1034987,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/polymorphic_engine_page.py"
+        },
+        {
+          "timestamp": 1765935776.3206472,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/api_discovery_page.py"
+        },
+        {
+          "timestamp": 1765935776.4061956,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/vuln_management_page.py"
+        },
+        {
+          "timestamp": 1765935776.4681654,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/malware_analysis_page.py"
+        },
+        {
+          "timestamp": 1765935776.5349681,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/remediation_tracking_page.py"
+        },
+        {
+          "timestamp": 1765935776.71472,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/threat_modeling_page.py"
+        },
+        {
+          "timestamp": 1765935776.8783653,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/backup_assessment_page.py"
+        },
+        {
+          "timestamp": 1765935776.96721,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/plugin_manager_page.py"
+        },
+        {
+          "timestamp": 1765935777.0290053,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/api_security_page.py"
+        },
+        {
+          "timestamp": 1765935777.08822,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/blockchain_forensics_page.py"
+        },
+        {
+          "timestamp": 1765935777.167376,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/exploit_browser_page.py"
+        },
+        {
+          "timestamp": 1765935783.8282115,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/exploit_chain_page.py"
+        },
+        {
+          "timestamp": 1765935788.1413143,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/satellite_rf_intel_page.py"
+        },
+        {
+          "timestamp": 1765935788.1795795,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/targets_page.py"
+        },
+        {
+          "timestamp": 1765935788.2100186,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/config_baseline_page.py"
+        },
+        {
+          "timestamp": 1765935788.3337781,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/network_traffic_page.py"
+        },
+        {
+          "timestamp": 1765935788.5823407,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/attack_simulation_page.py"
+        },
+        {
+          "timestamp": 1765935789.0555377,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/adversarial_ml_page.py"
+        },
+        {
+          "timestamp": 1765935789.6434681,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/credential_spray_page.py"
+        },
+        {
+          "timestamp": 1765935789.903522,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/password_audit_page.py"
+        },
+        {
+          "timestamp": 1765935790.1254952,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/red_team_page.py"
+        },
+        {
+          "timestamp": 1765935790.1655743,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/deepfake_detection_page.py"
+        },
+        {
+          "timestamp": 1765935790.2124066,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/iot_exploitation_page.py"
+        },
+        {
+          "timestamp": 1765935790.2705474,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/c2_page.py"
+        },
+        {
+          "timestamp": 1765935790.572419,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/ai_analysis_page.py"
+        },
+        {
+          "timestamp": 1765935790.7503393,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/nmap_page.py"
+        },
+        {
+          "timestamp": 1765935791.0215962,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/zero_day_page.py"
+        },
+        {
+          "timestamp": 1765935791.3731482,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/deception_page.py"
+        },
+        {
+          "timestamp": 1765935791.4897923,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/subdomain_takeover_page.py"
+        },
+        {
+          "timestamp": 1765935791.814531,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/security_awareness_page.py"
+        },
+        {
+          "timestamp": 1765935792.3105264,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/patch_management_page.py"
+        },
+        {
+          "timestamp": 1765935792.4297132,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/asset_inventory_page.py"
+        },
+        {
+          "timestamp": 1765935792.5910149,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/threat_hunting_page.py"
+        },
+        {
+          "timestamp": 1765935792.784649,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/vulnerabilities_page.py"
+        },
+        {
+          "timestamp": 1765935793.6133842,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/osint_page.py"
+        },
+        {
+          "timestamp": 1765935793.7364337,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/__init__.py"
+        },
+        {
+          "timestamp": 1765935793.8050008,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/cognitive_threat_page.py"
+        },
+        {
+          "timestamp": 1765935793.8995976,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/graphql_page.py"
+        },
+        {
+          "timestamp": 1765935794.0369337,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/gamification_page.py"
+        },
+        {
+          "timestamp": 1765935794.386657,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/social_engineering_page.py"
+        },
+        {
+          "timestamp": 1765935794.6594453,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/compliance_audit_page.py"
+        },
+        {
+          "timestamp": 1765935794.8146634,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/mobile_security_page.py"
+        },
+        {
+          "timestamp": 1765935795.0563483,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/blue_team_page.py"
+        },
+        {
+          "timestamp": 1765935795.2699673,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/container_security_page.py"
+        },
+        {
+          "timestamp": 1765935795.557324,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/neural_exploit_page.py"
+        },
+        {
+          "timestamp": 1765935795.7737522,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/forensics_page.py"
+        },
+        {
+          "timestamp": 1765935795.9277456,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/evolutionary_exploit_page.py"
+        },
+        {
+          "timestamp": 1765935796.2049499,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/attack_surface_page.py"
+        },
+        {
+          "timestamp": 1765935796.45006,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/network_mapper_page.py"
+        },
+        {
+          "timestamp": 1765935796.6358345,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/cmdb_page.py"
+        },
+        {
+          "timestamp": 1765935796.7449636,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/bug_bounty_page.py"
+        },
+        {
+          "timestamp": 1765935796.8699434,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/reports_page.py"
+        },
+        {
+          "timestamp": 1765935797.2059567,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/settings_page.py"
+        },
+        {
+          "timestamp": 1765935797.4422915,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/network_pivoting_page.py"
+        },
+        {
+          "timestamp": 1765935797.4964864,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/autonomous_attack_page.py"
+        },
+        {
+          "timestamp": 1765935797.5609088,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/soar_page.py"
+        },
+        {
+          "timestamp": 1765935797.6621737,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/swarm_intelligence_page.py"
+        },
+        {
+          "timestamp": 1765935797.739131,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/collaboration_hub_page.py"
+        },
+        {
+          "timestamp": 1765935797.8689122,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/ad_attacks_page.py"
+        },
+        {
+          "timestamp": 1765935797.9634967,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/automation_page.py"
+        },
+        {
+          "timestamp": 1765935798.0259547,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/security_dashboard_page.py"
+        },
+        {
+          "timestamp": 1765935798.1734495,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/memory_forensics_page.py"
+        },
+        {
+          "timestamp": 1765935798.3028433,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/dlp_page.py"
+        },
+        {
+          "timestamp": 1765935798.3830035,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/secrets_page.py"
+        },
+        {
+          "timestamp": 1765935798.4987102,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/attack_replay_page.py"
+        },
+        {
+          "timestamp": 1765935798.6213531,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/risk_scoring_page.py"
+        },
+        {
+          "timestamp": 1765935798.7162461,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/hardware_implant_page.py"
+        },
+        {
+          "timestamp": 1765935798.7787762,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/threat_intel_page.py"
+        },
+        {
+          "timestamp": 1765935798.8473976,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/vuln_scanner_page.py"
+        },
+        {
+          "timestamp": 1765935798.9467802,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/pentest_report_page.py"
+        },
+        {
+          "timestamp": 1765935798.9979246,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/hash_cracker_page.py"
+        },
+        {
+          "timestamp": 1765935799.0802894,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/security_policy_page.py"
+        },
+        {
+          "timestamp": 1765935799.1881638,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/payload_generator_page.py"
+        },
+        {
+          "timestamp": 1765935799.250346,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/incident_response_page.py"
+        },
+        {
+          "timestamp": 1765935799.3725562,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/dark_web_intel_page.py"
+        },
+        {
+          "timestamp": 1765935799.4182189,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/access_control_page.py"
+        },
+        {
+          "timestamp": 1765935799.5542529,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/bcp_page.py"
+        },
+        {
+          "timestamp": 1765935799.6598241,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/browser_exploitation_page.py"
+        },
+        {
+          "timestamp": 1765935799.7169802,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/neural_fingerprint_page.py"
+        },
+        {
+          "timestamp": 1765935799.7787151,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/email_security_page.py"
+        },
+        {
+          "timestamp": 1765935799.9185042,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/wireless_attacks_page.py"
+        },
+        {
+          "timestamp": 1765935799.9976425,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/quantum_c2_page.py"
+        },
+        {
+          "timestamp": 1765935800.133303,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/cloud_security_page.py"
+        },
+        {
+          "timestamp": 1765935800.244603,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/audit_log_page.py"
+        },
+        {
+          "timestamp": 1765935800.4478216,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/attack_map_page.py"
+        },
+        {
+          "timestamp": 1765935801.1010149,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/security_architecture_page.py"
+        },
+        {
+          "timestamp": 1765935801.198337,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/stego_exfil_page.py"
+        },
+        {
+          "timestamp": 1765935801.330838,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/scada_security_page.py"
+        },
+        {
+          "timestamp": 1765935801.4290726,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/hydra_page.py"
+        },
+        {
+          "timestamp": 1765935801.5579028,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/zero_day_predictor_page.py"
+        },
+        {
+          "timestamp": 1765935801.654797,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/edr_evasion_page.py"
+        },
+        {
+          "timestamp": 1765935801.7370484,
+          "file": "/home/adam/hydra 1/hydrarecon/scanners/base.py"
+        },
+        {
+          "timestamp": 1765935801.9027817,
+          "file": "/home/adam/hydra 1/hydrarecon/scanners/osint_scanner.py"
+        },
+        {
+          "timestamp": 1765935802.129716,
+          "file": "/home/adam/hydra 1/hydrarecon/scanners/hydra_scanner.py"
+        },
+        {
+          "timestamp": 1765935802.2498176,
+          "file": "/home/adam/hydra 1/hydrarecon/scanners/nmap_scanner.py"
+        },
+        {
+          "timestamp": 1765935802.4543843,
+          "file": "/home/adam/hydra 1/hydrarecon/scanners/osint_advanced.py"
+        }
+      ]
+    },
+    "pass-in-except": {
+      "count": 75,
+      "contexts": [
+        {
+          "timestamp": 1765935687.0053809,
+          "file": "/home/adam/hydra 1/hydrarecon/run.py"
+        },
+        {
+          "timestamp": 1765935688.185754,
+          "file": "/home/adam/hydra 1/hydrarecon/core/scada_security.py"
+        },
+        {
+          "timestamp": 1765935691.9922607,
+          "file": "/home/adam/hydra 1/hydrarecon/core/wifi_sensing.py"
+        },
+        {
+          "timestamp": 1765935693.288113,
+          "file": "/home/adam/hydra 1/hydrarecon/core/graphql_scanner.py"
+        },
+        {
+          "timestamp": 1765935693.9101326,
+          "file": "/home/adam/hydra 1/hydrarecon/core/hardware_integration.py"
+        },
+        {
+          "timestamp": 1765935694.0060084,
+          "file": "/home/adam/hydra 1/hydrarecon/core/plugin_system.py"
+        },
+        {
+          "timestamp": 1765935694.295166,
+          "file": "/home/adam/hydra 1/hydrarecon/core/api_security.py"
+        },
+        {
+          "timestamp": 1765935695.694094,
+          "file": "/home/adam/hydra 1/hydrarecon/core/api_discovery.py"
+        },
+        {
+          "timestamp": 1765935695.9749353,
+          "file": "/home/adam/hydra 1/hydrarecon/core/blockchain_evidence.py"
+        },
+        {
+          "timestamp": 1765935696.6955614,
+          "file": "/home/adam/hydra 1/hydrarecon/core/satellite_rf_intel.py"
+        },
+        {
+          "timestamp": 1765935696.8607152,
+          "file": "/home/adam/hydra 1/hydrarecon/core/dark_web_intel.py"
+        },
+        {
+          "timestamp": 1765935698.7144995,
+          "file": "/home/adam/hydra 1/hydrarecon/core/soar.py"
+        },
+        {
+          "timestamp": 1765935699.0867968,
+          "file": "/home/adam/hydra 1/hydrarecon/core/audit_log.py"
+        },
+        {
+          "timestamp": 1765935699.1590743,
+          "file": "/home/adam/hydra 1/hydrarecon/core/attack_simulation.py"
+        },
+        {
+          "timestamp": 1765935699.3381705,
+          "file": "/home/adam/hydra 1/hydrarecon/core/incident_response_automation.py"
+        },
+        {
+          "timestamp": 1765935700.0031796,
+          "file": "/home/adam/hydra 1/hydrarecon/core/memory_forensics.py"
+        },
+        {
+          "timestamp": 1765935700.1689835,
+          "file": "/home/adam/hydra 1/hydrarecon/core/biometric_security.py"
+        },
+        {
+          "timestamp": 1765935700.905016,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_iot_security.py"
+        },
+        {
+          "timestamp": 1765935701.5326817,
+          "file": "/home/adam/hydra 1/hydrarecon/core/threat_hunting.py"
+        },
+        {
+          "timestamp": 1765935702.314715,
+          "file": "/home/adam/hydra 1/hydrarecon/core/edr_evasion.py"
+        },
+        {
+          "timestamp": 1765935702.5962386,
+          "file": "/home/adam/hydra 1/hydrarecon/core/network_traffic.py"
+        },
+        {
+          "timestamp": 1765935702.8730333,
+          "file": "/home/adam/hydra 1/hydrarecon/core/secrets_scanner.py"
+        },
+        {
+          "timestamp": 1765935703.1379604,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_api_security.py"
+        },
+        {
+          "timestamp": 1765935703.4067538,
+          "file": "/home/adam/hydra 1/hydrarecon/core/iot_exploitation.py"
+        },
+        {
+          "timestamp": 1765935703.6625524,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_wireless_security.py"
+        },
+        {
+          "timestamp": 1765935704.0417247,
+          "file": "/home/adam/hydra 1/hydrarecon/core/cloud_posture_management.py"
+        },
+        {
+          "timestamp": 1765935704.2532861,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_firmware_analysis.py"
+        },
+        {
+          "timestamp": 1765935704.998573,
+          "file": "/home/adam/hydra 1/hydrarecon/core/container_security.py"
+        },
+        {
+          "timestamp": 1765935705.679892,
+          "file": "/home/adam/hydra 1/hydrarecon/core/drone_integration.py"
+        },
+        {
+          "timestamp": 1765935706.097475,
+          "file": "/home/adam/hydra 1/hydrarecon/core/zero_day_framework.py"
+        },
+        {
+          "timestamp": 1765935707.0418367,
+          "file": "/home/adam/hydra 1/hydrarecon/core/network_attack_simulation.py"
+        },
+        {
+          "timestamp": 1765935707.3853474,
+          "file": "/home/adam/hydra 1/hydrarecon/core/asset_inventory.py"
+        },
+        {
+          "timestamp": 1765935707.562361,
+          "file": "/home/adam/hydra 1/hydrarecon/core/cognitive_threat_engine.py"
+        },
+        {
+          "timestamp": 1765935708.055299,
+          "file": "/home/adam/hydra 1/hydrarecon/core/network_pivoting.py"
+        },
+        {
+          "timestamp": 1765935708.419101,
+          "file": "/home/adam/hydra 1/hydrarecon/core/c2_framework.py"
+        },
+        {
+          "timestamp": 1765935708.923625,
+          "file": "/home/adam/hydra 1/hydrarecon/core/mobile_security.py"
+        },
+        {
+          "timestamp": 1765935709.7559173,
+          "file": "/home/adam/hydra 1/hydrarecon/core/realtime_collaboration.py"
+        },
+        {
+          "timestamp": 1765935709.8689966,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_mobile_security.py"
+        },
+        {
+          "timestamp": 1765935710.8377154,
+          "file": "/home/adam/hydra 1/hydrarecon/core/ics_scada_security.py"
+        },
+        {
+          "timestamp": 1765935711.0574017,
+          "file": "/home/adam/hydra 1/hydrarecon/core/ad_attacks.py"
+        },
+        {
+          "timestamp": 1765935711.8714862,
+          "file": "/home/adam/hydra 1/hydrarecon/core/network_mapper.py"
+        },
+        {
+          "timestamp": 1765935712.3221035,
+          "file": "/home/adam/hydra 1/hydrarecon/core/credential_spray.py"
+        },
+        {
+          "timestamp": 1765935712.4374049,
+          "file": "/home/adam/hydra 1/hydrarecon/core/payload_generator.py"
+        },
+        {
+          "timestamp": 1765935713.1602547,
+          "file": "/home/adam/hydra 1/hydrarecon/core/malware_analysis.py"
+        },
+        {
+          "timestamp": 1765935713.4020824,
+          "file": "/home/adam/hydra 1/hydrarecon/core/exploit_browser.py"
+        },
+        {
+          "timestamp": 1765935714.0706148,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_dns_security.py"
+        },
+        {
+          "timestamp": 1765935714.7543745,
+          "file": "/home/adam/hydra 1/hydrarecon/core/forensics.py"
+        },
+        {
+          "timestamp": 1765935715.3203754,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_malware_sandbox.py"
+        },
+        {
+          "timestamp": 1765935715.9091809,
+          "file": "/home/adam/hydra 1/hydrarecon/core/autonomous_attack.py"
+        },
+        {
+          "timestamp": 1765935716.2838,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_memory_forensics.py"
+        },
+        {
+          "timestamp": 1765935716.4311607,
+          "file": "/home/adam/hydra 1/hydrarecon/core/hardware_implant.py"
+        },
+        {
+          "timestamp": 1765935716.7827332,
+          "file": "/home/adam/hydra 1/hydrarecon/core/browser_exploitation.py"
+        },
+        {
+          "timestamp": 1765935718.0122404,
+          "file": "/home/adam/hydra 1/hydrarecon/core/live_attack_map.py"
+        },
+        {
+          "timestamp": 1765935718.2305503,
+          "file": "/home/adam/hydra 1/hydrarecon/core/wireless_attacks.py"
+        },
+        {
+          "timestamp": 1765935718.503289,
+          "file": "/home/adam/hydra 1/hydrarecon/core/hash_cracker.py"
+        },
+        {
+          "timestamp": 1765935718.7645853,
+          "file": "/home/adam/hydra 1/hydrarecon/core/threat_intel.py"
+        },
+        {
+          "timestamp": 1765935719.1195772,
+          "file": "/home/adam/hydra 1/hydrarecon/core/patch_management.py"
+        },
+        {
+          "timestamp": 1765935719.4063208,
+          "file": "/home/adam/hydra 1/hydrarecon/core/security_dashboard.py"
+        },
+        {
+          "timestamp": 1765935724.2077918,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/wifi_sensing_3d.py"
+        },
+        {
+          "timestamp": 1765935725.4315143,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/particle_system.py"
+        },
+        {
+          "timestamp": 1765935726.4141004,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/third_party_risk_page.py"
+        },
+        {
+          "timestamp": 1765935775.4929388,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/wifi_sensing_page.py"
+        },
+        {
+          "timestamp": 1765935776.5694478,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/remediation_tracking_page.py"
+        },
+        {
+          "timestamp": 1765935788.0740094,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/exploit_chain_page.py"
+        },
+        {
+          "timestamp": 1765935789.350861,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/adversarial_ml_page.py"
+        },
+        {
+          "timestamp": 1765935792.101867,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/security_awareness_page.py"
+        },
+        {
+          "timestamp": 1765935793.2414064,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/vulnerabilities_page.py"
+        },
+        {
+          "timestamp": 1765935797.0833461,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/reports_page.py"
+        },
+        {
+          "timestamp": 1765935798.0900073,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/security_dashboard_page.py"
+        },
+        {
+          "timestamp": 1765935800.3427436,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/audit_log_page.py"
+        },
+        {
+          "timestamp": 1765935800.8932269,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/attack_map_page.py"
+        },
+        {
+          "timestamp": 1765935801.7849083,
+          "file": "/home/adam/hydra 1/hydrarecon/scanners/base.py"
+        },
+        {
+          "timestamp": 1765935802.050016,
+          "file": "/home/adam/hydra 1/hydrarecon/scanners/osint_scanner.py"
+        },
+        {
+          "timestamp": 1765935802.1856735,
+          "file": "/home/adam/hydra 1/hydrarecon/scanners/hydra_scanner.py"
+        },
+        {
+          "timestamp": 1765935802.776675,
+          "file": "/home/adam/hydra 1/hydrarecon/scanners/osint_advanced.py"
+        }
+      ]
+    },
+    "bare-except": {
+      "count": 44,
+      "contexts": [
+        {
+          "timestamp": 1765935687.509741,
+          "file": "/home/adam/hydra 1/hydrarecon/wifi_sensing_app.py"
+        },
+        {
+          "timestamp": 1765935688.5620396,
+          "file": "/home/adam/hydra 1/hydrarecon/core/exploit_framework.py"
+        },
+        {
+          "timestamp": 1765935688.7586522,
+          "file": "/home/adam/hydra 1/hydrarecon/core/polymorphic_engine.py"
+        },
+        {
+          "timestamp": 1765935691.0184777,
+          "file": "/home/adam/hydra 1/hydrarecon/core/wifi_sensing.py"
+        },
+        {
+          "timestamp": 1765935693.2686148,
+          "file": "/home/adam/hydra 1/hydrarecon/core/graphql_scanner.py"
+        },
+        {
+          "timestamp": 1765935694.220303,
+          "file": "/home/adam/hydra 1/hydrarecon/core/api_security.py"
+        },
+        {
+          "timestamp": 1765935694.69399,
+          "file": "/home/adam/hydra 1/hydrarecon/core/attack_replay.py"
+        },
+        {
+          "timestamp": 1765935696.8426886,
+          "file": "/home/adam/hydra 1/hydrarecon/core/dark_web_intel.py"
+        },
+        {
+          "timestamp": 1765935698.024149,
+          "file": "/home/adam/hydra 1/hydrarecon/core/soar.py"
+        },
+        {
+          "timestamp": 1765935699.1379223,
+          "file": "/home/adam/hydra 1/hydrarecon/core/attack_simulation.py"
+        },
+        {
+          "timestamp": 1765935699.9268312,
+          "file": "/home/adam/hydra 1/hydrarecon/core/memory_forensics.py"
+        },
+        {
+          "timestamp": 1765935701.3151472,
+          "file": "/home/adam/hydra 1/hydrarecon/core/threat_hunting.py"
+        },
+        {
+          "timestamp": 1765935702.2579248,
+          "file": "/home/adam/hydra 1/hydrarecon/core/edr_evasion.py"
+        },
+        {
+          "timestamp": 1765935702.531326,
+          "file": "/home/adam/hydra 1/hydrarecon/core/network_traffic.py"
+        },
+        {
+          "timestamp": 1765935703.3427076,
+          "file": "/home/adam/hydra 1/hydrarecon/core/iot_exploitation.py"
+        },
+        {
+          "timestamp": 1765935704.1436107,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_firmware_analysis.py"
+        },
+        {
+          "timestamp": 1765935704.803734,
+          "file": "/home/adam/hydra 1/hydrarecon/core/container_security.py"
+        },
+        {
+          "timestamp": 1765935706.3263206,
+          "file": "/home/adam/hydra 1/hydrarecon/core/security_utils.py"
+        },
+        {
+          "timestamp": 1765935706.8788686,
+          "file": "/home/adam/hydra 1/hydrarecon/core/network_attack_simulation.py"
+        },
+        {
+          "timestamp": 1765935707.3485456,
+          "file": "/home/adam/hydra 1/hydrarecon/core/asset_inventory.py"
+        },
+        {
+          "timestamp": 1765935708.8291264,
+          "file": "/home/adam/hydra 1/hydrarecon/core/mobile_security.py"
+        },
+        {
+          "timestamp": 1765935709.8359728,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_mobile_security.py"
+        },
+        {
+          "timestamp": 1765935710.7781215,
+          "file": "/home/adam/hydra 1/hydrarecon/core/ics_scada_security.py"
+        },
+        {
+          "timestamp": 1765935711.033472,
+          "file": "/home/adam/hydra 1/hydrarecon/core/ad_attacks.py"
+        },
+        {
+          "timestamp": 1765935711.281698,
+          "file": "/home/adam/hydra 1/hydrarecon/core/vuln_scanner.py"
+        },
+        {
+          "timestamp": 1765935712.9590683,
+          "file": "/home/adam/hydra 1/hydrarecon/core/malware_analysis.py"
+        },
+        {
+          "timestamp": 1765935714.1982257,
+          "file": "/home/adam/hydra 1/hydrarecon/core/config.py"
+        },
+        {
+          "timestamp": 1765935715.2415423,
+          "file": "/home/adam/hydra 1/hydrarecon/core/advanced_malware_sandbox.py"
+        },
+        {
+          "timestamp": 1765935715.8172364,
+          "file": "/home/adam/hydra 1/hydrarecon/core/autonomous_attack.py"
+        },
+        {
+          "timestamp": 1765935717.159896,
+          "file": "/home/adam/hydra 1/hydrarecon/core/supply_chain_security.py"
+        },
+        {
+          "timestamp": 1765935719.3692758,
+          "file": "/home/adam/hydra 1/hydrarecon/core/security_dashboard.py"
+        },
+        {
+          "timestamp": 1765935723.3885913,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/visualization_3d/wifi_sensing_3d.py"
+        },
+        {
+          "timestamp": 1765935764.2882383,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/wifi_sensing_page.py"
+        },
+        {
+          "timestamp": 1765935776.2401743,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/polymorphic_engine_page.py"
+        },
+        {
+          "timestamp": 1765935786.995577,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/exploit_chain_page.py"
+        },
+        {
+          "timestamp": 1765935788.842265,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/attack_simulation_page.py"
+        },
+        {
+          "timestamp": 1765935789.154999,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/adversarial_ml_page.py"
+        },
+        {
+          "timestamp": 1765935792.9789727,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/vulnerabilities_page.py"
+        },
+        {
+          "timestamp": 1765935796.9903345,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/reports_page.py"
+        },
+        {
+          "timestamp": 1765935799.2041633,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/payload_generator_page.py"
+        },
+        {
+          "timestamp": 1765935800.3036623,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/audit_log_page.py"
+        },
+        {
+          "timestamp": 1765935800.6593509,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/attack_map_page.py"
+        },
+        {
+          "timestamp": 1765935801.974884,
+          "file": "/home/adam/hydra 1/hydrarecon/scanners/osint_scanner.py"
+        },
+        {
+          "timestamp": 1765935802.6692474,
+          "file": "/home/adam/hydra 1/hydrarecon/scanners/osint_advanced.py"
+        }
+      ]
+    },
+    "multiple-blank-lines": {
+      "count": 1,
+      "contexts": [
+        {
+          "timestamp": 1765935754.8392534,
+          "file": "/home/adam/hydra 1/hydrarecon/gui/pages/wifi_sensing_page.py"
+        }
+      ]
+    },
+    "docstrings": {
+      "count": 369,
+      "contexts": [
+        {
+          "timestamp": 1765936297.930195,
+          "file": "core/config_baseline.py"
+        },
+        {
+          "timestamp": 1765936298.1713223,
+          "file": "core/wireless_attacks.py"
+        },
+        {
+          "timestamp": 1765936298.2263222,
+          "file": "gui/pages/hash_cracker_page.py"
+        },
+        {
+          "timestamp": 1765936298.2643795,
+          "file": "gui/pages/network_traffic_page.py"
+        },
+        {
+          "timestamp": 1765936298.2827535,
+          "file": "gui/pages/ai_narrator_page.py"
+        },
+        {
+          "timestamp": 1765936298.3193161,
+          "file": "core/ics_scada_security.py"
+        },
+        {
+          "timestamp": 1765936300.2240002,
+          "file": "gui/pages/exploit_chain_page.py"
+        },
+        {
+          "timestamp": 1765936300.2737014,
+          "file": "gui/pages/vuln_management_page.py"
+        },
+        {
+          "timestamp": 1765936330.7319813,
+          "file": "gui/pages/pentest_report_page.py"
+        },
+        {
+          "timestamp": 1765936330.7694933,
+          "file": "core/dlp.py"
+        },
+        {
+          "timestamp": 1765936330.8607042,
+          "file": "core/third_party_risk.py"
+        },
+        {
+          "timestamp": 1765936330.9540222,
+          "file": "core/biometric_security.py"
+        },
+        {
+          "timestamp": 1765936331.005094,
+          "file": "core/automation.py"
+        },
+        {
+          "timestamp": 1765936331.1637936,
+          "file": "gui/pages/bcp_page.py"
+        },
+        {
+          "timestamp": 1765936331.2333014,
+          "file": "core/quantum_security.py"
+        },
+        {
+          "timestamp": 1765936331.2801857,
+          "file": "gui/pages/ai_narrator_page.py"
+        },
+        {
+          "timestamp": 1765936361.691993,
+          "file": "core/container_security.py"
+        },
+        {
+          "timestamp": 1765936361.7370481,
+          "file": "scanners/hydra_scanner.py"
+        },
+        {
+          "timestamp": 1765936361.7778716,
+          "file": "core/security_policy.py"
+        },
+        {
+          "timestamp": 1765936361.798953,
+          "file": "core/security_dashboard.py"
+        },
+        {
+          "timestamp": 1765936361.8146393,
+          "file": "gui/pages/dashboard.py"
+        },
+        {
+          "timestamp": 1765936361.8503525,
+          "file": "core/cognitive_threat_engine.py"
+        },
+        {
+          "timestamp": 1765936361.8702183,
+          "file": "core/risk_scoring.py"
+        },
+        {
+          "timestamp": 1765936361.8931494,
+          "file": "gui/pages/network_traffic_page.py"
+        },
+        {
+          "timestamp": 1765936392.1588347,
+          "file": "wifi_sensing_app.py"
+        },
+        {
+          "timestamp": 1765936392.1955245,
+          "file": "gui/visualizations.py"
+        },
+        {
+          "timestamp": 1765936392.2020094,
+          "file": "core/logger.py"
+        },
+        {
+          "timestamp": 1765936392.2265258,
+          "file": "core/advanced_firmware_analysis.py"
+        },
+        {
+          "timestamp": 1765936392.2460108,
+          "file": "gui/pages/cognitive_threat_page.py"
+        },
+        {
+          "timestamp": 1765936392.2697945,
+          "file": "core/network_traffic.py"
+        },
+        {
+          "timestamp": 1765936392.2877736,
+          "file": "gui/pages/neural_exploit_page.py"
+        },
+        {
+          "timestamp": 1765936422.8469641,
+          "file": "core/asset_inventory.py"
+        },
+        {
+          "timestamp": 1765936422.9030042,
+          "file": "gui/pages/network_pivoting_page.py"
+        },
+        {
+          "timestamp": 1765936422.9380665,
+          "file": "gui/pages/nmap_page.py"
+        },
+        {
+          "timestamp": 1765936422.9765112,
+          "file": "gui/visualization_3d/data_flow_3d.py"
+        },
+        {
+          "timestamp": 1765936423.0881267,
+          "file": "core/memory_forensics.py"
+        },
+        {
+          "timestamp": 1765936423.2105193,
+          "file": "core/patch_management.py"
+        },
+        {
+          "timestamp": 1765936423.3021622,
+          "file": "gui/pages/cloud_security_page.py"
+        },
+        {
+          "timestamp": 1765936423.3206692,
+          "file": "test_esp32_serial.py"
+        },
+        {
+          "timestamp": 1765936453.7310853,
+          "file": "core/drone_integration.py"
+        },
+        {
+          "timestamp": 1765936453.7613587,
+          "file": "core/collaboration_hub.py"
+        },
+        {
+          "timestamp": 1765936453.7742128,
+          "file": "core/exploit_framework.py"
+        },
+        {
+          "timestamp": 1765936453.792263,
+          "file": "gui/pages/hardware_implant_page.py"
+        },
+        {
+          "timestamp": 1765936453.8046806,
+          "file": "gui/pages/subdomain_takeover_page.py"
+        },
+        {
+          "timestamp": 1765936453.8239186,
+          "file": "core/network_pivoting.py"
+        },
+        {
+          "timestamp": 1765936453.839269,
+          "file": "core/collaboration.py"
+        },
+        {
+          "timestamp": 1765936453.8688002,
+          "file": "core/mobile_security.py"
+        },
+        {
+          "timestamp": 1765936484.1293864,
+          "file": "test_esp32_advanced.py"
+        },
+        {
+          "timestamp": 1765936484.1728728,
+          "file": "gui/pages/email_security_page.py"
+        },
+        {
+          "timestamp": 1765936484.1848285,
+          "file": "gui/pages/api_discovery_page.py"
+        },
+        {
+          "timestamp": 1765936484.2125654,
+          "file": "gui/pages/hash_cracker_page.py"
+        },
+        {
+          "timestamp": 1765936484.2752461,
+          "file": "gui/visualization_3d/engine_3d.py"
+        },
+        {
+          "timestamp": 1765936484.3029807,
+          "file": "core/advanced_ssl_security.py"
+        },
+        {
+          "timestamp": 1765936484.3189466,
+          "file": "gui/pages/stego_exfil_page.py"
+        },
+        {
+          "timestamp": 1765936514.5929804,
+          "file": "core/polymorphic_engine.py"
+        },
+        {
+          "timestamp": 1765936514.616524,
+          "file": "core/payload_generator.py"
+        },
+        {
+          "timestamp": 1765936514.6417406,
+          "file": "core/hardware_integration.py"
+        },
+        {
+          "timestamp": 1765936514.666012,
+          "file": "core/neural_exploit_engine.py"
+        },
+        {
+          "timestamp": 1765936514.6880686,
+          "file": "core/drone_integration.py"
+        },
+        {
+          "timestamp": 1765936514.7123592,
+          "file": "wifi_sensing_app.py"
+        },
+        {
+          "timestamp": 1765936514.7404268,
+          "file": "gui/pages/ad_attacks_page.py"
+        },
+        {
+          "timestamp": 1765936545.0665119,
+          "file": "core/bug_bounty_copilot.py"
+        },
+        {
+          "timestamp": 1765936545.0962543,
+          "file": "gui/pages/cognitive_threat_page.py"
+        },
+        {
+          "timestamp": 1765936545.1375823,
+          "file": "core/data_sources.py"
+        },
+        {
+          "timestamp": 1765936545.1537468,
+          "file": "gui/pages/graphql_page.py"
+        },
+        {
+          "timestamp": 1765936545.169715,
+          "file": "core/neural_interface.py"
+        },
+        {
+          "timestamp": 1765936545.2382898,
+          "file": "core/advanced_ad_security.py"
+        },
+        {
+          "timestamp": 1765936575.4720192,
+          "file": "core/adversarial_ml.py"
+        },
+        {
+          "timestamp": 1765936575.506476,
+          "file": "core/bcp.py"
+        },
+        {
+          "timestamp": 1765936575.5304618,
+          "file": "gui/pages/autonomous_attack_page.py"
+        },
+        {
+          "timestamp": 1765936575.5762148,
+          "file": "core/network_mapper.py"
+        },
+        {
+          "timestamp": 1765936575.6209714,
+          "file": "core/wireless_attacks.py"
+        },
+        {
+          "timestamp": 1765936575.687596,
+          "file": "core/secrets_scanner.py"
+        },
+        {
+          "timestamp": 1765936575.7054536,
+          "file": "core/voice_control.py"
+        },
+        {
+          "timestamp": 1765936575.724709,
+          "file": "gui/pages/nmap_page.py"
+        },
+        {
+          "timestamp": 1765936606.0005553,
+          "file": "core/ai_threat_narrator.py"
+        },
+        {
+          "timestamp": 1765936606.0189562,
+          "file": "gui/pages/email_security_page.py"
+        },
+        {
+          "timestamp": 1765936606.0473447,
+          "file": "gui/pages/ad_attacks_page.py"
+        },
+        {
+          "timestamp": 1765936606.0622528,
+          "file": "gui/pages/network_mapper_page.py"
+        },
+        {
+          "timestamp": 1765936606.0867574,
+          "file": "core/vuln_correlation.py"
+        },
+        {
+          "timestamp": 1765936606.1107311,
+          "file": "gui/pages/cloud_security_page.py"
+        },
+        {
+          "timestamp": 1765936606.1267161,
+          "file": "gui/visualization_3d/threat_globe_3d.py"
+        },
+        {
+          "timestamp": 1765936606.1450684,
+          "file": "gui/pages/automation_page.py"
+        },
+        {
+          "timestamp": 1765936636.6760254,
+          "file": "gui/pages/forensics_page.py"
+        },
+        {
+          "timestamp": 1765936636.7286909,
+          "file": "gui/pages/satellite_rf_intel_page.py"
+        },
+        {
+          "timestamp": 1765936636.7808967,
+          "file": "gui/pages/threat_hunting_page.py"
+        },
+        {
+          "timestamp": 1765936636.7942603,
+          "file": "core/ai_assistant.py"
+        },
+        {
+          "timestamp": 1765936636.8295038,
+          "file": "gui/visualization_3d/holographic_display.py"
+        },
+        {
+          "timestamp": 1765936636.8628995,
+          "file": "gui/pages/audit_log_page.py"
+        },
+        {
+          "timestamp": 1765936636.8886523,
+          "file": "core/quantum_crypto.py"
+        },
+        {
+          "timestamp": 1765936636.9051518,
+          "file": "gui/pages/graphql_page.py"
+        },
+        {
+          "timestamp": 1765936667.1507912,
+          "file": "gui/pages/cognitive_threat_page.py"
+        },
+        {
+          "timestamp": 1765936667.1769063,
+          "file": "core/attack_simulation.py"
+        },
+        {
+          "timestamp": 1765936667.2111766,
+          "file": "core/hardware_integration.py"
+        },
+        {
+          "timestamp": 1765936667.2416735,
+          "file": "core/graphql_scanner.py"
+        },
+        {
+          "timestamp": 1765936667.292847,
+          "file": "core/advanced_iot_security.py"
+        },
+        {
+          "timestamp": 1765936667.3220992,
+          "file": "core/cmdb.py"
+        },
+        {
+          "timestamp": 1765936667.342734,
+          "file": "gui/pages/satellite_rf_intel_page.py"
+        },
+        {
+          "timestamp": 1765936667.3639307,
+          "file": "gui/pages/vulnerabilities_page.py"
+        },
+        {
+          "timestamp": 1765936697.931956,
+          "file": "core/autonomous_attack.py"
+        },
+        {
+          "timestamp": 1765936697.9561589,
+          "file": "gui/pages/scada_security_page.py"
+        },
+        {
+          "timestamp": 1765936697.9791005,
+          "file": "core/exploit_browser.py"
+        },
+        {
+          "timestamp": 1765936698.0130284,
+          "file": "gui/pages/cmdb_page.py"
+        },
+        {
+          "timestamp": 1765936698.038944,
+          "file": "gui/pages/api_security_page.py"
+        },
+        {
+          "timestamp": 1765936698.062222,
+          "file": "core/voice_control.py"
+        },
+        {
+          "timestamp": 1765936698.0920093,
+          "file": "core/forensics.py"
+        },
+        {
+          "timestamp": 1765936698.1142423,
+          "file": "gui/pages/adversarial_ml_page.py"
+        },
+        {
+          "timestamp": 1765936728.3735454,
+          "file": "gui/pages/automation_page.py"
+        },
+        {
+          "timestamp": 1765936728.3909123,
+          "file": "gui/pages/collaboration_hub_page.py"
+        },
+        {
+          "timestamp": 1765936728.4187276,
+          "file": "gui/pages/attack_replay_page.py"
+        },
+        {
+          "timestamp": 1765936728.4315262,
+          "file": "gui/pages/neural_fingerprint_page.py"
+        },
+        {
+          "timestamp": 1765936728.461865,
+          "file": "scanners/osint_advanced.py"
+        },
+        {
+          "timestamp": 1765936728.4999576,
+          "file": "gui/pages/mobile_security_page.py"
+        },
+        {
+          "timestamp": 1765936728.5339751,
+          "file": "core/polymorphic_engine.py"
+        },
+        {
+          "timestamp": 1765936728.5830812,
+          "file": "core/cmdb.py"
+        },
+        {
+          "timestamp": 1765936758.880045,
+          "file": "core/neural_interface.py"
+        },
+        {
+          "timestamp": 1765936758.8981957,
+          "file": "gui/pages/subdomain_takeover_page.py"
+        },
+        {
+          "timestamp": 1765936758.9195783,
+          "file": "core/plugin_system.py"
+        },
+        {
+          "timestamp": 1765936758.950533,
+          "file": "core/swarm_intelligence.py"
+        },
+        {
+          "timestamp": 1765936758.983087,
+          "file": "gui/pages/iot_exploitation_page.py"
+        },
+        {
+          "timestamp": 1765936758.9905074,
+          "file": "test_esp32_integration.py"
+        },
+        {
+          "timestamp": 1765936759.0099113,
+          "file": "gui/pages/hydra_page.py"
+        },
+        {
+          "timestamp": 1765936759.0493345,
+          "file": "core/exploit_browser.py"
+        },
+        {
+          "timestamp": 1765936789.307962,
+          "file": "gui/pages/satellite_rf_intel_page.py"
+        },
+        {
+          "timestamp": 1765936789.3455322,
+          "file": "core/asset_inventory.py"
+        },
+        {
+          "timestamp": 1765936789.3782701,
+          "file": "core/advanced_database_security.py"
+        },
+        {
+          "timestamp": 1765936789.4000807,
+          "file": "gui/notifications.py"
+        },
+        {
+          "timestamp": 1765936789.434686,
+          "file": "core/advanced_mobile_security.py"
+        },
+        {
+          "timestamp": 1765936789.4505126,
+          "file": "gui/pages/gamification_page.py"
+        },
+        {
+          "timestamp": 1765936789.473545,
+          "file": "gui/visualization_3d/network_topology_3d.py"
+        },
+        {
+          "timestamp": 1765936789.4884548,
+          "file": "gui/pages/evolutionary_exploit_page.py"
+        },
+        {
+          "timestamp": 1765936819.7336495,
+          "file": "gui/pages/compliance_audit_page.py"
+        },
+        {
+          "timestamp": 1765936819.7772503,
+          "file": "gui/pages/vuln_correlation_page.py"
+        },
+        {
+          "timestamp": 1765936819.8111854,
+          "file": "core/neural_fingerprint.py"
+        },
+        {
+          "timestamp": 1765936819.845539,
+          "file": "core/advanced_traffic_analysis.py"
+        },
+        {
+          "timestamp": 1765936819.8729563,
+          "file": "core/advanced_wireless_security.py"
+        },
+        {
+          "timestamp": 1765936819.9096942,
+          "file": "gui/pages/incident_response_page.py"
+        },
+        {
+          "timestamp": 1765936819.9384036,
+          "file": "core/advanced_mobile_security.py"
+        },
+        {
+          "timestamp": 1765936819.9733264,
+          "file": "gui/pages/ai_analysis_page.py"
+        },
+        {
+          "timestamp": 1765936850.2437127,
+          "file": "gui/pages/remediation_tracking_page.py"
+        },
+        {
+          "timestamp": 1765936850.2932715,
+          "file": "core/logger.py"
+        },
+        {
+          "timestamp": 1765936850.3045561,
+          "file": "core/security_utils.py"
+        },
+        {
+          "timestamp": 1765936850.3312519,
+          "file": "gui/pages/osint_page.py"
+        },
+        {
+          "timestamp": 1765936850.3608575,
+          "file": "gui/visualization_3d/vr_ar_support.py"
+        },
+        {
+          "timestamp": 1765936850.394258,
+          "file": "gui/pages/ai_analysis_page.py"
+        },
+        {
+          "timestamp": 1765936850.4188287,
+          "file": "core/advanced_wireless_security.py"
+        },
+        {
+          "timestamp": 1765936884.2736332,
+          "file": "core/attack_replay.py"
+        },
+        {
+          "timestamp": 1765936884.2925882,
+          "file": "gui/pages/collaboration_hub_page.py"
+        },
+        {
+          "timestamp": 1765936884.318411,
+          "file": "core/advanced_reporting.py"
+        },
+        {
+          "timestamp": 1765936884.337196,
+          "file": "gui/pages/nmap_page.py"
+        },
+        {
+          "timestamp": 1765936884.3816128,
+          "file": "gui/pages/quantum_crypto_page.py"
+        },
+        {
+          "timestamp": 1765936884.4083035,
+          "file": "gui/pages/plugin_manager_page.py"
+        },
+        {
+          "timestamp": 1765936884.4265842,
+          "file": "core/compliance_audit.py"
+        },
+        {
+          "timestamp": 1765936915.0373425,
+          "file": "core/voice_control.py"
+        },
+        {
+          "timestamp": 1765936915.0604103,
+          "file": "core/ics_scada_security.py"
+        },
+        {
+          "timestamp": 1765936915.093838,
+          "file": "gui/pages/mobile_security_page.py"
+        },
+        {
+          "timestamp": 1765936915.156727,
+          "file": "gui/pages/scada_security_page.py"
+        },
+        {
+          "timestamp": 1765936915.2479103,
+          "file": "gui/pages/security_architecture_page.py"
+        },
+        {
+          "timestamp": 1765936915.266911,
+          "file": "core/ai_engine.py"
+        },
+        {
+          "timestamp": 1765936915.2922413,
+          "file": "core/zero_day_framework.py"
+        },
+        {
+          "timestamp": 1765936915.338417,
+          "file": "gui/pages/blue_team_page.py"
+        },
+        {
+          "timestamp": 1765936945.5798762,
+          "file": "gui/splash_screen.py"
+        },
+        {
+          "timestamp": 1765936945.6147838,
+          "file": "core/advanced_malware_sandbox.py"
+        },
+        {
+          "timestamp": 1765936945.662069,
+          "file": "gui/visualization_3d/vr_ar_support.py"
+        },
+        {
+          "timestamp": 1765936945.6917098,
+          "file": "core/biometric_security.py"
+        },
+        {
+          "timestamp": 1765936945.711416,
+          "file": "gui/pages/credential_spray_page.py"
+        },
+        {
+          "timestamp": 1765936945.7513232,
+          "file": "gui/pages/osint_page.py"
+        },
+        {
+          "timestamp": 1765936945.790133,
+          "file": "core/backup_assessment.py"
+        },
+        {
+          "timestamp": 1765936945.822158,
+          "file": "gui/pages/dark_web_intel_page.py"
+        },
+        {
+          "timestamp": 1765936976.1239767,
+          "file": "gui/pages/asset_inventory_page.py"
+        },
+        {
+          "timestamp": 1765936976.158246,
+          "file": "core/api_discovery.py"
+        },
+        {
+          "timestamp": 1765936976.1951196,
+          "file": "core/api_security.py"
+        },
+        {
+          "timestamp": 1765936976.223575,
+          "file": "gui/pages/cognitive_threat_page.py"
+        },
+        {
+          "timestamp": 1765936976.232859,
+          "file": "test_esp32_advanced.py"
+        },
+        {
+          "timestamp": 1765936976.2638147,
+          "file": "gui/pages/iot_exploitation_page.py"
+        },
+        {
+          "timestamp": 1765936976.3057852,
+          "file": "wifi_sensing_app.py"
+        },
+        {
+          "timestamp": 1765936976.3247557,
+          "file": "core/subdomain_takeover.py"
+        },
+        {
+          "timestamp": 1765937006.5639997,
+          "file": "gui/pages/quantum_c2_page.py"
+        },
+        {
+          "timestamp": 1765937006.5975833,
+          "file": "gui/pages/config_baseline_page.py"
+        },
+        {
+          "timestamp": 1765937006.8217304,
+          "file": "core/logger.py"
+        },
+        {
+          "timestamp": 1765937006.8488615,
+          "file": "core/autonomous_pentest.py"
+        },
+        {
+          "timestamp": 1765937006.8692124,
+          "file": "core/dark_web_intelligence.py"
+        },
+        {
+          "timestamp": 1765937006.8825161,
+          "file": "gui/splash_screen.py"
+        },
+        {
+          "timestamp": 1765937006.9014144,
+          "file": "core/steganographic_exfil.py"
+        },
+        {
+          "timestamp": 1765937006.9323435,
+          "file": "core/email_security.py"
+        },
+        {
+          "timestamp": 1765937037.2599688,
+          "file": "core/blockchain_forensics.py"
+        },
+        {
+          "timestamp": 1765937037.2839437,
+          "file": "core/neural_fingerprint.py"
+        },
+        {
+          "timestamp": 1765937037.3053663,
+          "file": "gui/pages/backup_assessment_page.py"
+        },
+        {
+          "timestamp": 1765937037.3481069,
+          "file": "gui/pages/adversarial_ml_page.py"
+        },
+        {
+          "timestamp": 1765937037.5098357,
+          "file": "core/wifi_sensing.py"
+        },
+        {
+          "timestamp": 1765937037.527748,
+          "file": "gui/pages/automation_page.py"
+        },
+        {
+          "timestamp": 1765937037.5466409,
+          "file": "gui/pages/attack_surface_page.py"
+        },
+        {
+          "timestamp": 1765937067.9044087,
+          "file": "core/social_engineering.py"
+        },
+        {
+          "timestamp": 1765937067.9298341,
+          "file": "core/blue_team.py"
+        },
+        {
+          "timestamp": 1765937067.9548626,
+          "file": "gui/pages/api_security_page.py"
+        },
+        {
+          "timestamp": 1765937067.9984932,
+          "file": "gui/pages/security_architecture_page.py"
+        },
+        {
+          "timestamp": 1765937068.0356483,
+          "file": "core/ics_scada_security.py"
+        },
+        {
+          "timestamp": 1765937068.0800989,
+          "file": "gui/widgets.py"
+        },
+        {
+          "timestamp": 1765937068.1065257,
+          "file": "gui/pages/deepfake_detection_page.py"
+        },
+        {
+          "timestamp": 1765937068.119523,
+          "file": "gui/pages/ai_narrator_page.py"
+        },
+        {
+          "timestamp": 1765937098.401551,
+          "file": "gui/pages/social_engineering_page.py"
+        },
+        {
+          "timestamp": 1765937098.4247239,
+          "file": "gui/pages/threat_hunting_page.py"
+        },
+        {
+          "timestamp": 1765937098.4446704,
+          "file": "core/hardware_implant.py"
+        },
+        {
+          "timestamp": 1765937098.478878,
+          "file": "gui/pages/memory_forensics_page.py"
+        },
+        {
+          "timestamp": 1765937098.5069592,
+          "file": "core/advanced_iot_security.py"
+        },
+        {
+          "timestamp": 1765937098.5343928,
+          "file": "core/autonomous_pentest.py"
+        },
+        {
+          "timestamp": 1765937098.5540485,
+          "file": "gui/pages/quantum_crypto_page.py"
+        },
+        {
+          "timestamp": 1765937128.864891,
+          "file": "gui/pages/security_dashboard_page.py"
+        },
+        {
+          "timestamp": 1765937128.905215,
+          "file": "core/cloud_security.py"
+        },
+        {
+          "timestamp": 1765937128.9537597,
+          "file": "gui/pages/zero_day_predictor_page.py"
+        },
+        {
+          "timestamp": 1765937128.9895456,
+          "file": "wifi_sensing_app.py"
+        },
+        {
+          "timestamp": 1765937129.0321233,
+          "file": "core/advanced_reporting.py"
+        },
+        {
+          "timestamp": 1765937129.2690442,
+          "file": "core/exploit_chain_builder.py"
+        },
+        {
+          "timestamp": 1765937129.2980058,
+          "file": "core/zero_day_detection.py"
+        },
+        {
+          "timestamp": 1765937129.3342452,
+          "file": "core/network_mapper.py"
+        },
+        {
+          "timestamp": 1765937159.7160187,
+          "file": "gui/pages/edr_evasion_page.py"
+        },
+        {
+          "timestamp": 1765937159.7713623,
+          "file": "core/polymorphic_engine.py"
+        },
+        {
+          "timestamp": 1765937159.8320184,
+          "file": "core/steganographic_exfil.py"
+        },
+        {
+          "timestamp": 1765937159.9246414,
+          "file": "core/drone_integration.py"
+        },
+        {
+          "timestamp": 1765937160.0619962,
+          "file": "core/advanced_database_security.py"
+        },
+        {
+          "timestamp": 1765937160.1453235,
+          "file": "core/data_sources.py"
+        },
+        {
+          "timestamp": 1765937160.2707639,
+          "file": "gui/pages/attack_simulation_page.py"
+        },
+        {
+          "timestamp": 1765937160.32252,
+          "file": "gui/pages/gamification_page.py"
+        },
+        {
+          "timestamp": 1765937190.6899261,
+          "file": "core/security_awareness.py"
+        },
+        {
+          "timestamp": 1765937190.7264354,
+          "file": "core/advanced_reporting.py"
+        },
+        {
+          "timestamp": 1765937190.7643926,
+          "file": "core/vuln_management.py"
+        },
+        {
+          "timestamp": 1765937190.7920203,
+          "file": "core/access_control.py"
+        },
+        {
+          "timestamp": 1765937190.821367,
+          "file": "core/blue_team.py"
+        },
+        {
+          "timestamp": 1765937190.844609,
+          "file": "gui/pages/network_traffic_page.py"
+        },
+        {
+          "timestamp": 1765937190.9982324,
+          "file": "core/wifi_sensing.py"
+        },
+        {
+          "timestamp": 1765937191.0343022,
+          "file": "core/ad_attacks.py"
+        },
+        {
+          "timestamp": 1765937221.3775866,
+          "file": "gui/pages/mobile_security_page.py"
+        },
+        {
+          "timestamp": 1765937221.416894,
+          "file": "gui/pages/ai_analysis_page.py"
+        },
+        {
+          "timestamp": 1765937221.456123,
+          "file": "gui/pages/blockchain_forensics_page.py"
+        },
+        {
+          "timestamp": 1765937221.472372,
+          "file": "core/security_utils.py"
+        },
+        {
+          "timestamp": 1765937221.5012527,
+          "file": "core/threat_hunting_automation.py"
+        },
+        {
+          "timestamp": 1765937221.5330396,
+          "file": "gui/pages/security_awareness_page.py"
+        },
+        {
+          "timestamp": 1765937221.5710213,
+          "file": "core/advanced_dns_security.py"
+        },
+        {
+          "timestamp": 1765937221.6054358,
+          "file": "gui/pages/gamification_page.py"
+        },
+        {
+          "timestamp": 1765937252.094647,
+          "file": "gui/pages/config_baseline_page.py"
+        },
+        {
+          "timestamp": 1765937252.1245406,
+          "file": "core/threat_modeling.py"
+        },
+        {
+          "timestamp": 1765937252.1597652,
+          "file": "core/advanced_dns_security.py"
+        },
+        {
+          "timestamp": 1765937252.267994,
+          "file": "core/advanced_api_security.py"
+        },
+        {
+          "timestamp": 1765937252.4599645,
+          "file": "core/session_manager.py"
+        },
+        {
+          "timestamp": 1765937252.7000558,
+          "file": "core/biometric_security.py"
+        },
+        {
+          "timestamp": 1765937252.8079743,
+          "file": "gui/pages/forensics_page.py"
+        },
+        {
+          "timestamp": 1765937283.417443,
+          "file": "core/threat_modeling.py"
+        },
+        {
+          "timestamp": 1765937283.4596589,
+          "file": "core/session_manager.py"
+        },
+        {
+          "timestamp": 1765937283.526442,
+          "file": "gui/pages/cloud_security_page.py"
+        },
+        {
+          "timestamp": 1765937283.5437388,
+          "file": "gui/pages/gamification_page.py"
+        },
+        {
+          "timestamp": 1765937283.584201,
+          "file": "core/quantum_resistant_c2.py"
+        },
+        {
+          "timestamp": 1765937284.4427617,
+          "file": "gui/visualization_3d/wifi_sensing_3d.py"
+        },
+        {
+          "timestamp": 1765937284.5634222,
+          "file": "gui/pages/osint_page.py"
+        },
+        {
+          "timestamp": 1765937284.6193624,
+          "file": "core/autonomous_pentest.py"
+        },
+        {
+          "timestamp": 1765937315.0236487,
+          "file": "gui/visualization_3d/data_flow_3d.py"
+        },
+        {
+          "timestamp": 1765937315.056717,
+          "file": "gui/pages/attack_replay_page.py"
+        },
+        {
+          "timestamp": 1765937315.1269062,
+          "file": "core/advanced_reporting.py"
+        },
+        {
+          "timestamp": 1765937315.1606472,
+          "file": "core/hash_cracker.py"
+        },
+        {
+          "timestamp": 1765937315.184071,
+          "file": "gui/pages/blockchain_forensics_page.py"
+        },
+        {
+          "timestamp": 1765937315.2035875,
+          "file": "core/vuln_management.py"
+        },
+        {
+          "timestamp": 1765937315.2422287,
+          "file": "core/advanced_mobile_security.py"
+        },
+        {
+          "timestamp": 1765937345.5399842,
+          "file": "gui/visualization_3d/particle_system.py"
+        },
+        {
+          "timestamp": 1765937345.571625,
+          "file": "core/threat_hunting_automation.py"
+        },
+        {
+          "timestamp": 1765937345.5987673,
+          "file": "gui/pages/plugin_manager_page.py"
+        },
+        {
+          "timestamp": 1765937345.6322846,
+          "file": "core/incident_response.py"
+        },
+        {
+          "timestamp": 1765937345.6629438,
+          "file": "gui/visualization_3d/data_flow_3d.py"
+        },
+        {
+          "timestamp": 1765937345.6925635,
+          "file": "core/advanced_malware_sandbox.py"
+        },
+        {
+          "timestamp": 1765937345.7123804,
+          "file": "gui/pages/deception_page.py"
+        },
+        {
+          "timestamp": 1765937345.7519438,
+          "file": "core/zero_day_predictor.py"
+        },
+        {
+          "timestamp": 1765937376.0715184,
+          "file": "core/c2_framework.py"
+        },
+        {
+          "timestamp": 1765937376.0946326,
+          "file": "gui/pages/blue_team_page.py"
+        },
+        {
+          "timestamp": 1765937376.1219046,
+          "file": "wifi_sensing_app.py"
+        },
+        {
+          "timestamp": 1765937376.1431167,
+          "file": "gui/pages/neural_exploit_page.py"
+        },
+        {
+          "timestamp": 1765937376.1774187,
+          "file": "core/advanced_wireless_security.py"
+        },
+        {
+          "timestamp": 1765937376.2055833,
+          "file": "core/forensics.py"
+        },
+        {
+          "timestamp": 1765937376.2296937,
+          "file": "gui/pages/settings_page.py"
+        },
+        {
+          "timestamp": 1765937376.2813296,
+          "file": "gui/visualization_3d/attack_path_3d.py"
+        },
+        {
+          "timestamp": 1765937406.9319608,
+          "file": "gui/pages/blue_team_page.py"
+        },
+        {
+          "timestamp": 1765937406.956778,
+          "file": "gui/pages/memory_forensics_page.py"
+        },
+        {
+          "timestamp": 1765937406.9853737,
+          "file": "core/c2_framework.py"
+        },
+        {
+          "timestamp": 1765937407.0121286,
+          "file": "gui/pages/stego_exfil_page.py"
+        },
+        {
+          "timestamp": 1765937407.0340009,
+          "file": "gui/visualization_3d/data_flow_3d.py"
+        },
+        {
+          "timestamp": 1765937407.0585446,
+          "file": "gui/pages/polymorphic_engine_page.py"
+        },
+        {
+          "timestamp": 1765937407.0927212,
+          "file": "core/advanced_iot_security.py"
+        },
+        {
+          "timestamp": 1765937407.1112876,
+          "file": "core/edr_evasion.py"
+        },
+        {
+          "timestamp": 1765937437.383989,
+          "file": "gui/pages/ai_narrator_page.py"
+        },
+        {
+          "timestamp": 1765937437.425188,
+          "file": "gui/pages/patch_management_page.py"
+        },
+        {
+          "timestamp": 1765937437.4628031,
+          "file": "core/advanced_wireless_security.py"
+        },
+        {
+          "timestamp": 1765937437.4959784,
+          "file": "core/advanced_api_security.py"
+        },
+        {
+          "timestamp": 1765937437.5499027,
+          "file": "core/advanced_iot_security.py"
+        },
+        {
+          "timestamp": 1765937437.5895638,
+          "file": "gui/pages/network_pivoting_page.py"
+        },
+        {
+          "timestamp": 1765937437.633067,
+          "file": "gui/visualization_3d/exploit_chain_3d.py"
+        },
+        {
+          "timestamp": 1765937468.0800397,
+          "file": "core/forensics.py"
+        },
+        {
+          "timestamp": 1765937468.114584,
+          "file": "core/threat_intel.py"
+        },
+        {
+          "timestamp": 1765937468.1321473,
+          "file": "core/exploit_framework.py"
+        },
+        {
+          "timestamp": 1765937468.4915786,
+          "file": "gui/visualization_3d/wifi_sensing_3d.py"
+        },
+        {
+          "timestamp": 1765937468.5231595,
+          "file": "gui/pages/password_audit_page.py"
+        },
+        {
+          "timestamp": 1765937468.543971,
+          "file": "core/hardware_implant.py"
+        },
+        {
+          "timestamp": 1765937468.5818446,
+          "file": "gui/widgets.py"
+        },
+        {
+          "timestamp": 1765937468.60328,
+          "file": "core/compliance_audit.py"
+        },
+        {
+          "timestamp": 1765937498.9724238,
+          "file": "core/hardware_implant.py"
+        },
+        {
+          "timestamp": 1765937499.0039248,
+          "file": "core/security_architecture.py"
+        },
+        {
+          "timestamp": 1765937499.0888762,
+          "file": "gui/pages/browser_exploitation_page.py"
+        },
+        {
+          "timestamp": 1765937499.1161208,
+          "file": "gui/pages/social_engineering_page.py"
+        },
+        {
+          "timestamp": 1765937499.158372,
+          "file": "core/realtime_collaboration.py"
+        },
+        {
+          "timestamp": 1765937499.1941824,
+          "file": "gui/pages/network_pivoting_page.py"
+        },
+        {
+          "timestamp": 1765937499.2296736,
+          "file": "core/scada_security.py"
+        },
+        {
+          "timestamp": 1765937549.1816165,
+          "file": "core/browser_exploitation.py"
+        },
+        {
+          "timestamp": 1765937549.206269,
+          "file": "core/threat_modeling.py"
+        },
+        {
+          "timestamp": 1765937549.2437067,
+          "file": "core/supply_chain_security.py"
+        },
+        {
+          "timestamp": 1765937549.2787073,
+          "file": "core/ics_scada_security.py"
+        },
+        {
+          "timestamp": 1765937549.3677251,
+          "file": "gui/pages/attack_map_page.py"
+        },
+        {
+          "timestamp": 1765937549.4051902,
+          "file": "core/password_audit.py"
+        },
+        {
+          "timestamp": 1765937549.4581175,
+          "file": "core/quantum_security.py"
+        },
+        {
+          "timestamp": 1765937549.5007777,
+          "file": "gui/pages/memory_forensics_page.py"
+        },
+        {
+          "timestamp": 1765937638.8400106,
+          "file": "gui/splash_screen.py"
+        },
+        {
+          "timestamp": 1765937638.8672376,
+          "file": "core/quantum_security.py"
+        },
+        {
+          "timestamp": 1765937638.9039385,
+          "file": "gui/pages/reports_page.py"
+        },
+        {
+          "timestamp": 1765937638.9366016,
+          "file": "core/advanced_api_security.py"
+        },
+        {
+          "timestamp": 1765937638.956199,
+          "file": "gui/pages/payload_generator_page.py"
+        },
+        {
+          "timestamp": 1765937638.9717104,
+          "file": "gui/pages/hydra_page.py"
+        },
+        {
+          "timestamp": 1765937638.9944222,
+          "file": "core/advanced_memory_forensics.py"
+        },
+        {
+          "timestamp": 1765937639.0491514,
+          "file": "core/autonomous_attack.py"
+        },
+        {
+          "timestamp": 1765937924.7891526,
+          "file": "gui/pages/risk_scoring_page.py"
+        },
+        {
+          "timestamp": 1765937924.8179705,
+          "file": "gui/pages/social_engineering_page.py"
+        },
+        {
+          "timestamp": 1765937924.8486054,
+          "file": "core/compliance_audit.py"
+        },
+        {
+          "timestamp": 1765937924.8907502,
+          "file": "core/blue_team.py"
+        },
+        {
+          "timestamp": 1765937924.933109,
+          "file": "core/credential_spray.py"
+        },
+        {
+          "timestamp": 1765937924.9634714,
+          "file": "gui/pages/polymorphic_engine_page.py"
+        },
+        {
+          "timestamp": 1765937925.0235932,
+          "file": "core/zero_day_framework.py"
+        },
+        {
+          "timestamp": 1765937925.0454788,
+          "file": "core/polymorphic_engine.py"
+        },
+        {
+          "timestamp": 1765937955.7804482,
+          "file": "gui/pages/browser_exploitation_page.py"
+        },
+        {
+          "timestamp": 1765937955.815647,
+          "file": "core/hash_cracker.py"
+        },
+        {
+          "timestamp": 1765937955.852976,
+          "file": "gui/visualizations.py"
+        },
+        {
+          "timestamp": 1765937955.8766415,
+          "file": "gui/pages/security_policy_page.py"
+        },
+        {
+          "timestamp": 1765937955.8982697,
+          "file": "core/vuln_correlation.py"
+        },
+        {
+          "timestamp": 1765937955.9181426,
+          "file": "core/neural_fingerprint.py"
+        },
+        {
+          "timestamp": 1765937956.0321884,
+          "file": "core/biometric_security.py"
+        },
+        {
+          "timestamp": 1765937956.1399715,
+          "file": "core/network_attack_simulation.py"
+        },
+        {
+          "timestamp": 1765938975.6952088,
+          "file": "gui/pages/iot_exploitation_page.py"
+        },
+        {
+          "timestamp": 1765938975.7295082,
+          "file": "core/remediation_tracking.py"
+        },
+        {
+          "timestamp": 1765938975.7741861,
+          "file": "gui/pages/edr_evasion_page.py"
+        },
+        {
+          "timestamp": 1765938975.836619,
+          "file": "scanners/osint_advanced.py"
+        },
+        {
+          "timestamp": 1765938975.8748834,
+          "file": "gui/pages/blue_team_page.py"
+        },
+        {
+          "timestamp": 1765938975.9199522,
+          "file": "gui/pages/secrets_page.py"
+        },
+        {
+          "timestamp": 1765938975.9553812,
+          "file": "core/biometric_security.py"
+        },
+        {
+          "timestamp": 1765940444.932368,
+          "file": "gui/pages/memory_forensics_page.py"
+        },
+        {
+          "timestamp": 1765940444.9629228,
+          "file": "core/vuln_scanner.py"
+        },
+        {
+          "timestamp": 1765940445.0052693,
+          "file": "core/biometric_security.py"
+        },
+        {
+          "timestamp": 1765940445.0369363,
+          "file": "core/advanced_mobile_security.py"
+        },
+        {
+          "timestamp": 1765940445.0593185,
+          "file": "gui/pages/zero_day_predictor_page.py"
+        },
+        {
+          "timestamp": 1765940445.0885801,
+          "file": "gui/pages/autonomous_attack_page.py"
+        },
+        {
+          "timestamp": 1765940445.1106286,
+          "file": "gui/visualization_3d/particle_system.py"
+        },
+        {
+          "timestamp": 1765940445.1348615,
+          "file": "gui/pages/config_baseline_page.py"
+        },
+        {
+          "timestamp": 1765942662.1673942,
+          "file": "core/wifi_sensing.py"
+        },
+        {
+          "timestamp": 1765942662.1946144,
+          "file": "core/evolutionary_exploit.py"
+        },
+        {
+          "timestamp": 1765942662.223593,
+          "file": "gui/pages/autonomous_attack_page.py"
+        },
+        {
+          "timestamp": 1765942662.246022,
+          "file": "core/neural_interface.py"
+        },
+        {
+          "timestamp": 1765942662.3123116,
+          "file": "core/hardware_implant.py"
+        },
+        {
+          "timestamp": 1765942662.4115884,
+          "file": "core/incident_response_automation.py"
+        },
+        {
+          "timestamp": 1765942662.5162566,
+          "file": "core/threat_hunting.py"
+        },
+        {
+          "timestamp": 1765942662.5763931,
+          "file": "gui/pages/gamification_page.py"
+        },
+        {
+          "timestamp": 1765943795.4024634,
+          "file": "gui/main_window.py"
+        },
+        {
+          "timestamp": 1765943795.4234774,
+          "file": "core/evolutionary_exploit.py"
+        },
+        {
+          "timestamp": 1765943795.4468439,
+          "file": "core/dark_web_intelligence.py"
+        },
+        {
+          "timestamp": 1765943795.47207,
+          "file": "gui/pages/polymorphic_engine_page.py"
+        },
+        {
+          "timestamp": 1765943795.5181367,
+          "file": "core/c2_framework.py"
+        },
+        {
+          "timestamp": 1765943795.5445333,
+          "file": "gui/pages/config_baseline_page.py"
+        },
+        {
+          "timestamp": 1765943795.584025,
+          "file": "core/realtime_collaboration.py"
+        }
+      ]
+    },
+    "type-hints": {
+      "count": 13,
+      "contexts": [
+        {
+          "timestamp": 1765936392.2988408,
+          "file": "gui/pages/network_mapper_page.py"
+        },
+        {
+          "timestamp": 1765936484.237817,
+          "file": "core/data_sources.py"
+        },
+        {
+          "timestamp": 1765936514.7603512,
+          "file": "gui/pages/attack_simulation_page.py"
+        },
+        {
+          "timestamp": 1765936545.1972945,
+          "file": "gui/pages/incident_response_page.py"
+        },
+        {
+          "timestamp": 1765936545.2165499,
+          "file": "gui/pages/payload_generator_page.py"
+        },
+        {
+          "timestamp": 1765936850.282761,
+          "file": "gui/pages/container_security_page.py"
+        },
+        {
+          "timestamp": 1765936884.213531,
+          "file": "gui/pages/wifi_sensing_page.py"
+        },
+        {
+          "timestamp": 1765937037.3825057,
+          "file": "gui/pages/zero_day_page.py"
+        },
+        {
+          "timestamp": 1765937098.361692,
+          "file": "gui/pages/attack_simulation_page.py"
+        },
+        {
+          "timestamp": 1765937252.0605338,
+          "file": "core/c2_framework.py"
+        },
+        {
+          "timestamp": 1765937315.0864184,
+          "file": "gui/pages/polymorphic_engine_page.py"
+        },
+        {
+          "timestamp": 1765938975.793723,
+          "file": "gui/pages/threat_intel_page.py"
+        },
+        {
+          "timestamp": 1765943795.4909744,
+          "file": "gui/pages/swarm_intelligence_page.py"
+        }
+      ]
+    },
+    "error-messages": {
+      "count": 1,
+      "contexts": [
+        {
+          "timestamp": 1765937499.0484746,
+          "file": "core/advanced_ml_engine.py"
+        }
+      ]
+    },
+    "perf-loops": {
+      "count": 23,
+      "contexts": [
+        {
+          "timestamp": 1765937549.5741103,
+          "file": "core/threat_intelligence.py"
+        },
+        {
+          "timestamp": 1765937549.603737,
+          "file": "core/threat_intelligence.py"
+        },
+        {
+          "timestamp": 1765937602.525704,
+          "file": "core/remediation_tracking.py"
+        },
+        {
+          "timestamp": 1765937602.5697925,
+          "file": "core/cloud_posture_management.py"
+        },
+        {
+          "timestamp": 1765937639.1232898,
+          "file": "core/quantum_security.py"
+        },
+        {
+          "timestamp": 1765937925.1245775,
+          "file": "core/iot_exploitation.py"
+        },
+        {
+          "timestamp": 1765937925.150843,
+          "file": "core/iot_exploitation.py"
+        },
+        {
+          "timestamp": 1765937925.1574821,
+          "file": "core/iot_exploitation.py"
+        },
+        {
+          "timestamp": 1765937925.1816385,
+          "file": "core/threat_intelligence.py"
+        },
+        {
+          "timestamp": 1765937925.1888676,
+          "file": "core/threat_intelligence.py"
+        },
+        {
+          "timestamp": 1765937925.2131329,
+          "file": "core/memory_forensics.py"
+        },
+        {
+          "timestamp": 1765937925.2378812,
+          "file": "core/zero_day_predictor.py"
+        },
+        {
+          "timestamp": 1765938477.981363,
+          "file": "core/quantum_security.py"
+        },
+        {
+          "timestamp": 1765938976.022466,
+          "file": "core/neural_fingerprint.py"
+        },
+        {
+          "timestamp": 1765938976.0683203,
+          "file": "core/exploit_chain_builder.py"
+        },
+        {
+          "timestamp": 1765938976.0864968,
+          "file": "core/forensics.py"
+        },
+        {
+          "timestamp": 1765940414.654287,
+          "file": "core/cognitive_threat_engine.py"
+        },
+        {
+          "timestamp": 1765940445.204156,
+          "file": "core/neural_fingerprint.py"
+        },
+        {
+          "timestamp": 1765940445.504693,
+          "file": "core/zero_day_predictor.py"
+        },
+        {
+          "timestamp": 1765940445.5636516,
+          "file": "core/audit_log.py"
+        },
+        {
+          "timestamp": 1765943795.659119,
+          "file": "core/config_baseline.py"
+        },
+        {
+          "timestamp": 1765943795.6996424,
+          "file": "core/password_audit.py"
+        },
+        {
+          "timestamp": 1765943795.708819,
+          "file": "core/password_audit.py"
+        }
+      ]
+    },
+    "code-smell": {
+      "count": 6,
+      "contexts": [
+        {
+          "timestamp": 1765940447.5193548,
+          "file": "core/browser_exploitation.py"
+        },
+        {
+          "timestamp": 1765940447.5254397,
+          "file": "core/browser_exploitation.py"
+        },
+        {
+          "timestamp": 1765940447.5307102,
+          "file": "core/browser_exploitation.py"
+        },
+        {
+          "timestamp": 1765943799.4065354,
+          "file": "gui/pages/attack_surface_page.py"
+        },
+        {
+          "timestamp": 1765943799.4303324,
+          "file": "gui/pages/attack_surface_page.py"
+        },
+        {
+          "timestamp": 1765943799.4383147,
+          "file": "gui/pages/attack_surface_page.py"
+        }
+      ]
+    }
+  },
+  "failed_fixes": {},
+  "learned_patterns": {},
+  "evolution_history": []
+}

@@ -659,7 +659,7 @@ class BehavioralBiometricsEngine:
                     dt = datetime.fromisoformat(ts)
                     hours.append(dt.hour)
                     days.append(dt.weekday())
-                except:
+                except Exception:
                     pass
         
         # Calculate distributions

@@ -902,6 +902,73 @@ class ThreatIntelPage(QWidget):
             ))
     
     def _export_iocs(self):
-        """Export IOCs"""
-        # TODO: Implement export dialog
-        pass
+        """Export IOCs to file"""
+        from PyQt6.QtWidgets import QFileDialog, QMessageBox
+        import json
+        import csv
+        from datetime import datetime
+        
+        if not hasattr(self, 'current_indicators') or not self.current_indicators:
+            QMessageBox.warning(self, "No Data", "No IOCs to export")
+            return
+        
+        file_path, selected_filter = QFileDialog.getSaveFileName(
+            self,
+            "Export IOCs",
+            f"iocs_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "JSON Files (*.json);;CSV Files (*.csv);;STIX 2.1 (*.stix.json);;All Files (*)"
+        )
+        
+        if not file_path:
+            return
+        
+        try:
+            indicators = self.current_indicators
+            
+            if file_path.endswith('.csv'):
+                with open(file_path, 'w', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(['Type', 'Value', 'Confidence', 'Source', 'Tags', 'First Seen'])
+                    for ind in indicators:
+                        writer.writerow([
+                            ind.type.value if hasattr(ind.type, 'value') else str(ind.type),
+                            ind.value,
+                            ind.confidence,
+                            ind.source,
+                            ','.join(ind.tags) if ind.tags else '',
+                            ind.first_seen.isoformat() if ind.first_seen else ''
+                        ])
+            elif file_path.endswith('.stix.json'):
+                # STIX 2.1 format
+                stix_bundle = {
+                    "type": "bundle",
+                    "id": f"bundle--{datetime.now().strftime('%Y%m%d%H%M%S')}",
+                    "objects": []
+                }
+                for ind in indicators:
+                    stix_bundle["objects"].append({
+                        "type": "indicator",
+                        "id": f"indicator--{hash(ind.value) % 10**12}",
+                        "pattern": f"[{ind.type.value if hasattr(ind.type, 'value') else 'unknown'}:value = '{ind.value}']",
+                        "pattern_type": "stix",
+                        "valid_from": ind.first_seen.isoformat() if ind.first_seen else datetime.now().isoformat(),
+                        "confidence": ind.confidence
+                    })
+                with open(file_path, 'w') as f:
+                    json.dump(stix_bundle, f, indent=2)
+            else:
+                # Default JSON
+                export_data = [{
+                    'type': ind.type.value if hasattr(ind.type, 'value') else str(ind.type),
+                    'value': ind.value,
+                    'confidence': ind.confidence,
+                    'source': ind.source,
+                    'tags': ind.tags,
+                    'first_seen': ind.first_seen.isoformat() if ind.first_seen else None
+                } for ind in indicators]
+                with open(file_path, 'w') as f:
+                    json.dump(export_data, f, indent=2)
+            
+            QMessageBox.information(self, "Export Complete", f"Exported {len(indicators)} IOCs to {file_path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Export Failed", str(e))

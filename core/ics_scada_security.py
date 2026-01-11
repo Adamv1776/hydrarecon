@@ -208,7 +208,7 @@ class ModbusScanner:
                     'product': 'Modbus Device'
                 }
                 
-        except:
+        except Exception:
             pass
             
         return None
@@ -245,7 +245,7 @@ class ModbusScanner:
                                 coils.append(bool(byte & (1 << i)))
                     return coils
                     
-        except:
+        except Exception:
             pass
             
         return None
@@ -279,7 +279,7 @@ class ModbusScanner:
                         registers.append(value)
                     return registers
                     
-        except:
+        except Exception:
             pass
             
         return None
@@ -388,7 +388,7 @@ class S7CommScanner:
                     'firmware': 'Unknown'
                 }
                 
-        except:
+        except Exception:
             pass
             
         return None

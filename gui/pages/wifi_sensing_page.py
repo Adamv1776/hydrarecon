@@ -283,7 +283,7 @@ class _EngineRunner(QThread):
     stopped = pyqtSignal()
     error = pyqtSignal(str)
 
-    def __init__(self, engine: WifiSensingEngine):
+    def __init__(self, engine: "WifiSensingEngine"):
         super().__init__()
         self.engine = engine
         self.loop: Optional[asyncio.AbstractEventLoop] = None
@@ -6627,7 +6627,7 @@ class MultiPathAnalyzer:
         # Eigendecomposition
         try:
             eigenvalues, eigenvectors = np.linalg.eigh(self.correlation_matrix)
-        except:
+        except Exception:
             return []
         
         # Sort by eigenvalue magnitude
@@ -6769,7 +6769,7 @@ class SubspaceTracker:
         # Eigendecomposition
         try:
             eigenvalues, eigenvectors = np.linalg.eigh(self.covariance_matrix)
-        except:
+        except Exception:
             return []
         
         # Sort eigenvalues
@@ -6797,13 +6797,13 @@ class SubspaceTracker:
         # Solve for rotation matrix
         try:
             phi = np.linalg.lstsq(Es1, Es2, rcond=None)[0]
-        except:
+        except Exception:
             return []
         
         # Get angles from eigenvalues of phi
         try:
             eig_phi = np.linalg.eigvals(phi)
-        except:
+        except Exception:
             return []
         
         # Convert to angles (assuming lambda/2 spacing)
@@ -9689,7 +9689,7 @@ class WifiSensingPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.engine: Optional[WifiSensingEngine] = None
+        self.engine: Optional["WifiSensingEngine"] = None
         self.runner: Optional[_EngineRunner] = None
         self.bridge = _EventBridge()
         self._discovered_aps = []
@@ -11742,7 +11742,7 @@ class WifiSensingPage(QWidget):
                             channel = int(parts[2]) if len(parts) > 2 and parts[2].isdigit() else 0
                             signal = int(parts[3]) if len(parts) > 3 and parts[3].isdigit() else 50
                             rssi = -100 + signal  # Convert 0-100 to approx dBm
-                        except:
+                        except Exception:
                             channel = 0
                             rssi = -70
                         
@@ -11787,17 +11787,17 @@ class WifiSensingPage(QWidget):
                     elif 'DS Parameter set: channel' in line:
                         try:
                             current_ap['channel'] = int(line.split('channel')[1].strip())
-                        except:
+                        except Exception:
                             pass
                     elif 'signal:' in line:
                         try:
                             current_ap['rssi'] = int(float(line.split('signal:')[1].split()[0]))
-                        except:
+                        except Exception:
                             pass
                 
                 if current_ap.get('bssid'):
                     aps.append(current_ap)
-        except:
+        except Exception:
             pass
         
         # Sort by signal strength
@@ -15984,7 +15984,7 @@ class NeuralODEDynamics:
             # Stability: all real parts should be negative
             max_real = max(eigenvalues.real)
             self.stability_margin = float(-max_real)
-        except:
+        except Exception:
             self.dynamics_eigenvalues = []
             self.stability_margin = 0.0
 
@@ -20306,7 +20306,7 @@ class HierarchicalStateSpace:
                 'B': np.random.randn(effective_dim, self.input_dim) * 0.01,
                 'C': np.random.randn(self.input_dim, effective_dim) * 0.01,
                 'D': np.eye(self.input_dim) * 0.01,
-                'dt': 1.0 / (sequence_length // pool_factor),
+                'dt': 1.0 / (self.sequence_length // pool_factor),
                 'pool_factor': pool_factor,
                 'state_dim': effective_dim
             }
@@ -26543,7 +26543,7 @@ class SymbolicRegressionEngine:
                 # Fitness: negative MSE with complexity penalty
                 f = -mse - 0.01 * complexity
                 fitness.append(f)
-            except:
+            except Exception:
                 fitness.append(float('-inf'))
         return np.array(fitness)
         
@@ -45154,7 +45154,7 @@ class SymbolicRegressionCSI:
             for expr in self.population:
                 try:
                     fitness = self._evaluate_fitness(data, expr)
-                except:
+                except Exception:
                     fitness = float('-inf')
                 fitness_scores.append(fitness)
             
@@ -50574,7 +50574,7 @@ class SymbolicRegressionCSI:
             complexity = self._expression_complexity(expr)
             
             return float(-mse - 0.01 * complexity)
-        except:
+        except Exception:
             return float('-inf')
     
     def _expression_complexity(self, expr: Dict) -> int:
@@ -51160,7 +51160,7 @@ class LIMEExplainerCSI:
             coeffs = np.linalg.lstsq(X_bias, y, rcond=None)[0]
             weights = coeffs[:-1]
             intercept = coeffs[-1]
-        except:
+        except Exception:
             weights = np.zeros(X.shape[1])
             intercept = np.mean(y)
         
@@ -59394,7 +59394,7 @@ class AutoMLPipelineCSI:
             output = self._run_pipeline(x, pipeline)
             # Use output quality as score
             return float(np.var(output) / (np.mean(np.abs(output)) + 1e-6))
-        except:
+        except Exception:
             return 0.0
     
     def _run_pipeline(self, x: np.ndarray, pipeline: Tuple) -> np.ndarray:
@@ -68839,7 +68839,7 @@ class ReservoirComputingCSI:
             'state_mean': float(np.mean(self.state)),
             'state_std': float(np.std(self.state)),
             'spectral_radius': float(np.max(np.abs(np.linalg.eigvals(self.W_res)))),
-            'memory_capacity_estimate': float(reservoir_size * self.alpha)
+            'memory_capacity_estimate': float(self.reservoir_size * self.alpha)
         }
     
     def train_readout(self, states: np.ndarray, targets: np.ndarray,

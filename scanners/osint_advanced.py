@@ -282,7 +282,7 @@ class EmailOSINT(BaseOSINTModule):
                                 # Skip obvious fake/placeholder emails
                                 if not any(x in email_lower for x in ['example', 'test', 'sample', '@x.', '@xx.', 'noreply']):
                                     emails.add(email_lower)
-            except:
+            except Exception:
                 continue
         
         # Method 2: Hunter.io (if API key available)
@@ -297,7 +297,7 @@ class EmailOSINT(BaseOSINTModule):
                         data = await resp.json()
                         for email_info in data.get('data', {}).get('emails', []):
                             emails.add(email_info.get('value', '').lower())
-            except:
+            except Exception:
                 pass
         
         # Method 3: GitHub commits search (public info)
@@ -314,7 +314,7 @@ class EmailOSINT(BaseOSINTModule):
                         email = author.get('email', '')
                         if email and '@' in email:
                             emails.add(email.lower())
-        except:
+        except Exception:
             pass
         
         # Method 4: Google dorking simulation - check common email patterns
@@ -360,9 +360,9 @@ class EmailOSINT(BaseOSINTModule):
                     severity="info",
                     tags=["email", "validated"]
                 )
-            except:
+            except Exception:
                 pass
-        except:
+        except Exception:
             pass
         return None
     
@@ -401,7 +401,7 @@ class EmailOSINT(BaseOSINTModule):
                         severity="info",
                         tags=["email", "gravatar", "profile"]
                     )
-        except:
+        except Exception:
             pass
         return None
     
@@ -442,7 +442,7 @@ class EmailOSINT(BaseOSINTModule):
                             severity="high" if len(breaches) > 2 else "medium",
                             tags=["breach", "exposure", "credentials"]
                         ))
-            except:
+            except Exception:
                 pass
         
         # Check email reputation with emailrep.io (free, no API key needed)
@@ -476,7 +476,7 @@ class EmailOSINT(BaseOSINTModule):
                         severity="high" if data.get('details', {}).get('credentials_leaked') else "info",
                         tags=["email", "reputation"]
                     ))
-        except:
+        except Exception:
             pass
         
         return findings
@@ -517,7 +517,7 @@ class EmailOSINT(BaseOSINTModule):
                                 severity="info",
                                 tags=["github", "developer", "profile"]
                             ))
-        except:
+        except Exception:
             pass
         
         return findings
@@ -593,7 +593,7 @@ class SocialMediaOSINT(BaseOSINTModule):
                                 "exists": True,
                                 "status": resp.status
                             }
-            except:
+            except Exception:
                 pass
             return None
         
@@ -706,7 +706,7 @@ class CodeRepositoryOSINT(BaseOSINTModule):
                     
                     # Respect rate limits
                     await asyncio.sleep(2)
-            except:
+            except Exception:
                 continue
         
         # Search for organization/user repos
@@ -739,7 +739,7 @@ class CodeRepositoryOSINT(BaseOSINTModule):
                             severity="info",
                             tags=["github", "organization", "repositories"]
                         ))
-        except:
+        except Exception:
             pass
         
         return findings
@@ -828,7 +828,7 @@ class WaybackOSINT(BaseOSINTModule):
                                 severity="medium",
                                 tags=["wayback", "sensitive", "historical"]
                             ))
-        except:
+        except Exception:
             pass
         
         return findings
@@ -854,7 +854,7 @@ class ThreatIntelOSINT(BaseOSINTModule):
         # Resolve to IP
         try:
             ip = socket.gethostbyname(domain)
-        except:
+        except Exception:
             ip = target if self._is_ip(target) else None
         
         # AlienVault OTX
@@ -890,7 +890,7 @@ class ThreatIntelOSINT(BaseOSINTModule):
                         severity="high" if pulses > 5 else "medium" if pulses > 0 else "info",
                         tags=["threat", "malware", "otx"]
                     ))
-        except:
+        except Exception:
             pass
         
         # VirusTotal (if API key)
@@ -924,7 +924,7 @@ class ThreatIntelOSINT(BaseOSINTModule):
                             severity="critical" if malicious > 3 else "high" if malicious > 0 else "medium" if suspicious > 0 else "info",
                             tags=["virustotal", "malware", "reputation"]
                         ))
-            except:
+            except Exception:
                 pass
         
         return findings
@@ -933,7 +933,7 @@ class ThreatIntelOSINT(BaseOSINTModule):
         try:
             socket.inet_aton(target)
             return True
-        except:
+        except Exception:
             return False
 
 

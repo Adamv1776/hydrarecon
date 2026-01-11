@@ -1256,7 +1256,7 @@ class MemoryForensicsEngine:
                 if port in {443, 8443, 8080} and "0.0.0.0" not in conn["remote"]:
                     # Could be C2, needs further analysis
                     pass
-            except:
+            except Exception:
                 pass
         
         return False

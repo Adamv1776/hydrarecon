@@ -461,7 +461,7 @@ class AttackSimulationEngine:
         for callback in self._callbacks:
             try:
                 callback(event_type, data)
-            except:
+            except Exception:
                 pass
     
     def create_scenario(

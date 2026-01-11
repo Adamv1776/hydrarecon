@@ -538,7 +538,7 @@ class AdversarialMLPage(QWidget):
                             item.setForeground(QColor("#ff8800"))
                         else:
                             item.setForeground(QColor("#ff4444"))
-                    except:
+                    except Exception:
                         pass
                 self.defense_table.setItem(row, col, item)
         

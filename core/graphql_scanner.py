@@ -395,7 +395,7 @@ brute force attacks more efficiently.""",
                         )
                         self.findings.append(finding)
                         return finding
-        except:
+        except Exception:
             pass
         
         return None

@@ -599,7 +599,7 @@ class AttackReplaySystem:
                 data_compressed = base64.b64decode(row[6])
                 data_json = gzip.decompress(data_compressed).decode()
                 data = json.loads(data_json)
-            except:
+            except Exception:
                 data = json.loads(row[6]) if row[6] else {}
             
             events.append(RecordedEvent(
@@ -775,7 +775,7 @@ class AttackReplaySystem:
                 data_compressed = base64.b64decode(row[6])
                 data_json = gzip.decompress(data_compressed).decode()
                 data = json.loads(data_json)
-            except:
+            except Exception:
                 data = json.loads(row[6]) if row[6] else {}
             
             events.append(RecordedEvent(

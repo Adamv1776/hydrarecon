@@ -445,7 +445,7 @@ class VulnerabilityDatabase:
             fixed = affected_range.replace('<', '').replace('=', '').strip()
             try:
                 return self._compare_versions(version, fixed) < 0
-            except:
+            except Exception:
                 return True
         return True
     

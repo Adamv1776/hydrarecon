@@ -1006,7 +1006,7 @@ class AttackSimulationPage(QWidget):
             try:
                 tactic = AttackCategory(tactic_text)
                 techniques = self.engine.get_techniques(tactic)
-            except:
+            except Exception:
                 techniques = self.engine.get_techniques()
         
         for tech in techniques:
@@ -1083,12 +1083,12 @@ class AttackSimulationPage(QWidget):
         
         try:
             category = AttackCategory(self.category_combo.currentText())
-        except:
+        except Exception:
             category = AttackCategory.EXECUTION
         
         try:
             severity = Severity(self.severity_combo.currentText())
-        except:
+        except Exception:
             severity = Severity.MEDIUM
         
         scenario = self.engine.create_scenario(

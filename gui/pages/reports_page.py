@@ -697,19 +697,19 @@ class ReportsPage(QWidget):
                 try:
                     cursor = self.db.execute("SELECT COUNT(*) FROM vulnerabilities")
                     vuln_count = cursor.fetchone()[0]
-                except:
+                except Exception:
                     pass
                 
                 try:
                     cursor = self.db.execute("SELECT COUNT(*) FROM targets")
                     target_count = cursor.fetchone()[0]
-                except:
+                except Exception:
                     pass
                 
                 try:
                     cursor = self.db.execute("SELECT COUNT(*) FROM credentials")
                     cred_count = cursor.fetchone()[0]
-                except:
+                except Exception:
                     pass
             
             stats = f"""
@@ -799,7 +799,7 @@ class ReportsPage(QWidget):
                             'description': row[9] if len(row) > 9 else '',
                             'remediation': row[10] if len(row) > 10 else ''
                         })
-            except:
+            except Exception:
                 # Use sample data
                 data['vulnerabilities'] = [
                     {'id': 1, 'title': 'Sample Vulnerability', 'severity': 'high', 'host': '192.168.1.1', 'cve': 'CVE-2024-0001', 'cvss': '7.5'}
@@ -815,7 +815,7 @@ class ReportsPage(QWidget):
                             'id': row[0],
                             'target': row[2] if len(row) > 2 else '-'
                         })
-            except:
+            except Exception:
                 pass
         
         return data

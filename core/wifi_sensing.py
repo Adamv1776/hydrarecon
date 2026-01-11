@@ -2783,7 +2783,7 @@ class CSIExtractor:
                 capture_output=True, timeout=5
             )
             return result.returncode == 0
-        except:
+        except Exception:
             return False
     
     def start_capture(self, callback: Optional[Callable] = None):
@@ -3454,14 +3454,14 @@ class WifiSensingEngine:
                     elif 'Channel:' in line:
                         try:
                             current_ap['channel'] = int(line.split('Channel:')[1].strip())
-                        except:
+                        except Exception:
                             pass
                     
                     elif 'Signal level=' in line:
                         try:
                             rssi_str = line.split('Signal level=')[1].split()[0]
                             current_ap['rssi'] = int(rssi_str)
-                        except:
+                        except Exception:
                             pass
                 
                 # Add last AP

@@ -662,7 +662,7 @@ class PayloadGeneratorPage(QWidget):
         if bad_chars_text:
             try:
                 config.bad_chars = bytes(bad_chars_text, 'utf-8').decode('unicode_escape').encode('latin-1')
-            except:
+            except Exception:
                 config.bad_chars = b"\x00\x0a\x0d"
         
         self.status_bar.setText("Generating payload...")
@@ -684,7 +684,7 @@ class PayloadGeneratorPage(QWidget):
         try:
             code = payload.encoded_payload.decode('utf-8', errors='replace')
             self.code_preview.setPlainText(code)
-        except:
+        except Exception:
             self.code_preview.setPlainText("Binary payload - see Hex view")
         
         # Update hex view

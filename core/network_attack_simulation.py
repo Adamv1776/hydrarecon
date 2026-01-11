@@ -215,7 +215,7 @@ class NetworkRecon:
                     
                     return Target(ip=ip)
                     
-                except:
+                except Exception:
                     pass
                     
         return None
@@ -244,7 +244,7 @@ class NetworkRecon:
                     writer.write(b'HEAD / HTTP/1.0\r\n\r\n')
                     await writer.drain()
                     banner = (await asyncio.wait_for(reader.read(1024), timeout=2.0)).decode('utf-8', errors='ignore')
-                except:
+                except Exception:
                     pass
                     
                 writer.close()
@@ -257,7 +257,7 @@ class NetworkRecon:
                     'banner': banner[:200] if banner else None
                 })
                 
-            except:
+            except Exception:
                 pass
                 
         return target

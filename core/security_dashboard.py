@@ -209,7 +209,7 @@ class SecurityDashboardEngine:
         for callback in self._callbacks:
             try:
                 callback(event_type, data)
-            except:
+            except Exception:
                 pass
     
     def update_metric(self, metric_id: str, value: float, record_history: bool = True):

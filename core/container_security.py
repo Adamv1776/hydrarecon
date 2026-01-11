@@ -426,7 +426,7 @@ class ContainerSecurityScanner:
             )
             await result.communicate()
             return result.returncode == 0
-        except:
+        except Exception:
             return False
     
     async def _check_kubectl_available(self) -> bool:
@@ -439,7 +439,7 @@ class ContainerSecurityScanner:
             )
             await result.communicate()
             return result.returncode == 0
-        except:
+        except Exception:
             return False
     
     async def _list_containers(self) -> List[ContainerInfo]:
@@ -626,7 +626,7 @@ class ContainerSecurityScanner:
                             "value": env[:50] + "..." if len(env) > 50 else env
                         })
                         break
-        except:
+        except Exception:
             pass
         
         return secrets
@@ -706,7 +706,7 @@ class ContainerSecurityScanner:
             )
             stdout, _ = await result.communicate()
             return stdout.decode().split()
-        except:
+        except Exception:
             return ["default"]
     
     async def _scan_namespace_pods(self, namespace: str) -> List[K8sFinding]:
@@ -948,7 +948,7 @@ class ContainerSecurityScanner:
                     return int(num * multiplier)
             
             return int(float(re.sub(r'[^\d.]', '', size_str)))
-        except:
+        except Exception:
             return 0
     
     async def generate_report(self, scan: ScanReport, format: str = "json") -> str:

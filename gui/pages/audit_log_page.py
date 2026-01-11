@@ -1096,14 +1096,14 @@ class AuditLogPage(QWidget):
         if category != "All":
             try:
                 cat_filter = EventCategory(category.lower())
-            except:
+            except Exception:
                 pass
         
         level_filter = None
         if level != "All":
             try:
                 level_filter = LogLevel(level.lower())
-            except:
+            except Exception:
                 pass
         
         events = self.engine.search_events(

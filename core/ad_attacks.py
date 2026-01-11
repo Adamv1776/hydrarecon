@@ -469,7 +469,7 @@ class ActiveDirectoryAttacks:
                         filetime = int(entry.pwdLastSet.value)
                         if filetime > 0:
                             user.password_last_set = datetime(1601, 1, 1) + timedelta(microseconds=filetime // 10)
-                    except:
+                    except Exception:
                         pass
                 
                 users.append(user)
@@ -562,7 +562,7 @@ class ActiveDirectoryAttacks:
                 if comp.dns_hostname:
                     try:
                         comp.ip_address = socket.gethostbyname(comp.dns_hostname)
-                    except:
+                    except Exception:
                         pass
                 
                 computers.append(comp)

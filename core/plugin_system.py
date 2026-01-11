@@ -432,7 +432,7 @@ class PluginManager:
                 with open(self._registry_path) as f:
                     return json.load(f)
             except Exception:
-                pass
+                pass  # Consider: logger.exception('Unexpected error')
         return {"plugins": {}, "enabled": []}
     
     def _save_registry(self) -> None:
@@ -684,14 +684,130 @@ class PluginManager:
         return True
     
     async def _install_from_url(self, url: str) -> bool:
-        """Install plugin from URL"""
-        # TODO: Implement URL download and install
-        return False
+        """Install plugin from URL.
+        
+        Downloads a plugin package from a URL and installs it locally.
+        Supports .zip and .tar.gz archives.
+        """
+        import tempfile
+        import urllib.request
+        import zipfile
+        import tarfile
+        
+        try:
+            # Create temp directory for download
+            with tempfile.TemporaryDirectory() as temp_dir:
+                temp_path = Path(temp_dir)
+                
+                # Determine file type from URL
+                if url.endswith('.zip'):
+                    archive_path = temp_path / "plugin.zip"
+                elif url.endswith('.tar.gz') or url.endswith('.tgz'):
+                    archive_path = temp_path / "plugin.tar.gz"
+                else:
+                    archive_path = temp_path / "plugin.zip"  # Default to zip
+                
+                # Download the file
+                logger.info(f"Downloading plugin from {url}")
+                urllib.request.urlretrieve(url, archive_path)
+                
+                # Extract archive
+                extract_dir = temp_path / "extracted"
+                extract_dir.mkdir()
+                
+                if archive_path.suffix == '.zip':
+                    with zipfile.ZipFile(archive_path, 'r') as zf:
+                        zf.extractall(extract_dir)
+                elif '.tar' in str(archive_path):
+                    with tarfile.open(archive_path, 'r:*') as tf:
+                        tf.extractall(extract_dir)
+                
+                # Find the plugin directory (look for manifest.json)
+                plugin_dir = None
+                for item in extract_dir.rglob("manifest.json"):
+                    plugin_dir = item.parent
+                    break
+                
+                if not plugin_dir:
+                    logger.error("No manifest.json found in downloaded archive")
+                    return False
+                
+                # Install from extracted path
+                return await self._install_from_path(str(plugin_dir))
+                
+        except urllib.error.URLError as e:
+            logger.error(f"Failed to download plugin: {e}")
+            return False
+        except (zipfile.BadZipFile, tarfile.TarError) as e:
+            logger.error(f"Failed to extract plugin archive: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error installing from URL: {e}")
+            return False
     
     async def _install_from_marketplace(self, plugin_id: str) -> bool:
-        """Install plugin from marketplace"""
-        # TODO: Implement marketplace integration
-        return False
+        """Install plugin from the HydraRecon marketplace.
+        
+        Connects to the official plugin marketplace to download
+        and install verified plugins.
+        """
+        import urllib.request
+        import urllib.error
+        
+        # Marketplace configuration
+        MARKETPLACE_BASE_URL = os.environ.get(
+            'HYDRA_MARKETPLACE_URL',
+            'https://marketplace.hydrarecon.io/api/v1'
+        )
+        
+        try:
+            # Query marketplace for plugin info
+            info_url = f"{MARKETPLACE_BASE_URL}/plugins/{plugin_id}"
+            
+            try:
+                with urllib.request.urlopen(info_url, timeout=30) as response:
+                    plugin_info = json.loads(response.read().decode())
+            except urllib.error.HTTPError as e:
+                if e.code == 404:
+                    logger.error(f"Plugin '{plugin_id}' not found in marketplace")
+                else:
+                    logger.error(f"Marketplace error: HTTP {e.code}")
+                return False
+            except urllib.error.URLError as e:
+                logger.warning(f"Cannot connect to marketplace: {e}")
+                logger.info("Marketplace integration requires internet connectivity")
+                return False
+            
+            # Verify plugin compatibility
+            required_version = plugin_info.get('min_hydra_version', '1.0.0')
+            current_version = '1.0.0'  # HydraRecon version
+            
+            def parse_version(v: str) -> tuple:
+                """Parse version string to tuple for comparison"""
+                try:
+                    return tuple(int(x) for x in v.split('.')[:3])
+                except (ValueError, AttributeError):
+                    return (0, 0, 0)
+            
+            if parse_version(current_version) < parse_version(required_version):
+                logger.error(f"Plugin requires HydraRecon {required_version}, current is {current_version}")
+                return False
+            
+            # Download from marketplace download URL
+            download_url = plugin_info.get('download_url')
+            if not download_url:
+                logger.error("No download URL provided by marketplace")
+                return False
+            
+            # Use URL installer
+            return await self._install_from_url(download_url)
+            
+        except json.JSONDecodeError:
+            logger.error("Invalid response from marketplace")
+            return False
+        except Exception as e:
+            logger.error(f"Marketplace installation failed: {e}")
+            return False
     
     async def uninstall_plugin(self, plugin_id: str) -> bool:
         """Uninstall a plugin"""
@@ -712,9 +828,100 @@ class PluginManager:
         return True
     
     async def update_plugin(self, plugin_id: str) -> bool:
-        """Update a plugin to the latest version"""
-        # TODO: Implement plugin update
-        return False
+        """Update a plugin to the latest version.
+        
+        Checks for updates and installs the newest version while
+        preserving plugin configuration.
+        """
+        import urllib.request
+        import urllib.error
+        
+        if plugin_id not in self._registry['plugins']:
+            logger.error(f"Plugin {plugin_id} is not installed")
+            return False
+        
+        plugin_info = self._registry['plugins'][plugin_id]
+        current_version = plugin_info.get('version', '0.0.0')
+        source = plugin_info.get('source', '')
+        
+        # Marketplace configuration
+        MARKETPLACE_BASE_URL = os.environ.get(
+            'HYDRA_MARKETPLACE_URL',
+            'https://marketplace.hydrarecon.io/api/v1'
+        )
+        
+        try:
+            # Check marketplace for latest version
+            info_url = f"{MARKETPLACE_BASE_URL}/plugins/{plugin_id}"
+            
+            try:
+                with urllib.request.urlopen(info_url, timeout=30) as response:
+                    marketplace_info = json.loads(response.read().decode())
+            except urllib.error.URLError:
+                # Fallback: try updating from original source if it's a URL
+                if source.startswith(('http://', 'https://')):
+                    logger.info(f"Marketplace unavailable, updating from source: {source}")
+                    
+                    # Backup configuration
+                    config_backup = None
+                    plugin_path = self.plugins_dir / plugin_id
+                    config_path = plugin_path / "config.json"
+                    if config_path.exists():
+                        with open(config_path) as f:
+                            config_backup = json.load(f)
+                    
+                    # Reinstall from source
+                    success = await self._install_from_url(source)
+                    
+                    # Restore configuration
+                    if success and config_backup:
+                        with open(config_path, 'w') as f:
+                            json.dump(config_backup, f, indent=2)
+                    
+                    return success
+                else:
+                    logger.warning("Cannot check for updates: marketplace unavailable")
+                    return False
+            
+            latest_version = marketplace_info.get('version', '0.0.0')
+            
+            # Simple version comparison
+            def parse_version(v):
+                return tuple(int(x) for x in v.split('.')[:3] if x.isdigit())
+            
+            if parse_version(latest_version) <= parse_version(current_version):
+                logger.info(f"Plugin {plugin_id} is already up to date (v{current_version})")
+                return True
+            
+            logger.info(f"Updating {plugin_id} from v{current_version} to v{latest_version}")
+            
+            # Backup current configuration
+            config_backup = None
+            plugin_path = self.plugins_dir / plugin_id
+            config_path = plugin_path / "config.json"
+            if config_path.exists():
+                with open(config_path) as f:
+                    config_backup = json.load(f)
+            
+            # Install new version
+            download_url = marketplace_info.get('download_url')
+            if not download_url:
+                logger.error("No download URL for update")
+                return False
+            
+            success = await self._install_from_url(download_url)
+            
+            # Restore configuration
+            if success and config_backup:
+                with open(config_path, 'w') as f:
+                    json.dump(config_backup, f, indent=2)
+                logger.info("Plugin configuration preserved")
+            
+            return success
+            
+        except Exception as e:
+            logger.error(f"Failed to update plugin {plugin_id}: {e}")
+            return False
     
     async def load_enabled_plugins(self) -> None:
         """Load all enabled plugins from registry"""

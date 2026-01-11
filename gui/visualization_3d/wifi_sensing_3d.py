@@ -493,14 +493,14 @@ class WifiSensing3D(Visualization3DEngine):
         if entity.object_3d:
             try:
                 self.scene.remove_object(entity.object_3d)
-            except:
+            except Exception:
                 pass
         
         # Remove track object if exists
         if hasattr(entity, 'track_object') and entity.track_object:
             try:
                 self.scene.remove_object(entity.track_object)
-            except:
+            except Exception:
                 pass
         
         # Remove from entities dict
@@ -1697,7 +1697,7 @@ class WifiSensing3D(Visualization3DEngine):
         for obj in self._signal_ray_objects:
             try:
                 self.scene.remove_object(obj)
-            except:
+            except Exception:
                 pass
         self._signal_ray_objects.clear()
         
@@ -1904,7 +1904,7 @@ class WifiSensing3D(Visualization3DEngine):
         for obj in self._obstacle_objects:
             try:
                 self.scene.remove_object(obj)
-            except:
+            except Exception:
                 pass
         self._obstacle_objects.clear()
         
@@ -2224,7 +2224,7 @@ class WifiSensing3D(Visualization3DEngine):
                 # Remove after animation completes
                 try:
                     self.scene.remove_object(obj)
-                except:
+                except Exception:
                     pass
                 return
             
@@ -2779,7 +2779,7 @@ class WifiSensing3D(Visualization3DEngine):
                 major_segments=24,
                 minor_segments=8
             )
-        except:
+        except Exception:
             # Fallback to circle
             mesh = Mesh3D.create_sphere(radius=0.6, segments=16)
         
