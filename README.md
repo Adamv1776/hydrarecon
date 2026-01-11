@@ -3,7 +3,7 @@
 ```
 ╔═══════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                   ║
-║   ⚡ HYDRARECON v1.0                                                              ║
+║   ⚡ HYDRARECON v2.0                                                              ║
 ║   Enterprise Security Assessment Suite                                            ║
 ║                                                                                   ║
 ║   ██╗  ██╗██╗   ██╗██████╗ ██████╗  █████╗ ██████╗ ███████╗ ██████╗ ██████╗ ███╗  ║
@@ -19,11 +19,12 @@
 ```
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-1.0.0-00ff88?style=for-the-badge&logo=security" alt="Version">
+  <img src="https://img.shields.io/badge/Version-2.0.0-00ff88?style=for-the-badge&logo=security" alt="Version">
   <img src="https://img.shields.io/badge/Python-3.10+-0088ff?style=for-the-badge&logo=python" alt="Python">
   <img src="https://img.shields.io/badge/PyQt6-6.6+-a855f7?style=for-the-badge&logo=qt" alt="PyQt6">
   <img src="https://img.shields.io/badge/License-Commercial-ff8800?style=for-the-badge" alt="License">
   <img src="https://img.shields.io/badge/Lines-408K+-00d4ff?style=for-the-badge" alt="Lines of Code">
+  <img src="https://img.shields.io/badge/ESP32-Supported-green?style=for-the-badge&logo=espressif" alt="ESP32">
 </p>
 
 <p align="center">
@@ -51,7 +52,7 @@ See [LICENSE](LICENSE) and [DISCLAIMER.md](DISCLAIMER.md) for full terms.
 
 ### One-Line Install (Linux/Mac)
 ```bash
-git clone https://github.com/hydrarecon/hydrarecon.git && cd hydrarecon && ./install-quick.sh
+git clone https://github.com/Adamv1776/hydrarecon.git && cd hydrarecon && ./install-quick.sh
 ```
 
 ### Other Methods
@@ -134,6 +135,61 @@ git clone https://github.com/hydrarecon/hydrarecon.git && cd hydrarecon && ./ins
 | Blockchain Forensics | Cryptocurrency tracking |
 | Cloud Security | AWS/Azure/GCP assessment |
 | IoT/SCADA | Industrial security testing |
+| **🚁 Drone Detection** | **ESP32-based UAV detection radar** |
+
+---
+
+## 🚁 ESP32 Drone Detection (NEW!)
+
+HydraRecon now includes an advanced **ESP32-based drone detection system** with real-time radar visualization!
+
+### Features
+- **Real-time Radar Display** - Animated sweep with drone blip visualization
+- **Multi-Manufacturer Detection** - Identifies DJI, Parrot, Autel, Skydio, Holy Stone, Hubsan, Syma drones
+- **Signal Analysis** - RSSI-based distance estimation and signal strength monitoring
+- **Threat Assessment** - Automatic threat level classification (Critical/High/Medium/Low)
+- **WiFi Protocol Analysis** - Detects drone probe requests and beacon frames
+- **Channel Hopping** - Full 2.4GHz spectrum scanning across all 13 channels
+- **Export Results** - Save detections to JSON or CSV format
+- **Alert System** - Real-time notifications for new drone contacts
+
+### ESP32 Hardware Setup
+
+```
+Required Hardware:
+- ESP32 DevKit V1 or ESP32-WROOM-32
+- USB cable for programming and serial communication
+
+Wiring: None required - uses built-in WiFi
+```
+
+### Firmware Installation
+
+1. Install Arduino IDE with ESP32 board support
+2. Open `esp32_firmware/drone_detector.ino`
+3. Select board: "ESP32 Dev Module"
+4. Upload firmware to ESP32
+5. Note the COM port (e.g., /dev/ttyUSB0 or COM3)
+
+### Usage
+
+1. Navigate to **Drone Detection** page in HydraRecon
+2. Enter ESP32 serial port (e.g., `/dev/ttyUSB0`)
+3. Click **Start Scanning**
+4. View detected drones on the radar display
+5. Monitor threat levels and signal strength in real-time
+
+### Detection Capabilities
+
+| Manufacturer | OUI Prefixes | Detection Range |
+|--------------|--------------|-----------------|
+| DJI | 60:60:1F, 34:D2:62 | ~100-500m |
+| Parrot | 90:03:B7, A0:14:3D | ~50-200m |
+| Autel | B8:9A:2A | ~50-300m |
+| Skydio | 6C:DF:FB | ~50-200m |
+| Holy Stone | 28:BD:89 | ~30-150m |
+| Hubsan | 74:5A:AA | ~30-150m |
+| Syma | 1C:B7:2C | ~20-100m |
 
 ---
 
