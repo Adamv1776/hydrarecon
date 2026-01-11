@@ -110,24 +110,66 @@ echo -e "${GREEN}✓ Python dependencies installed${NC}"
 
 # Create desktop entry (Linux)
 echo -e "\n${BLUE}[5/5]${NC} Creating shortcuts..."
+INSTALL_DIR="$(pwd)"
+
 if [[ "$OS" == "linux" ]]; then
+    # Create applications menu entry
     DESKTOP_DIR="${HOME}/.local/share/applications"
     mkdir -p "$DESKTOP_DIR"
     
     cat > "$DESKTOP_DIR/hydrarecon.desktop" << EOF
 [Desktop Entry]
-Version=1.0
+Version=2.0
 Type=Application
 Name=HydraRecon
 Comment=Enterprise Security Assessment Suite
-Exec=$(pwd)/start.sh
-Icon=$(pwd)/data/icons/hydrarecon.png
+Exec=${INSTALL_DIR}/start.sh
+Icon=${INSTALL_DIR}/gui/icons/hydrarecon.png
 Terminal=false
 Categories=Security;Network;System;
-Keywords=security;pentest;hacking;scanner;
+Keywords=security;pentest;hacking;scanner;drone;esp32;
+StartupWMClass=HydraRecon
 EOF
     chmod +x "$DESKTOP_DIR/hydrarecon.desktop"
-    echo -e "${GREEN}✓ Desktop shortcut created${NC}"
+    echo -e "${GREEN}✓ Applications menu entry created${NC}"
+    
+    # Create Desktop shortcut
+    if [[ -d "${HOME}/Desktop" ]]; then
+        DESKTOP_SHORTCUT="${HOME}/Desktop/HydraRecon.desktop"
+        cat > "$DESKTOP_SHORTCUT" << EOF
+[Desktop Entry]
+Version=2.0
+Type=Application
+Name=HydraRecon
+Comment=Enterprise Security Assessment Suite - Click to Launch!
+Exec=${INSTALL_DIR}/start.sh
+Icon=${INSTALL_DIR}/gui/icons/hydrarecon.png
+Terminal=false
+Categories=Security;Network;System;
+Keywords=security;pentest;hacking;scanner;drone;esp32;
+StartupWMClass=HydraRecon
+EOF
+        chmod +x "$DESKTOP_SHORTCUT"
+        # Mark as trusted on GNOME/Ubuntu
+        gio set "$DESKTOP_SHORTCUT" metadata::trusted true 2>/dev/null || true
+        echo -e "${GREEN}✓ Desktop shortcut created on Desktop!${NC}"
+    fi
+    
+    # Update desktop database
+    update-desktop-database "${DESKTOP_DIR}" 2>/dev/null || true
+    
+elif [[ "$OS" == "macos" ]]; then
+    # Create macOS Application alias on Desktop
+    if [[ -d "${HOME}/Desktop" ]]; then
+        cat > "${HOME}/Desktop/HydraRecon.command" << EOF
+#!/bin/bash
+cd "${INSTALL_DIR}"
+source venv/bin/activate 2>/dev/null || true
+python3 launcher.py
+EOF
+        chmod +x "${HOME}/Desktop/HydraRecon.command"
+        echo -e "${GREEN}✓ Desktop shortcut created (HydraRecon.command)${NC}"
+    fi
 fi
 
 # Make scripts executable
