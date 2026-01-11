@@ -33,6 +33,14 @@ try:
     )
 except ImportError:
     AdvancedWebSpider = None
+    Endpoint = None
+    Parameter = None
+    Form = None
+    CrawlResult = None
+    AuthType = None
+    RequestMethod = None
+    ContentType = None
+    ParameterLocation = None
 
 try:
     from core.spider_ai_engine import (
