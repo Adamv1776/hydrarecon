@@ -131,3 +131,4 @@ config.json
 *.tmp
 *.temp
 *.bak
+hydrarecon/
