@@ -1,52 +1,47 @@
-# 🚀 HydraRecon - Quick Start Guide
+# 🚀 HydraRecon - Installation Guide
+
+## ⬇️ Quick Download
+
+**GitHub Repository**: https://github.com/Adamv1776/hydrarecon
+
+---
 
 ## One-Line Installation
 
-### Linux / macOS
+### 🐧 Linux / 🍎 macOS
 ```bash
-curl -sSL https://hydrarecon.io/install.sh | bash
+git clone https://github.com/Adamv1776/hydrarecon.git && cd hydrarecon && chmod +x install-quick.sh && ./install-quick.sh
 ```
 
-Or manually:
-```bash
-git clone https://github.com/hydrarecon/hydrarecon.git
-cd hydrarecon
-./install-quick.sh
-```
-
-### Windows
-1. Download the [Windows Installer](https://hydrarecon.io/download/hydrarecon-windows.zip)
-2. Extract the ZIP file
+### 🪟 Windows
+1. **[Download ZIP](https://github.com/Adamv1776/hydrarecon/archive/refs/heads/main.zip)**
+2. Extract to a folder (e.g., `C:\HydraRecon`)
 3. Double-click `install-windows.bat`
-4. Run `start.bat`
+4. A desktop shortcut will be created automatically!
 
 ---
 
 ## Installation Methods
 
-### Method 1: Quick Install (Recommended)
+### Method 1: Quick Install (Recommended) ⭐
 ```bash
 # Clone repository
-git clone https://github.com/hydrarecon/hydrarecon.git
+git clone https://github.com/Adamv1776/hydrarecon.git
 cd hydrarecon
 
-# Run installer
+# Make installer executable and run
+chmod +x install-quick.sh
 ./install-quick.sh
 
-# Start
+# A desktop shortcut is created automatically!
+# Or start manually:
 ./start.sh
 ```
 
-### Method 2: pip Install
-```bash
-pip install hydrarecon
-hydrarecon-gui
-```
-
-### Method 3: Manual Install
+### Method 2: Manual Install
 ```bash
 # Clone
-git clone https://github.com/hydrarecon/hydrarecon.git
+git clone https://github.com/Adamv1776/hydrarecon.git
 cd hydrarecon
 
 # Create virtual environment
@@ -55,25 +50,32 @@ source venv/bin/activate  # Linux/Mac
 # or: venv\Scripts\activate  # Windows
 
 # Install dependencies
-pip install -r requirements-core.txt
+pip install PyQt6 pyserial requests dnspython aiohttp numpy
 
 # Run
 python3 launcher.py
 ```
 
-### Method 4: Docker
+### Method 3: Docker
 ```bash
-docker pull hydrarecon/hydrarecon:latest
-docker run -it --net=host -e DISPLAY=$DISPLAY hydrarecon/hydrarecon
+git clone https://github.com/Adamv1776/hydrarecon.git
+cd hydrarecon
+docker-compose up -d
 ```
 
-### Method 5: Make
-```bash
-git clone https://github.com/hydrarecon/hydrarecon.git
-cd hydrarecon
-make install
-make run
-```
+---
+
+## ▶️ Running HydraRecon
+
+After installation:
+
+**Linux/macOS:**
+- Double-click the **HydraRecon** icon on your Desktop
+- Or run: `cd hydrarecon && source venv/bin/activate && python launcher.py`
+
+**Windows:**
+- Double-click the **HydraRecon** shortcut on your Desktop
+- Or run: `start.bat`
 
 ---
 
@@ -89,13 +91,13 @@ make run
 
 ### Required Software
 - **Python 3.10+** - [Download](https://python.org)
-- **Nmap** - Network scanner (included in Kali)
-- **Qt6** - GUI framework (installed automatically)
+- **Git** - [Download](https://git-scm.com)
 
-### Optional Software
+### Optional Software (for full functionality)
+- **Nmap** - Network scanner (`apt install nmap`)
+- **Hydra** - Password cracker (`apt install hydra`)
 - **Shodan API key** - Enhanced OSINT
-- **Censys API key** - Certificate search
-- **VirusTotal API** - Malware analysis
+- **ESP32** - For drone detection feature
 
 ---
 

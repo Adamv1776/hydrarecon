@@ -48,20 +48,36 @@ See [LICENSE](LICENSE) and [DISCLAIMER.md](DISCLAIMER.md) for full terms.
 
 ---
 
-## ⬇️ Quick Download
+## ⬇️ Quick Download & Install
 
-### One-Line Install (Linux/Mac)
+### 🐧 Linux / 🍎 macOS (One Command!)
 ```bash
-git clone https://github.com/Adamv1776/hydrarecon.git && cd hydrarecon && ./install-quick.sh
+git clone https://github.com/Adamv1776/hydrarecon.git && cd hydrarecon && chmod +x install-quick.sh && ./install-quick.sh
 ```
+**After install, double-click the HydraRecon icon on your Desktop!**
 
-### Other Methods
-| Method | Command |
-|--------|---------|
-| **pip** | `pip install hydrarecon && hydrarecon-gui` |
-| **Manual** | `./install-quick.sh` |
-| **Docker** | `docker pull hydrarecon/hydrarecon` |
-| **Windows** | Download ZIP → Run `install-windows.bat` |
+### 🪟 Windows
+1. **[Download ZIP](https://github.com/Adamv1776/hydrarecon/archive/refs/heads/main.zip)**
+2. Extract the ZIP file
+3. Double-click `install-windows.bat`
+4. Double-click the **HydraRecon** shortcut on your Desktop!
+
+### 📦 Alternative Methods
+| Method | Instructions |
+|--------|--------------|
+| **Git Clone** | `git clone https://github.com/Adamv1776/hydrarecon.git` |
+| **Download ZIP** | [Click here to download](https://github.com/Adamv1776/hydrarecon/archive/refs/heads/main.zip) |
+| **Docker** | `docker-compose up -d` (after cloning) |
+
+### ▶️ Running HydraRecon
+After installation, you can launch HydraRecon:
+```bash
+# Linux/Mac - Use the desktop shortcut OR:
+cd hydrarecon && source venv/bin/activate && python launcher.py
+
+# Windows - Use the desktop shortcut OR:
+start.bat
+```
 
 📖 **Full installation guide**: [INSTALL.md](INSTALL.md)
 
