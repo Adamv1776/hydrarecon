@@ -163,6 +163,27 @@ try:
 except ImportError:
     SecurityChaosPage = None
 
+# Next-Generation Security Modules (v4.0)
+try:
+    from .deception_network_page import DeceptionNetworkPage
+except ImportError:
+    DeceptionNetworkPage = None
+
+try:
+    from .autonomous_redteam_page import AutonomousRedTeamPage
+except ImportError:
+    AutonomousRedTeamPage = None
+
+try:
+    from .adversarial_simulator_page import AdversarialSimulatorPage
+except ImportError:
+    AdversarialSimulatorPage = None
+
+try:
+    from .threat_intel_fusion_page import ThreatIntelFusionPage
+except ImportError:
+    ThreatIntelFusionPage = None
+
 __all__ = [
     'DashboardPage',
     'NmapPage',
@@ -207,4 +228,9 @@ __all__ = [
     'SupplyChainGraphPage',
     'ZeroTrustValidatorPage',
     'SecurityChaosPage',
+    # Next-Generation Security Modules (v4.0)
+    'DeceptionNetworkPage',
+    'AutonomousRedTeamPage',
+    'AdversarialSimulatorPage',
+    'ThreatIntelFusionPage',
 ]

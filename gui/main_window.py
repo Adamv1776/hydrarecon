@@ -581,6 +581,34 @@ try:
 except ImportError:
     SecurityChaosPage = None
 
+# ============================================================================
+# 🚀 NEXT-GENERATION SECURITY MODULES (v4.0) - AI-POWERED OFFENSIVE SECURITY
+# ============================================================================
+
+# 🕸️ Deception Network Fabric - AI-POWERED HONEYPOT ORCHESTRATION
+try:
+    from .pages.deception_network_page import DeceptionNetworkPage
+except ImportError:
+    DeceptionNetworkPage = None
+
+# 🤖 Autonomous Red Team Orchestrator - MITRE ATT&CK AUTOMATED OPERATIONS
+try:
+    from .pages.autonomous_redteam_page import AutonomousRedTeamPage
+except ImportError:
+    AutonomousRedTeamPage = None
+
+# 🧬 Adversarial Attack Simulator - GAN-INSPIRED ATTACK GENERATION
+try:
+    from .pages.adversarial_simulator_page import AdversarialSimulatorPage
+except ImportError:
+    AdversarialSimulatorPage = None
+
+# 🔍 Threat Intelligence Fusion Center - MULTI-SOURCE INTEL AGGREGATION
+try:
+    from .pages.threat_intel_fusion_page import ThreatIntelFusionPage
+except ImportError:
+    ThreatIntelFusionPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -862,6 +890,12 @@ class HydraReconMainWindow(QMainWindow):
                 ("supply_chain_graph", "Supply Chain Graph", "🔗"),
                 ("zero_trust_validator", "Zero Trust Validator", "🛡️"),
                 ("security_chaos", "Security Chaos", "🔥"),
+            ],
+            "⚔️ Next-Gen Offensive": [
+                ("deception_network", "Deception Network", "🕸️"),
+                ("autonomous_redteam", "Autonomous Red Team", "🤖"),
+                ("adversarial_simulator", "Adversarial Simulator", "🧬"),
+                ("threat_intel_fusion", "Threat Intel Fusion", "🔍"),
             ],
         }
         
@@ -1210,6 +1244,26 @@ class HydraReconMainWindow(QMainWindow):
         # 🔥 Security Chaos Engineering
         if SecurityChaosPage:
             self.pages["security_chaos"] = SecurityChaosPage(self)
+        
+        # ============================================================================
+        # 🚀 NEXT-GENERATION SECURITY MODULES (v4.0)
+        # ============================================================================
+        
+        # 🕸️ Deception Network Fabric
+        if DeceptionNetworkPage:
+            self.pages["deception_network"] = DeceptionNetworkPage(self)
+        
+        # 🤖 Autonomous Red Team Orchestrator
+        if AutonomousRedTeamPage:
+            self.pages["autonomous_redteam"] = AutonomousRedTeamPage(self)
+        
+        # 🧬 Adversarial Attack Simulator
+        if AdversarialSimulatorPage:
+            self.pages["adversarial_simulator"] = AdversarialSimulatorPage(self)
+        
+        # 🔍 Threat Intelligence Fusion Center
+        if ThreatIntelFusionPage:
+            self.pages["threat_intel_fusion"] = ThreatIntelFusionPage(self)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)
