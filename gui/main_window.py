@@ -493,6 +493,12 @@ try:
 except ImportError:
     AttackOrchestratorPage = None
 
+# 🌐 Live Threat Intelligence Feed - REAL-TIME THREAT MONITORING
+try:
+    from .pages.live_threat_feed_page import LiveThreatFeedPage
+except ImportError:
+    LiveThreatFeedPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -633,6 +639,9 @@ class HydraReconMainWindow(QMainWindow):
             ],
             "🎯 AI Attack Orchestrator": [
                 ("attack_orchestrator", "🔥 Attack Orchestrator", "🎯"),
+            ],
+            "🌐 Live Threat Intel": [
+                ("live_threat_feed", "📡 Live Threat Feed", "🌐"),
             ],
             "🔍 Reconnaissance": [
                 ("nmap", "Nmap Scanner", "🔍"),
@@ -1044,6 +1053,10 @@ class HydraReconMainWindow(QMainWindow):
         # 🎯 AI Attack Orchestrator - THE UNIQUE FEATURE
         if AttackOrchestratorPage:
             self.pages["attack_orchestrator"] = AttackOrchestratorPage(self.config, self.db)
+        
+        # 🌐 Live Threat Intelligence Feed
+        if LiveThreatFeedPage:
+            self.pages["live_threat_feed"] = LiveThreatFeedPage(self.config, self.db)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)
