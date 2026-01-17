@@ -499,6 +499,12 @@ try:
 except ImportError:
     LiveThreatFeedPage = None
 
+# 🔥 Vulnerability Intelligence - CVE TRACKING AND PRIORITIZATION
+try:
+    from .pages.vuln_intel_page import VulnIntelPage
+except ImportError:
+    VulnIntelPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -642,6 +648,7 @@ class HydraReconMainWindow(QMainWindow):
             ],
             "🌐 Live Threat Intel": [
                 ("live_threat_feed", "📡 Live Threat Feed", "🌐"),
+                ("vuln_intel", "🔥 Vulnerability Intel", "🔥"),
             ],
             "🔍 Reconnaissance": [
                 ("nmap", "Nmap Scanner", "🔍"),
@@ -1057,6 +1064,10 @@ class HydraReconMainWindow(QMainWindow):
         # 🌐 Live Threat Intelligence Feed
         if LiveThreatFeedPage:
             self.pages["live_threat_feed"] = LiveThreatFeedPage(self.config, self.db)
+        
+        # 🔥 Vulnerability Intelligence
+        if VulnIntelPage:
+            self.pages["vuln_intel"] = VulnIntelPage(self.config, self.db)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)
