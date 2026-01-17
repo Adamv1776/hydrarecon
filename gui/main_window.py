@@ -511,6 +511,12 @@ try:
 except ImportError:
     AutonomousAgentPage = None
 
+# 🗺️ Network Topology Mapper - VISUAL NETWORK DISCOVERY
+try:
+    from .pages.topology_mapper_page import TopologyMapperPage
+except ImportError:
+    TopologyMapperPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -652,6 +658,7 @@ class HydraReconMainWindow(QMainWindow):
             "🎯 AI Attack Orchestrator": [
                 ("attack_orchestrator", "🔥 Attack Orchestrator", "🎯"),
                 ("autonomous_agent", "🤖 Autonomous Agent", "🤖"),
+                ("topology_mapper", "🗺️ Network Topology", "🗺️"),
             ],
             "🌐 Live Threat Intel": [
                 ("live_threat_feed", "📡 Live Threat Feed", "🌐"),
@@ -1079,6 +1086,10 @@ class HydraReconMainWindow(QMainWindow):
         # 🤖 Autonomous Red Team Agent
         if AutonomousAgentPage:
             self.pages["autonomous_agent"] = AutonomousAgentPage(self)
+        
+        # 🗺️ Network Topology Mapper
+        if TopologyMapperPage:
+            self.pages["topology_mapper"] = TopologyMapperPage(self)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)
