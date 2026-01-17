@@ -487,6 +487,12 @@ try:
 except ImportError:
     WordScrubberPage = None
 
+# 🎯 AI Attack Orchestrator - THE UNIQUE FEATURE
+try:
+    from .pages.attack_orchestrator_page import AttackOrchestratorPage
+except ImportError:
+    AttackOrchestratorPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -624,6 +630,9 @@ class HydraReconMainWindow(QMainWindow):
         menu_groups = {
             "🏠 Dashboard": [
                 ("dashboard", "Dashboard", "🏠"),
+            ],
+            "🎯 AI Attack Orchestrator": [
+                ("attack_orchestrator", "🔥 Attack Orchestrator", "🎯"),
             ],
             "🔍 Reconnaissance": [
                 ("nmap", "Nmap Scanner", "🔍"),
@@ -1031,6 +1040,10 @@ class HydraReconMainWindow(QMainWindow):
             self.pages["email_security"] = EmailSecurityPage(self)
         if WordScrubberPage:
             self.pages["word_scrubber"] = WordScrubberPage(self)
+        
+        # 🎯 AI Attack Orchestrator - THE UNIQUE FEATURE
+        if AttackOrchestratorPage:
+            self.pages["attack_orchestrator"] = AttackOrchestratorPage(self.config, self.db)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)
