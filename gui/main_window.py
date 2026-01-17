@@ -535,6 +535,12 @@ try:
 except ImportError:
     ExecutiveDashboardPage = None
 
+# 🛤️ Attack Path Analyzer - ATTACK PATH VISUALIZATION
+try:
+    from .pages.attack_path_page import AttackPathAnalyzerPage
+except ImportError:
+    AttackPathAnalyzerPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -678,6 +684,7 @@ class HydraReconMainWindow(QMainWindow):
                 ("autonomous_agent", "🤖 Autonomous Agent", "🤖"),
                 ("topology_mapper", "🗺️ Network Topology", "🗺️"),
                 ("breach_simulation", "💥 Breach Simulation", "💥"),
+                ("attack_path", "🛤️ Attack Path Analyzer", "🛤️"),
             ],
             "🌐 Live Threat Intel": [
                 ("live_threat_feed", "📡 Live Threat Feed", "🌐"),
@@ -1123,6 +1130,10 @@ class HydraReconMainWindow(QMainWindow):
         # 📊 Executive Security Dashboard
         if ExecutiveDashboardPage:
             self.pages["executive_dashboard"] = ExecutiveDashboardPage(self)
+        
+        # 🛤️ Attack Path Analyzer
+        if AttackPathAnalyzerPage:
+            self.pages["attack_path"] = AttackPathAnalyzerPage(self)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)
