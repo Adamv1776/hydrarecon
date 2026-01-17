@@ -517,6 +517,12 @@ try:
 except ImportError:
     TopologyMapperPage = None
 
+# 📋 Security Compliance Analyzer - MULTI-FRAMEWORK COMPLIANCE ASSESSMENT
+try:
+    from .pages.compliance_analyzer_page import ComplianceAnalyzerPage
+except ImportError:
+    ComplianceAnalyzerPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -731,6 +737,7 @@ class HydraReconMainWindow(QMainWindow):
                 ("mobile_sec", "Mobile Security", "📱"),
             ],
             "📋 Compliance & GRC": [
+                ("compliance_analyzer", "📋 Compliance Analyzer", "📋"),
                 ("compliance", "Compliance Audit", "📋"),
                 ("risk_scoring", "Risk Scoring", "📊"),
                 ("vuln_mgmt", "Vuln Management", "📊"),
@@ -1090,6 +1097,10 @@ class HydraReconMainWindow(QMainWindow):
         # 🗺️ Network Topology Mapper
         if TopologyMapperPage:
             self.pages["topology_mapper"] = TopologyMapperPage(self)
+        
+        # 📋 Security Compliance Analyzer
+        if ComplianceAnalyzerPage:
+            self.pages["compliance_analyzer"] = ComplianceAnalyzerPage(self)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)
