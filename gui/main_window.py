@@ -529,6 +529,12 @@ try:
 except ImportError:
     BreachSimulationPage = None
 
+# 📊 Executive Security Dashboard - C-SUITE SECURITY METRICS
+try:
+    from .pages.executive_dashboard_page import ExecutiveDashboardPage
+except ImportError:
+    ExecutiveDashboardPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -762,6 +768,7 @@ class HydraReconMainWindow(QMainWindow):
                 ("backup_assessment", "Backup Assessment", "💾"),
             ],
             "📊 Dashboards & Reports": [
+                ("executive_dashboard", "📊 Executive Dashboard", "📊"),
                 ("sec_dashboard", "Security Dashboard", "📈"),
                 ("security_metrics", "Security Metrics", "📊"),
                 ("audit_log", "Audit Logs", "📜"),
@@ -1112,6 +1119,10 @@ class HydraReconMainWindow(QMainWindow):
         # 💥 Breach Simulation Engine
         if BreachSimulationPage:
             self.pages["breach_simulation"] = BreachSimulationPage(self)
+        
+        # 📊 Executive Security Dashboard
+        if ExecutiveDashboardPage:
+            self.pages["executive_dashboard"] = ExecutiveDashboardPage(self)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)
