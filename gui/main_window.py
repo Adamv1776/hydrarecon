@@ -523,6 +523,12 @@ try:
 except ImportError:
     ComplianceAnalyzerPage = None
 
+# 💥 Breach Simulation Engine - REALISTIC ATTACK SCENARIO SIMULATION
+try:
+    from .pages.breach_simulation_page import BreachSimulationPage
+except ImportError:
+    BreachSimulationPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -665,6 +671,7 @@ class HydraReconMainWindow(QMainWindow):
                 ("attack_orchestrator", "🔥 Attack Orchestrator", "🎯"),
                 ("autonomous_agent", "🤖 Autonomous Agent", "🤖"),
                 ("topology_mapper", "🗺️ Network Topology", "🗺️"),
+                ("breach_simulation", "💥 Breach Simulation", "💥"),
             ],
             "🌐 Live Threat Intel": [
                 ("live_threat_feed", "📡 Live Threat Feed", "🌐"),
@@ -1101,6 +1108,10 @@ class HydraReconMainWindow(QMainWindow):
         # 📋 Security Compliance Analyzer
         if ComplianceAnalyzerPage:
             self.pages["compliance_analyzer"] = ComplianceAnalyzerPage(self)
+        
+        # 💥 Breach Simulation Engine
+        if BreachSimulationPage:
+            self.pages["breach_simulation"] = BreachSimulationPage(self)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)
