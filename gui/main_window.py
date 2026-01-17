@@ -505,6 +505,12 @@ try:
 except ImportError:
     VulnIntelPage = None
 
+# 🤖 Autonomous Red Team Agent - AI-DRIVEN AUTONOMOUS PENTESTING
+try:
+    from .pages.autonomous_agent_page import AutonomousAgentPage
+except ImportError:
+    AutonomousAgentPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -645,6 +651,7 @@ class HydraReconMainWindow(QMainWindow):
             ],
             "🎯 AI Attack Orchestrator": [
                 ("attack_orchestrator", "🔥 Attack Orchestrator", "🎯"),
+                ("autonomous_agent", "🤖 Autonomous Agent", "🤖"),
             ],
             "🌐 Live Threat Intel": [
                 ("live_threat_feed", "📡 Live Threat Feed", "🌐"),
@@ -1068,6 +1075,10 @@ class HydraReconMainWindow(QMainWindow):
         # 🔥 Vulnerability Intelligence
         if VulnIntelPage:
             self.pages["vuln_intel"] = VulnIntelPage(self.config, self.db)
+        
+        # 🤖 Autonomous Red Team Agent
+        if AutonomousAgentPage:
+            self.pages["autonomous_agent"] = AutonomousAgentPage(self)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)
