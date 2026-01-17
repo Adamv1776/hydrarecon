@@ -541,6 +541,46 @@ try:
 except ImportError:
     AttackPathAnalyzerPage = None
 
+# ============================================================================
+# 🚀 REVOLUTIONARY SECURITY MODULES (v3.0) - NEXT-GEN SECURITY AUTOMATION
+# ============================================================================
+
+# 🔮 Predictive Threat Intelligence - AI-POWERED ATTACK PREDICTION
+try:
+    from .pages.predictive_threat_intel_page import PredictiveThreatIntelPage
+except ImportError:
+    PredictiveThreatIntelPage = None
+
+# 🔄 Security Digital Twin - VIRTUAL NETWORK SIMULATION
+try:
+    from .pages.security_digital_twin_page import SecurityDigitalTwinPage
+except ImportError:
+    SecurityDigitalTwinPage = None
+
+# 🔧 Autonomous Healing - SELF-HEALING SECURITY
+try:
+    from .pages.autonomous_healing_page import AutonomousHealingPage
+except ImportError:
+    AutonomousHealingPage = None
+
+# 🔗 Supply Chain Graph - SOFTWARE SUPPLY CHAIN SECURITY
+try:
+    from .pages.supply_chain_graph_page import SupplyChainGraphPage
+except ImportError:
+    SupplyChainGraphPage = None
+
+# 🛡️ Zero Trust Validator - NIST SP 800-207 VALIDATION
+try:
+    from .pages.zero_trust_validator_page import ZeroTrustValidatorPage
+except ImportError:
+    ZeroTrustValidatorPage = None
+
+# 🔥 Security Chaos Engineering - NETFLIX-STYLE CHAOS TESTING
+try:
+    from .pages.security_chaos_page import SecurityChaosPage
+except ImportError:
+    SecurityChaosPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -814,6 +854,14 @@ class HydraReconMainWindow(QMainWindow):
                 ("access_control", "Access Control", "🔐"),
                 ("automation", "Automation", "⚡"),
                 ("plugins", "Plugins", "🧩"),
+            ],
+            "🚀 Revolutionary": [
+                ("predictive_threat_intel", "Predictive Threat Intel", "🔮"),
+                ("security_digital_twin", "Security Digital Twin", "🔄"),
+                ("autonomous_healing", "Autonomous Healing", "🔧"),
+                ("supply_chain_graph", "Supply Chain Graph", "🔗"),
+                ("zero_trust_validator", "Zero Trust Validator", "🛡️"),
+                ("security_chaos", "Security Chaos", "🔥"),
             ],
         }
         
@@ -1134,6 +1182,34 @@ class HydraReconMainWindow(QMainWindow):
         # 🛤️ Attack Path Analyzer
         if AttackPathAnalyzerPage:
             self.pages["attack_path"] = AttackPathAnalyzerPage(self)
+        
+        # ============================================================================
+        # 🚀 REVOLUTIONARY SECURITY MODULES (v3.0)
+        # ============================================================================
+        
+        # 🔮 Predictive Threat Intelligence
+        if PredictiveThreatIntelPage:
+            self.pages["predictive_threat_intel"] = PredictiveThreatIntelPage(self)
+        
+        # 🔄 Security Digital Twin
+        if SecurityDigitalTwinPage:
+            self.pages["security_digital_twin"] = SecurityDigitalTwinPage(self)
+        
+        # 🔧 Autonomous Healing
+        if AutonomousHealingPage:
+            self.pages["autonomous_healing"] = AutonomousHealingPage(self)
+        
+        # 🔗 Supply Chain Graph
+        if SupplyChainGraphPage:
+            self.pages["supply_chain_graph"] = SupplyChainGraphPage(self)
+        
+        # 🛡️ Zero Trust Validator
+        if ZeroTrustValidatorPage:
+            self.pages["zero_trust_validator"] = ZeroTrustValidatorPage(self)
+        
+        # 🔥 Security Chaos Engineering
+        if SecurityChaosPage:
+            self.pages["security_chaos"] = SecurityChaosPage(self)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)

@@ -132,6 +132,37 @@ try:
 except ImportError:
     CollaborationHubPage = None
 
+# Revolutionary Security Modules (v3.0)
+try:
+    from .predictive_threat_intel_page import PredictiveThreatIntelPage
+except ImportError:
+    PredictiveThreatIntelPage = None
+
+try:
+    from .security_digital_twin_page import SecurityDigitalTwinPage
+except ImportError:
+    SecurityDigitalTwinPage = None
+
+try:
+    from .autonomous_healing_page import AutonomousHealingPage
+except ImportError:
+    AutonomousHealingPage = None
+
+try:
+    from .supply_chain_graph_page import SupplyChainGraphPage
+except ImportError:
+    SupplyChainGraphPage = None
+
+try:
+    from .zero_trust_validator_page import ZeroTrustValidatorPage
+except ImportError:
+    ZeroTrustValidatorPage = None
+
+try:
+    from .security_chaos_page import SecurityChaosPage
+except ImportError:
+    SecurityChaosPage = None
+
 __all__ = [
     'DashboardPage',
     'NmapPage',
@@ -169,4 +200,11 @@ __all__ = [
     'GamificationPage',
     'AttackReplayPage',
     'CollaborationHubPage',
+    # Revolutionary Security Modules (v3.0)
+    'PredictiveThreatIntelPage',
+    'SecurityDigitalTwinPage',
+    'AutonomousHealingPage',
+    'SupplyChainGraphPage',
+    'ZeroTrustValidatorPage',
+    'SecurityChaosPage',
 ]
