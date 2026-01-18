@@ -609,6 +609,12 @@ try:
 except ImportError:
     ThreatIntelFusionPage = None
 
+# 🧬 Hyperdimensional Security Computing - BRAIN-INSPIRED 10,000D VECTORS
+try:
+    from .pages.hyperdimensional_security_page import HyperdimensionalSecurityPage
+except ImportError:
+    HyperdimensionalSecurityPage = None
+
 
 class HydraReconMainWindow(QMainWindow):
     """Main application window"""
@@ -896,6 +902,9 @@ class HydraReconMainWindow(QMainWindow):
                 ("autonomous_redteam", "Autonomous Red Team", "🤖"),
                 ("adversarial_simulator", "Adversarial Simulator", "🧬"),
                 ("threat_intel_fusion", "Threat Intel Fusion", "🔍"),
+            ],
+            "🧠 Cognitive Computing": [
+                ("hyperdimensional_security", "Hyperdimensional Security", "🧬"),
             ],
         }
         
@@ -1264,6 +1273,10 @@ class HydraReconMainWindow(QMainWindow):
         # 🔍 Threat Intelligence Fusion Center
         if ThreatIntelFusionPage:
             self.pages["threat_intel_fusion"] = ThreatIntelFusionPage(self)
+        
+        # 🧬 Hyperdimensional Security Computing
+        if HyperdimensionalSecurityPage:
+            self.pages["hyperdimensional_security"] = HyperdimensionalSecurityPage(self)
         
         for page in self.pages.values():
             self.content_stack.addWidget(page)

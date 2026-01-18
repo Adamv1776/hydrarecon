@@ -184,6 +184,12 @@ try:
 except ImportError:
     ThreatIntelFusionPage = None
 
+# Hyperdimensional Computing Module (v5.0)
+try:
+    from .hyperdimensional_security_page import HyperdimensionalSecurityPage
+except ImportError:
+    HyperdimensionalSecurityPage = None
+
 __all__ = [
     'DashboardPage',
     'NmapPage',
@@ -233,4 +239,6 @@ __all__ = [
     'AutonomousRedTeamPage',
     'AdversarialSimulatorPage',
     'ThreatIntelFusionPage',
+    # Hyperdimensional Computing (v5.0)
+    'HyperdimensionalSecurityPage',
 ]
